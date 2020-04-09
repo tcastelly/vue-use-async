@@ -45,7 +45,7 @@ export default class Xhr<T: mixed> {
 
   port: number = 80;
 
-  responseType: 'arraybuffer' | 'blob' | 'json' | 'text' = 'json';
+  responseType: 'arraybuffer' | 'blob' | 'json' | 'text' = 'text';
 
   _eventsReady: boolean;
 
