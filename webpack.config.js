@@ -9,6 +9,7 @@ module.exports = {
   entry: ['./src/index.js'],
   output: {
     path: path.resolve(__dirname, 'dist'),
+    libraryTarget: 'umd',
     filename: 'index.js',
   },
   externals: isProd ? {
