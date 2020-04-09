@@ -32,7 +32,7 @@
   directly resolved.
   
 - useAsync, similar to `useXhr`. Can resolve a function when computed parameters changed.
-  if `condition` is used, the function will wait `true` before be resolved.
+  if `condition` is used, the function will wait `true` before be applied.
   ```javascript
   const func = () => Promise.resolve('ok');
   const { data } = useAsync(func, [params, condition]);
