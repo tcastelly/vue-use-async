@@ -56,4 +56,6 @@ declare export default class Xhr<T: mixed> {
   resolve(res: T): Promise<T>;
 
   reject(res: any): Promise<T>;
+
+  _oXHR: XMLHttpRequest;
 }
