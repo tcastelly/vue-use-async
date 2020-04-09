@@ -2,9 +2,8 @@
 
 import Vue from 'vue';
 import VueCompositionApi, { ref } from '@vue/composition-api';
-import useXhr from '../src/useXhr';
 import mockXhr from './mockXhr';
-import type Xhr from '../src/Xhr';
+import { useXhr, Xhr } from '../src';
 
 Vue.use(VueCompositionApi);
 

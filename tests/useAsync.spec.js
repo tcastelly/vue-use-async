@@ -2,7 +2,7 @@
 
 import Vue from 'vue';
 import VueCompositionApi, { computed } from '@vue/composition-api';
-import useAsync from '../src/useAsync';
+import { useAsync } from '../src';
 
 Vue.use(VueCompositionApi);
 
