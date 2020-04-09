@@ -2,6 +2,10 @@
   "name": "vue-use-async",
   "version": "0.0.1-beta.1",
   "description": "Xhr and async helpers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tcastelly/vue-use-async.git"
+  },
   "license": "MIT",
   "author": "Thomas CASTELLY",
   "main": "dist/index.js",
@@ -14,7 +18,7 @@
     "lint": "eslint src tests",
     "lint:fix": "eslint --fix src tests",
     "precommit": "lint-staged",
-    "prepublishOnly": "npm run lint && npm run build:webpack",
+    "prepublishOnly": "npm run lint && npm run test && npm run build",
     "test": "jest tests/** --no-cache"
   },
   "husky": {
