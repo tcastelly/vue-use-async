@@ -1,0 +1,22 @@
+// @flow
+
+import type Vue from 'vue';
+import type { Ref, Computed } from '@vue/composition-api';
+import type Xhr, { XhrConfig } from './Xhr';
+import type { UseAsyncReturn } from './useAsync';
+
+export type GetConfig = string | XhrConfig & $Shape<{| cacheDuration: 'max' | number |}>;
+
+declare export default function
+  useXhr <U: mixed>(?{|
+  onError?: (Error) => any,
+  context?: Vue,
+  legacy?: boolean, // can be used for VueJS 2.x without composition-api
+  token?: Ref<?string> | Computed<?string> | ?string,
+|}): {
+  get: <T>(parametersObj: GetConfig, params?: Object | Ref<Object>) => UseAsyncReturn<T>,
+  post: <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => UseAsyncReturn<T>,
+  put: <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => UseAsyncReturn<T>,
+  delete: <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => UseAsyncReturn<T>,
+  xhr: Xhr<U>,
+};

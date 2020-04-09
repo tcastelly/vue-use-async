@@ -1,0 +1,5 @@
+# ignore all except dist flow-typed
+*
+!/flow-typed/vue-composition-api.js
+!/README.md
+!/dist/**

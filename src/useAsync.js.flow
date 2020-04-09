@@ -1,0 +1,24 @@
+// @flow
+
+import { type Ref } from '@vue/composition-api';
+
+export type UseAsyncReturn<T> = {|
+  isPending: Ref<boolean>,
+  error: Ref<?Error>,
+  data: Ref<T>,
+  reload: (any) => void,
+  onError: ((Error) => void) => void,
+  promise: Promise<T>,
+|}
+
+declare export default function useAsync<T> (
+  func: (...any) => Promise<T>,
+  params?: Ref<any> | any,
+  condition?: (Ref<any> | any) => boolean,
+): UseAsyncReturn<T>;
+
+// $FlowFixMe - static object in function, when Main.js will be migrated to composition API, will be replaced by inject
+useAsync.config = {
+  onError(Error) { // eslint-disable-line no-unused-vars
+  },
+};

@@ -1,0 +1,67 @@
+{
+  "name": "vue-use-async",
+  "version": "0.0.1-beta.1",
+  "description": "Xhr and async helpers",
+  "license": "MIT",
+  "author": "Thomas CASTELLY",
+  "main": "dist/index.js",
+  "scripts": {
+    "afterbuild": "node ./scripts/afterbuild.js",
+    "build": "npm run build:webpack && npm run afterbuild",
+    "build:webpack": "webpack --mode=production",
+    "flow": "flow",
+    "flow:deps": "flow-typed install jest@22.x",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint --fix src tests",
+    "precommit": "lint-staged",
+    "prepublishOnly": "npm run lint && npm run build:webpack",
+    "test": "jest tests/** --no-cache"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "@vue/composition-api": "^0.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-flow": "^7.9.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^25.3.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-flowtype": "^4.7.0",
+    "eslint-plugin-flowtype-errors": "^4.2.0",
+    "eslint-plugin-import": "^2.20.2",
+    "flow-bin": "^0.122.0",
+    "flow-typed": "^3.1.0",
+    "husky": "^4.2.3",
+    "jest": "^25.3.0",
+    "lint-staged": "^10.1.2",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "vue": "^2.6.11"
+  },
+  "engines": {
+    "node": ">=10"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ]
+}
