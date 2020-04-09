@@ -5,10 +5,18 @@ import type { Ref, Computed } from '@vue/composition-api';
 import type Xhr, { XhrConfig } from './Xhr';
 import type { UseAsyncReturn } from './useAsync';
 
-export type GetConfig = string | XhrConfig & $Shape<{| cacheDuration: 'max' | number |}>;
+export type GetConfig = string | (XhrConfig & $Shape<{|
+  url?: string;
+
+  params?: Object;
+
+  port?: ?number;
+
+  cacheDuration?: 'max' | number;
+|}>);
 
 declare export default function
-  useXhr <U: mixed>(?{|
+  useXhr<U: mixed>(?{|
   onError?: (Error) => any,
   context?: Vue,
   legacy?: boolean, // can be used for VueJS 2.x without composition-api

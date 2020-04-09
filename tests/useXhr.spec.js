@@ -27,7 +27,7 @@ describe('GIVEN `useAsync`', () => {
         mocked = mockXhr.get({ url: '/fake/get' });
         mocked.resolve('get-ok');
 
-        const { data: _data, promise } = get('/fake/get');
+        const { data: _data, promise } = get({ url: '/fake/get', params: {} });
         data = _data;
 
         await promise;
