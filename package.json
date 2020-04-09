@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",
@@ -58,11 +58,11 @@
     "jest": "^25.3.0",
     "lint-staged": "^10.1.2",
     "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "vue": "^2.6.11"
+    "webpack-cli": "^3.3.11"
   },
   "peerDependencies": {
-    "@vue/composition-api": "^0.5.0"
+    "@vue/composition-api": "^0.5.0",
+    "vue": "^2.6.11"
   },
   "engines": {
     "node": ">=10"
