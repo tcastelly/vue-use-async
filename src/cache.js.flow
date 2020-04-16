@@ -2,7 +2,7 @@
 
 import type { XhrGet } from './Xhr';
 
-declare export default function cache<T> (params: {
+declare export default function cache<T>(params: {
   id: string,
   xhr: () => XhrGet<T>,
   duration: ?number | 'max',

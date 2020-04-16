@@ -5,28 +5,18 @@ import {
   ref,
   onBeforeUnmount,
   watch,
+  computed,
   type Computed,
   type Ref,
 } from '@vue/composition-api';
-import Xhr, { type XhrConfig } from './Xhr';
-import cache from './cache';
+import Xhr, { type XhrConfig, type XhrGet } from './Xhr';
+import cache, { clearCache } from './cache';
 import useAsync from './useAsync';
-import type { GetConfig } from './useXhr.js.flow';
+import type { GetConfig, GetReturn } from './useXhr.js.flow';
 
 // used as default `onError`
 function _blank(e: Error) { // eslint-disable-line no-unused-vars
 }
-
-type GetReturn<T> = {|
-  isPending: Computed<boolean>,
-  data: Ref<T>,
-  error: Ref<?Error>,
-  abort: Function,
-  promise: Promise<T>,
-  onError: ((Error) => void) => void,
-|}
-
-export type GetXhr<T> = (GetConfig) => GetReturn<T>;
 
 type UseXhr = {|
   onError?: (Error) => any,
@@ -120,33 +110,44 @@ export default function (args?: UseXhr) {
       };
     }
 
-    // Preserve function extended in promise (abort)
-    const xhrPromise = cache<T>({
-      id: decodeURIComponent(Xhr.stringifyUrl(url, typeof getParams === 'object' ? getParams.params : {})),
-      xhr: xhr.get.bind(xhr, getParams),
-      duration,
-    });
+    const cacheId = decodeURIComponent(Xhr.stringifyUrl(url, typeof getParams === 'object' ? getParams.params : {}));
 
-    // don t need to abort later, remove the xhr from the list
-    const removeHttpXhrList = () => {
-      const httpXhrIndex = xhrList.value.indexOf(xhr);
-      if (httpXhrIndex > -1) {
-        xhrList.value.splice(httpXhrIndex, 1);
-      }
+    const xhrPromise = ref<XhrGet<T>>();
+
+    const reload = () => {
+      isPending.value = true;
+      clearCache(cacheId);
+
+      // Preserve function extended in promise (abort)
+      xhrPromise.value = cache<T>({
+        id: cacheId,
+        xhr: xhr.get.bind(xhr, getParams),
+        duration,
+      });
+
+      // don t need to abort later, remove the xhr from the list
+      const removeHttpXhrList = () => {
+        const httpXhrIndex = xhrList.value.indexOf(xhr);
+        if (httpXhrIndex > -1) {
+          xhrList.value.splice(httpXhrIndex, 1);
+        }
+      };
+
+      xhrPromise.value.then((_data) => {
+        removeHttpXhrList();
+        data.value = _data;
+      }, (err) => {
+        removeHttpXhrList();
+        error.value = err;
+        errorList.forEach((cb) => cb(error.value));
+        _onError(err);
+      });
+      xhrPromise.value.finally(() => {
+        isPending.value = false;
+      });
     };
 
-    xhrPromise.then((_data) => {
-      removeHttpXhrList();
-      data.value = _data;
-    }, (err) => {
-      removeHttpXhrList();
-      error.value = err;
-      errorList.forEach((cb) => cb(error.value));
-      _onError(err);
-    });
-    xhrPromise.finally(() => {
-      isPending.value = false;
-    });
+    reload();
 
     if (!legacy) {
       onBeforeUnmount(() => {
@@ -161,8 +162,11 @@ export default function (args?: UseXhr) {
         errorList.push(cb);
       },
       error,
-      abort: xhrPromise.abortXhr,
-      promise: xhrPromise,
+      abort() {
+        return xhrPromise.value.abortXhr();
+      },
+      promise: computed(() => xhrPromise.value),
+      reload,
     };
   }
 

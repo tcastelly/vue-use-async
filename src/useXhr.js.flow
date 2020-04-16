@@ -15,6 +15,16 @@ export type GetConfig = string | (XhrConfig & $Shape<{|
   cacheDuration?: 'max' | number;
 |}>);
 
+export type GetReturn<T> = {|
+  isPending: Computed<boolean>,
+  data: Ref<T>,
+  error: Ref<?Error>,
+  abort: Function,
+  promise: Computed<Promise<T>>,
+  reload: Function,
+  onError: ((Error) => void) => void,
+|}
+
 declare export default function
   useXhr<U: mixed>(?{|
   onError?: (Error) => any,

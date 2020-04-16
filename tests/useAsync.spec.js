@@ -17,7 +17,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async (done) => {
       ({ data, promise } = useAsync(func));
-      await promise;
+      await promise.value;
       done();
     });
 
@@ -36,7 +36,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async (done) => {
       ({ data, promise } = useAsync(func, computed(() => 'msg')));
-      await promise;
+      await promise.value;
       done();
     });
 
@@ -59,7 +59,7 @@ describe('GIVEN, `useAsync', () => {
         computed(() => 'msg'),
         () => true,
       ));
-      await promise;
+      await promise.value;
       done();
     });
 
@@ -78,7 +78,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async (done) => {
       ({ data, promise } = useAsync(func, computed(() => ['msg', 'msg2'])));
-      await promise;
+      await promise.value;
       done();
     });
 

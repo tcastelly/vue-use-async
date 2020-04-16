@@ -1,6 +1,6 @@
 // @flow
 
-import { type Ref } from '@vue/composition-api';
+import { type Ref, type Computed } from '@vue/composition-api';
 
 export type UseAsyncReturn<T> = {|
   isPending: Ref<boolean>,
@@ -8,10 +8,10 @@ export type UseAsyncReturn<T> = {|
   data: Ref<T>,
   reload: (any) => void,
   onError: ((Error) => void) => void,
-  promise: Promise<T>,
+  promise: Computed<Promise<T>>,
 |}
 
-declare export default function useAsync<T> (
+declare export default function useAsync<T>(
   func: (...any) => Promise<T>,
   params?: Ref<any> | any,
   condition?: (Ref<any> | any) => boolean,
