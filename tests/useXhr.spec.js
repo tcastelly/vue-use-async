@@ -34,7 +34,7 @@ describe('GIVEN `useAsync`', () => {
           reload: _reload,
           isPending: _isPending,
           promise,
-        } = get({ url: '/fake/get', params: {} });
+        } = get('/fake/get', {});
 
         data = _data;
         reload = _reload;

@@ -82,45 +82,61 @@ export default function (args?: UseXhr) {
     let url = '';
     let duration = 0;
     let _onError = (onError || _blank).bind(context);
-    let getParams: GetConfig = {};
 
-    if (typeof parametersObj === 'string' /*:: && typeof getParams === 'object' */) {
-      url = parametersObj;
-      getParams.url = url;
-    } else if (parametersObj && typeof parametersObj === 'object') {
-      ({ url, params } = parametersObj);
-      duration = parametersObj.cacheDuration;
-      _onError = (parametersObj.onError || _onError).bind(context);
+    const retrieveGetParams = () => {
+      let getParams: GetConfig = {};
 
-      getParams = {
-        ...getParams,
-        ...parametersObj,
-      };
-    }
+      if (typeof parametersObj === 'string' /*:: && typeof getParams === 'object' */) {
+        url = parametersObj;
+        getParams.url = url;
+      } else if (parametersObj && typeof parametersObj === 'object') {
+        ({ url } = parametersObj);
 
-    if (args && args.token /*:: && typeof getParams === 'object' */) {
-      getParams.token = getTokenValue(args.token);
-    }
+        // use params from second args of get function
+        if (!params) {
+          params = parametersObj.params || {};
+        }
 
-    // merge params
-    if (params && typeof getParams === 'object' && getParams.params) {
-      getParams.params = {
-        ...getParams.params,
-        ...(isRef(params) ? (params.value || {}) : params),
-      };
-    }
+        duration = parametersObj.cacheDuration;
+        _onError = (parametersObj.onError || _onError).bind(context);
 
-    const cacheId = decodeURIComponent(Xhr.stringifyUrl(url, typeof getParams === 'object' ? getParams.params : {}));
+        getParams = {
+          ...getParams,
+          ...parametersObj,
+        };
+      }
+
+      if (args && args.token /*:: && typeof getParams === 'object' */) {
+        getParams.token = getTokenValue(args.token);
+      }
+
+      // merge params
+      if (params && typeof getParams === 'object' && getParams.params) {
+        getParams.params = {
+          ...getParams.params,
+          ...(isRef(params) ? (params.value || {}) : params),
+        };
+      }
+
+      return getParams;
+    };
+
+    let lastCacheId;
 
     const xhrPromise = ref<XhrGet<T>>();
 
     const reload = () => {
       isPending.value = true;
-      clearCache(cacheId);
+
+      const getParams = retrieveGetParams();
+      if (lastCacheId) {
+        clearCache(lastCacheId);
+      }
+      lastCacheId = decodeURIComponent(Xhr.stringifyUrl(url, typeof getParams === 'object' ? getParams.params : {}));
 
       // Preserve function extended in promise (abort)
       xhrPromise.value = cache<T>({
-        id: cacheId,
+        id: lastCacheId,
         xhr: xhr.get.bind(xhr, getParams),
         duration,
       });
