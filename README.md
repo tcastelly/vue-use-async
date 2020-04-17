@@ -53,7 +53,7 @@
   }
   ```
   
-- useSpinner, useFull to bind the `isPending` to a spinner icon. A minimum duration
+- useSpinner, useful to bind the `isPending` to a spinner icon. A minimum duration
   ```javascript
   import { useAsync, useSpinner } from 'vue-use-async';
   
