@@ -126,6 +126,10 @@ export default function (args?: UseXhr) {
     const xhrPromise = ref<XhrGet<T>>();
 
     const reload = () => {
+      if (isPending.value) {
+        xhr.abort();
+      }
+
       isPending.value = true;
 
       const getParams = retrieveGetParams();

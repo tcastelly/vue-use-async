@@ -5,6 +5,7 @@ import Deferred from './Deferred';
 import useAsync from './useAsync';
 import useXhr from './useXhr';
 import Xhr from './Xhr';
+import spinner from './spinner';
 
 export {
   cache,
@@ -14,4 +15,5 @@ export {
   useAsync,
   useXhr,
   Xhr,
+  spinner,
 };

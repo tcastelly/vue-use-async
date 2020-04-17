@@ -25,8 +25,7 @@ export type GetReturn<T> = {|
   onError: ((Error) => void) => void,
 |}
 
-declare export default function
-  useXhr<U: mixed>(?{|
+declare export default function useXhr<U: mixed>(?{|
   onError?: (Error) => any,
   context?: Vue,
   legacy?: boolean, // can be used for VueJS 2.x without composition-api
