@@ -10,23 +10,30 @@
 `npm install vue-use-async`
 
 # Usage
-```javascript
-import { Xhr, useXhr, useAsync } from 'vue-use-async';
-```
 - Xhr Class
 
   ```javascript
+  import { Xhr } from 'vue-use-async';
+  
   new Xhr().get({ url: '/' });
   ```
 
 - useXhr, you must install `@vue/composition-api` via `Vue.use()` before using other APIs:
   ```javascript
-  const { get } = useXhr({ token });
-  const { 
-    data, 
-    isPending,
-    promise,
-  } = get({ url: '/', cacheDuration: 200 });
+  import { useXhr } from 'vue-use-async';
+  
+  export default function () {
+    const { get } = useXhr({ token });
+  
+    const { 
+      data, 
+      isPending,
+      promise,
+    } = get({ url: '/', cacheDuration: 200 });
+  
+    // ...
+  }
+  
   ```
   E.g; In `setup`, a computed bearer token can be used. Each query has data bind to be used
   directly in a template.
@@ -36,8 +43,29 @@ import { Xhr, useXhr, useAsync } from 'vue-use-async';
 - useAsync, similar to `useXhr` can resolve a function when computed parameters changed.
   if `condition` is used, the function will wait `true` before being applied.
   ```javascript
-  const func = () => Promise.resolve('ok');
-  const { data } = useAsync(func, [params, condition]);
+  import { useAsync } from 'vue-use-async';
+  
+  export default function () {
+    const func = () => Promise.resolve('ok');
+    const { data } = useAsync(func, [params, condition]);
+  
+    // ...
+  }
+  ```
+  
+- useSpinner, useFull to bind the `isPending` to a spinner icon. A minimum duration
+  ```javascript
+  import { useAsync, useSpinner } from 'vue-use-async';
+  
+  export default function () {
+
+    const func = () => Promise.resolve('ok');
+    const { data, isPending } = useAsync(func, [params, condition]);
+  
+    const isPendingSpinner = useSpinner(isPending);
+  
+    // ...
+  }
   ```
 
 # FlowJS
