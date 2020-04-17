@@ -58,7 +58,6 @@
   import { useAsync, useSpinner } from 'vue-use-async';
   
   export default function () {
-
     const func = () => Promise.resolve('ok');
     const { data, isPending } = useAsync(func, [params, condition]);
   
