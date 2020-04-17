@@ -71,7 +71,7 @@ export default function (args?: UseXhr) {
    * For GET it's possible to add cache
    */
   function get<T>(parametersObj: GetConfig, params?: Object | Ref<Object>): GetReturn<T> {
-    const isPending = ref<boolean>(true);
+    const isPending = ref<boolean>();
 
     const data = ref<T>();
 
