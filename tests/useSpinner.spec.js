@@ -2,14 +2,14 @@
 
 import Vue from 'vue';
 import VueCompositionApi, { ref } from '@vue/composition-api';
-import spinner from '../src/spinner';
+import userSpinner from '../src/useSpinner';
 
 Vue.use(VueCompositionApi);
 
 describe('GIVEN `isPendingSpinner`', () => {
   describe('WHEN resolve a pending right now', () => {
     const isPending = ref<boolean>(true);
-    const isPendingSpinner = spinner(isPending);
+    const isPendingSpinner = userSpinner(isPending);
 
     beforeAll((done) => {
       isPending.value = false;
@@ -25,7 +25,7 @@ describe('GIVEN `isPendingSpinner`', () => {
 
   describe('WHEN resolve a pending after the duration', () => {
     const isPending = ref<boolean>(true);
-    const isPendingSpinner = spinner(isPending, 50);
+    const isPendingSpinner = userSpinner(isPending, 50);
 
     beforeAll((done) => {
       isPending.value = false;
