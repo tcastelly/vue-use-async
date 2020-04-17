@@ -47,6 +47,7 @@
   
   export default function () {
     const func = () => Promise.resolve('ok');
+  
     const { data } = useAsync(func, [params, condition]);
   
     // ...
@@ -59,6 +60,7 @@
   
   export default function () {
     const func = () => Promise.resolve('ok');
+  
     const { data, isPending } = useAsync(func, [params, condition]);
   
     const isPendingSpinner = useSpinner(isPending);
