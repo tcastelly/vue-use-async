@@ -7,11 +7,11 @@ import { useAsync } from '../src';
 Vue.use(VueCompositionApi);
 
 describe('GIVEN, `useAsync', () => {
-  describe('WHEN `useAsync`', () => {
+  describe('WHEN resolve `useAsync`', () => {
     const func = () => new Promise((resolve) => {
       setTimeout(() => {
         resolve('ok');
-      }, 200);
+      });
     });
     let data;
     let promise;
@@ -23,6 +23,29 @@ describe('GIVEN, `useAsync', () => {
 
     it('THEN `data` should be resolved', () => {
       expect(data.value).toBe('ok');
+    });
+  });
+
+  describe('WHEN reject `useAsync`', () => {
+    const func = () => new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(Error('ko'));
+      });
+    });
+    let error;
+    let promise;
+    beforeAll(async (done) => {
+      ({ error, promise } = useAsync(func));
+      try {
+        await promise.value;
+      } catch (e) {
+        done();
+      }
+    });
+
+    it('THEN `data` should be resolved', () => {
+      // $FlowFixMe - there is an error
+      expect(error.value.message).toBe('ko');
     });
   });
 
