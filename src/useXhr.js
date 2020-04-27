@@ -81,7 +81,11 @@ export default function (args?: UseXhr) {
 
     let url = '';
     let duration = 0;
-    let _onError = (onError || _blank).bind(context);
+    let _onError = (e) => {
+      (onError || _blank).call(context, e);
+
+      throw e;
+    };
 
     const retrieveGetParams = () => {
       let getParams: GetConfig = {};

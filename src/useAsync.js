@@ -52,6 +52,8 @@ function useAsync<T>(
         errorList.forEach((cb) => cb(error.value));
         useAsync.config.onError(_error);
         d.value.reject(_error);
+
+        throw _error;
       });
 
       p.finally(() => {

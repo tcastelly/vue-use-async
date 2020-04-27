@@ -4,7 +4,7 @@ import { type Ref, type Computed } from '@vue/composition-api';
 
 export type UseAsyncReturn<T> = {|
   isPending: Ref<boolean>,
-  error: Ref<?Error>,
+  error: Ref<?Error | Object>,
   data: Ref<T>,
   reload: (any) => void,
   onError: ((Error) => void) => void,
