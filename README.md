@@ -54,6 +54,8 @@
   }
   ```
   
+- error handler, it's possible to capture rejected promise with [errorCaptured](https://vuejs.org/v2/api/#errorCaptured)
+  
 - useSpinner, useful to bind the `isPending` to a spinner icon. A minimum duration
   ```javascript
   import { useAsync, useSpinner } from 'vue-use-async';
