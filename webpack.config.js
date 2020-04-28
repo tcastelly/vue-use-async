@@ -2,9 +2,10 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-  target: 'node',
+  target: 'web',
   context: __dirname,
   entry: ['./src/index.js'],
+  // devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
