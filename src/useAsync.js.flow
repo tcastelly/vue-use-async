@@ -7,7 +7,7 @@ export type UseAsyncReturn<T> = {|
   error: Ref<?Error | Object>,
   data: Ref<T>,
   reload: (any) => void,
-  onError: ((Error) => void) => void,
+  onError: ((Error | Object) => void) => void,
   promise: Computed<Promise<T>>,
 |}
 
