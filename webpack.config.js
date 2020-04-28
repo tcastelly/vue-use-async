@@ -5,7 +5,8 @@ module.exports = {
   target: 'web',
   context: __dirname,
   entry: ['./src/index.js'],
-  // devtool: 'source-map',
+  // un-comment to generate source-map in the build
+  // devtool: 'eval-source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
