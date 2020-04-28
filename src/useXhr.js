@@ -47,7 +47,20 @@ export default function (args?: UseXhr) {
     token: null,
   });
 
+  const error = ref<?Error | Object>();
+
   let xhr: Xhr<mixed> = new Xhr<mixed>();
+
+  if (!legacy) {
+    watch(
+      () => error.value,
+      () => {
+        if (error.value) {
+          throw error.value;
+        }
+      },
+    );
+  }
 
   watch(
     () => {
@@ -74,8 +87,6 @@ export default function (args?: UseXhr) {
     const isPending = ref<boolean>();
 
     const data = ref<T>();
-
-    const error = ref<?Error>();
 
     const errorList = [];
 
@@ -156,6 +167,7 @@ export default function (args?: UseXhr) {
       xhrPromise.value.then((_data) => {
         removeHttpXhrList();
         data.value = _data;
+        error.value = null;
       }, (err) => {
         removeHttpXhrList();
         error.value = err;
