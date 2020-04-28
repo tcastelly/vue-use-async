@@ -22,7 +22,7 @@ function useAsync<T>(
   onError: ((Error) => void) => void,
   promise: Computed<Promise<T>>,
 |} {
-  const isPending = ref(true);
+  const isPending = ref();
 
   const data = ref<T>();
 
@@ -52,6 +52,10 @@ function useAsync<T>(
     if (condition(_params)) {
       d.value = new Deferred();
 
+      isPending.value = true;
+      error.value = null;
+      isThrowDisabled = false;
+
       // it's possible to pass multiple args by using an array as params
       const p = Array.isArray(_params)
         ? func.call(null, ..._params)
@@ -60,8 +64,6 @@ function useAsync<T>(
       p.then((res) => {
         data.value = res;
         d.value.resolve(res);
-        isThrowDisabled = false;
-        error.value = null;
       }, (_error) => {
         error.value = _error || null;
         errorList.forEach((cb) => cb(error.value));

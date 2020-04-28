@@ -146,6 +146,8 @@ export default function (args?: UseXhr) {
       }
 
       isPending.value = true;
+      error.value = null;
+      isThrowDisabled = false;
 
       const getParams = retrieveGetParams();
       if (lastCacheId) {
@@ -171,8 +173,6 @@ export default function (args?: UseXhr) {
       xhrPromise.value.then((_data) => {
         removeHttpXhrList();
         data.value = _data;
-        isThrowDisabled = false;
-        error.value = null;
       }, (err) => {
         removeHttpXhrList();
         errorList.forEach((cb) => cb(error.value));
