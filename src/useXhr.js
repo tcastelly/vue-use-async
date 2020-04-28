@@ -51,12 +51,16 @@ export default function (args?: UseXhr) {
 
   let xhr: Xhr<mixed> = new Xhr<mixed>();
 
+  let isThrowDisabled = false;
   if (!legacy) {
     watch(
       () => error.value,
-      () => {
-        if (error.value) {
-          throw error.value;
+      (e) => {
+        if (e && !isThrowDisabled) {
+          // throw error break success of watch
+          // force to disable it, else infinite loop
+          isThrowDisabled = true;
+          throw e;
         }
       },
     );
@@ -167,12 +171,13 @@ export default function (args?: UseXhr) {
       xhrPromise.value.then((_data) => {
         removeHttpXhrList();
         data.value = _data;
+        isThrowDisabled = false;
         error.value = null;
       }, (err) => {
         removeHttpXhrList();
-        error.value = err;
         errorList.forEach((cb) => cb(error.value));
         _onError(err);
+        error.value = err;
       });
       xhrPromise.value.finally(() => {
         isPending.value = false;

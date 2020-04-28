@@ -28,6 +28,19 @@ function useAsync<T>(
 
   const error = ref<?Error>();
 
+  let isThrowDisabled = false;
+  watch(
+    () => error.value,
+    (e) => {
+      if (e && !isThrowDisabled) {
+        // throw error break success of watch
+        // force to disable it, else infinite loop
+        isThrowDisabled = true;
+        throw e;
+      }
+    },
+  );
+
   const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
 
   const errorList = [];
@@ -47,11 +60,14 @@ function useAsync<T>(
       p.then((res) => {
         data.value = res;
         d.value.resolve(res);
+        isThrowDisabled = false;
+        error.value = null;
       }, (_error) => {
         error.value = _error || null;
         errorList.forEach((cb) => cb(error.value));
         useAsync.config.onError(_error);
         d.value.reject(_error);
+        error.value = _error;
       });
 
       p.finally(() => {
