@@ -84,7 +84,9 @@ function useAsync<T>(
 
   watch(
     () => wrapParams.value,
-    _reload,
+    _reload, {
+      deep: true,
+    },
   );
 
   return {
