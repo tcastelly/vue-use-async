@@ -38,6 +38,8 @@ function useAsync<T>(
         isThrowDisabled = true;
         throw e;
       }
+    }, {
+      immediate: true,
     },
   );
 
@@ -85,6 +87,7 @@ function useAsync<T>(
   watch(
     () => wrapParams.value,
     _reload, {
+      immediate: true,
       deep: true,
     },
   );

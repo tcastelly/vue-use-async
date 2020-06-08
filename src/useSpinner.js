@@ -23,6 +23,8 @@ export default function (isPending: Ref<boolean>, duration?: number = 400) {
       } else {
         isPendingSpinner.value = isPending.value;
       }
+    }, {
+      immediate: true,
     },
   );
 

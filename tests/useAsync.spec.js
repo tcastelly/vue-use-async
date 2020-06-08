@@ -15,6 +15,7 @@ describe('GIVEN, `useAsync', () => {
     });
     let data;
     let promise;
+
     beforeAll(async (done) => {
       ({ data, promise } = useAsync(func));
       await promise.value;

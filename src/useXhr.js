@@ -62,6 +62,8 @@ export default function (args?: UseXhr) {
           isThrowDisabled = true;
           throw e;
         }
+      }, {
+        immediate: true,
       },
     );
   }
@@ -79,6 +81,8 @@ export default function (args?: UseXhr) {
       if (token) {
         xhr.token = token;
       }
+    }, {
+      immediate: true,
     },
   );
 
