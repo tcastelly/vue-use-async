@@ -52,39 +52,6 @@ export default function (args?: UseXhr) {
   let xhr: Xhr<mixed> = new Xhr<mixed>();
 
   let isThrowDisabled = false;
-  if (!legacy) {
-    watch(
-      () => error.value,
-      (e) => {
-        if (e && !isThrowDisabled) {
-          // throw error break success of watch
-          // force to disable it, else infinite loop
-          isThrowDisabled = true;
-          throw e;
-        }
-      }, {
-        immediate: true,
-      },
-    );
-  }
-
-  watch(
-    () => {
-      if (args) {
-        return getTokenValue(args.token);
-      }
-      return null;
-    },
-    () => {
-      xhr = new Xhr<mixed>();
-      const token = args ? getTokenValue(args.token) : null;
-      if (token) {
-        xhr.token = token;
-      }
-    }, {
-      immediate: true,
-    },
-  );
 
   const xhrList = ref<Array<Xhr<mixed>>>([]);
 
@@ -190,12 +157,6 @@ export default function (args?: UseXhr) {
 
     reload();
 
-    if (!legacy) {
-      onBeforeUnmount(() => {
-        xhrList.value.forEach((_xhr) => _xhr.abort());
-      });
-    }
-
     return {
       isPending,
       data,
@@ -216,6 +177,44 @@ export default function (args?: UseXhr) {
   const put = <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
 
   const _delete = <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
+
+  if (!legacy) {
+    onBeforeUnmount(() => {
+      xhrList.value.forEach((_xhr) => _xhr.abort());
+    });
+
+    watch(
+      () => error.value,
+      (e) => {
+        if (e && !isThrowDisabled) {
+          // throw error break success of watch
+          // force to disable it, else infinite loop
+          isThrowDisabled = true;
+          throw e;
+        }
+      }, {
+        immediate: true,
+      },
+    );
+  }
+
+  watch(
+    () => {
+      if (args) {
+        return getTokenValue(args.token);
+      }
+      return null;
+    },
+    () => {
+      xhr = new Xhr<mixed>();
+      const token = args ? getTokenValue(args.token) : null;
+      if (token) {
+        xhr.token = token;
+      }
+    }, {
+      immediate: true,
+    },
+  );
 
   return {
     get,
