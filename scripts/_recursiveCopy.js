@@ -27,7 +27,7 @@ module.exports = async function recursiveCopy(src, dest) {
     );
   }
 
-  if (src.search(/\.js\.flow$/) > -1) {
+  if (src.search(/\.js\.flow$/) > -1 || src.search(/\.d\.ts$/) > -1) {
     return copyFileAsync(src, dest);
   }
   return null;

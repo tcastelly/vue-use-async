@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "declaration": true,
+    "emitDeclarationOnly": true,
     "target": "es6",
     "module": "CommonJS",
     "baseUrl": ".",
@@ -10,5 +12,6 @@
       ]
     },
     "jsx": "preserve"
-  }
+  },
+  "exclude": ["node_modules"]
 }
