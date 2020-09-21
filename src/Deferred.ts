@@ -1,5 +1,3 @@
-// @flow
-
 export default class Deferred<T> {
   resolve: Function;
 

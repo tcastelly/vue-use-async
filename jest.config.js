@@ -1,7 +1,7 @@
 module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
-    'tsconfig.json',
+    '!tsconfig.json',
     '!**/coverage/**',
     '!**/dist/**',
     '!**/node_modules/**',

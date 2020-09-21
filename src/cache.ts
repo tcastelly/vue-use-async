@@ -1,4 +1,4 @@
-import { XhrGet } from '@/types';
+import { XhrGet } from './types';
 import Logger from './_base/Logger';
 
 const _cache: Map<string, XhrGet<any>> = new Map();
