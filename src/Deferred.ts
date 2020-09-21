@@ -1,6 +1,6 @@
 // @flow
 
-export default class Deferred<T: mixed> {
+export default class Deferred<T> {
   resolve: Function;
 
   reject: Function;

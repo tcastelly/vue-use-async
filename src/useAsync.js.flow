@@ -1,6 +1,6 @@
 // @flow
 
-import { type Ref, type Computed } from '@vue/composition-api';
+import { type Ref, type Computed } from 'vue';
 
 export type UseAsyncReturn<T> = {|
   isPending: Ref<boolean>,

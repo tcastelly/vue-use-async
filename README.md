@@ -18,7 +18,7 @@
   new Xhr().get({ url: '/' });
   ```
 
-- useXhr, you must install `@vue/composition-api` via `Vue.use()` before using other APIs:
+- useXhr:
   ```javascript
   import { useXhr } from 'vue-use-async';
   

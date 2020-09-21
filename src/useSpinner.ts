@@ -1,13 +1,16 @@
 // @flow
 
 import {
-  watch, computed, ref, type Ref,
-} from '@vue/composition-api';
+  watch,
+  computed,
+  ref,
+  Ref,
+} from 'vue';
 
-export default function (isPending: Ref<boolean>, duration?: number = 400) {
+export default function (isPending: Ref<boolean>, duration: number = 400) {
   const isPendingSpinner = ref<boolean>(false);
 
-  let timeoutId: TimeoutID;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   watch(
     () => isPending.value,

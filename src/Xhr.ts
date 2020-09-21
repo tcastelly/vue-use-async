@@ -1,10 +1,8 @@
-// @flow
-
-import type { XhrGet, XhrConfig } from './Xhr.js.flow';
+import { XhrGet, XhrParams } from '@/types';
 import Deferred from './Deferred';
 
-export default class Xhr<T: mixed> {
-  static parseResult(xhr: XMLHttpRequest) {
+export default class Xhr<T> {
+  static parseResult (xhr: XMLHttpRequest) {
     let result = xhr.response;
     try {
       const contentType = xhr.getResponseHeader('Content-Type');
@@ -17,23 +15,23 @@ export default class Xhr<T: mixed> {
     return result;
   }
 
-  onError: (e: ProgressEvent) => any = () => {
+  onError: (e: ProgressEvent) => void = () => {
   };
 
-  onStart: (e: ProgressEvent) => any = () => {
+  onStart: (e: ProgressEvent) => void = () => {
   };
 
-  onAbort: (e: ProgressEvent) => any = () => {
+  onAbort: (e: ProgressEvent) => void = () => {
   };
 
-  onProgress: (e: ProgressEvent) => any = () => {
-  }
-
-  onEnd: (result: ?any, e: ProgressEvent) => any = () => {
+  onProgress: (e: ProgressEvent) => void = () => {
   };
 
-  // Baerer token
-  token: ?string = null;
+  onEnd: (result: any | null, e: ProgressEvent) => void = () => {
+  };
+
+  // Bearer token
+  token: string | null = null;
 
   url: string = '';
 
@@ -51,12 +49,12 @@ export default class Xhr<T: mixed> {
 
   _oXHR: XMLHttpRequest;
 
-  _onEnd: Function;
+  _onEnd: (e: ProgressEvent) => void;
 
-  _onError(...args: any) {
-    this.onError(...args);
+  _onError (e: ProgressEvent) {
+    this.onError(e);
 
-    this._deferred.reject(...args);
+    this._deferred.reject(e);
   }
 
   _deferred: Deferred<T>;
@@ -67,19 +65,19 @@ export default class Xhr<T: mixed> {
 
   _eventReady: boolean;
 
-  constructor(paramsObj?: XhrConfig) {
+  constructor (xhrParams?: XhrParams, params?: Object) {
     // `new` or all public methods can initialize events
     // variable used to avoid multiple same listeners
     this._eventsReady = false;
 
-    this._constructor(paramsObj);
+    this._constructor(xhrParams, params);
   }
 
-  static new(paramsObj?: XhrConfig) {
-    return new Xhr<T>(paramsObj);
+  static new (paramsObj: XhrParams) {
+    return new Xhr(paramsObj);
   }
 
-  removeEvents() {
+  removeEvents () {
     const removeEvents = () => {
       this._oXHR.removeEventListener('load', this._onEnd, false);
       this._oXHR.removeEventListener('error', this.onError, false);
@@ -94,7 +92,7 @@ export default class Xhr<T: mixed> {
     this._deferred.promise.then(removeEvents, removeEvents);
   }
 
-  post(paramsObj: XhrConfig): Promise<any> {
+  post (paramsObj: XhrParams): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('POST', this.url, true);
     this._send();
@@ -102,7 +100,7 @@ export default class Xhr<T: mixed> {
     return this._deferred.promise;
   }
 
-  put(paramsObj: XhrConfig): Promise<any> {
+  put (paramsObj: XhrParams): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('PUT', this.url, true);
     this._send();
@@ -116,18 +114,17 @@ export default class Xhr<T: mixed> {
    *
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
-  get(paramsObj?: XhrConfig): XhrGet<T> {
+  get (paramsObj?: XhrParams): XhrGet<T> {
     this._constructor(paramsObj);
 
     this._oXHR.open('GET', Xhr.stringifyUrl(this.url, this.params), true);
     this._send();
 
     // add to the promise, way to cancel xhr query
-    // $FlowFixMe
-    const _d: XhrGet = this._deferred.promise;
+    const _d: Partial<XhrGet<T>> = this._deferred.promise;
     _d.abortXhr = this.abort.bind(this);
 
-    return _d;
+    return _d as XhrGet<T>;
   }
 
   /**
@@ -142,7 +139,7 @@ export default class Xhr<T: mixed> {
    *
    * @returns {Promise}
    */
-  delete(paramsObj: XhrConfig): Promise<any> {
+  delete (paramsObj: XhrParams): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('DELETE', Xhr.stringifyUrl(this.url, this.params), true);
     this._send();
@@ -153,11 +150,10 @@ export default class Xhr<T: mixed> {
   /**
    * Abort xhr query and reject promise
    */
-  abort() {
+  abort () {
     // don t abort twice
     if (!this._isXhrResolved || this._isXhrRejected) {
-      // preserve context for tests
-      // $FlowFixMe
+      // @ts-ignore - preserve context for tests
       this._oXHR.abort(null, this);
       this._isXhrRejected = true;
       this._deferred.reject({
@@ -169,7 +165,7 @@ export default class Xhr<T: mixed> {
     return this._deferred.promise;
   }
 
-  static stringifyUrl(url: string, params?: Object = {}) {
+  static stringifyUrl (url: string, params: Object = {}) {
     const paramsInjected = Xhr._injectParamsInUrl(url, params);
     ({
       url,
@@ -195,7 +191,7 @@ export default class Xhr<T: mixed> {
   /**
    * return FormData
    */
-  static getFormData(data: Object) {
+  static getFormData (data: Object) {
     const formData = new FormData();
 
     let value;
@@ -223,7 +219,7 @@ export default class Xhr<T: mixed> {
    * Force to resolve deferred
    * @param res
    */
-  resolve(res: any): Promise<any> {
+  resolve (res: any): Promise<any> {
     this._deferred.resolve(res);
 
     return this._deferred.promise;
@@ -233,7 +229,7 @@ export default class Xhr<T: mixed> {
    * Force to reject deferred
    * @param res
    */
-  reject(res: any): Promise<any> {
+  reject (res: any): Promise<any> {
     this._deferred.reject(res);
 
     return this._deferred.promise;
@@ -246,7 +242,7 @@ export default class Xhr<T: mixed> {
    * @return {{url: *, params}}
    * @private
    */
-  static _injectParamsInUrl(url: string, params?: Object) {
+  static _injectParamsInUrl (url: string, params?: Object) {
     // replace path params
     const unbindParams = { ...params };
 
@@ -278,7 +274,7 @@ export default class Xhr<T: mixed> {
    * @param {XMLHttpRequest} xhr
    * @private
    */
-  _setEvents(xhr: XMLHttpRequest) {
+  _setEvents (xhr: XMLHttpRequest) {
     // don t redefine events
     if (this._eventsReady) {
       return;
@@ -299,7 +295,7 @@ export default class Xhr<T: mixed> {
    * Send xhr
    * If params contain files, use multipart, else JSON
    */
-  _send() {
+  _send () {
     let params;
 
     if (this.sendAs === 'multipart') {
@@ -313,15 +309,14 @@ export default class Xhr<T: mixed> {
       this._oXHR.setRequestHeader('Authorization', `Bearer ${this.token}`);
     }
 
-    // preserve context for tests
-    // $FlowFixMe
+    // @ts-ignore - preserve context for tests
     this._oXHR.send(params, this);
   }
 
   /**
    * The constructor can be called by the `new` or by each public method
    */
-  _constructor(paramsObj?: XhrConfig, params: Object) {
+  _constructor (paramsObj: XhrParams, params?: Object) {
     if (paramsObj && typeof paramsObj === 'object') {
       this.sendAs = paramsObj.sendAs || this.sendAs;
       this.url = paramsObj.url || this.url;

@@ -1,32 +1,25 @@
-// @flow
-
 import {
-  ref,
-  computed,
-  isRef,
-  watch,
-  type Computed,
-  type Ref,
-} from '@vue/composition-api';
+  computed, ComputedRef, isRef, Ref, ref, watch,
+} from 'vue';
 import Deferred from './Deferred';
 
 function useAsync<T>(
   func: (...any) => Promise<T>,
   params: Ref<any> | any = {},
-  condition: (Ref<any> | any) => boolean = () => true,
-): {|
+  condition: (params: Ref<any> | any) => boolean = () => true,
+): {
   isPending: Ref<boolean>,
-  error: Ref<?Error>,
+  error: Ref<Error | null>,
   data: Ref<T>,
   reload: (any) => void,
-  onError: ((Error) => void) => void,
-  promise: Computed<Promise<T>>,
-|} {
+  onError: (cb: (Error) => void) => void,
+  promise: ComputedRef<Promise<T>>,
+} {
   const isPending = ref();
 
   const data = ref<T>();
 
-  const error = ref<?Error>();
+  const error = ref<Error | null>();
 
   let isThrowDisabled = false;
   watch(
@@ -50,7 +43,7 @@ function useAsync<T>(
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
 
-  const _reload = (_params: mixed) => {
+  const _reload = (_params: Object) => {
     if (condition(_params)) {
       d.value = new Deferred();
 
@@ -103,7 +96,7 @@ function useAsync<T>(
 }
 
 useAsync.config = {
-  onError(e: Error) { // eslint-disable-line no-unused-vars
+  onError(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-vars
   },
 };
 

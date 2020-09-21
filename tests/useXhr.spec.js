@@ -1,18 +1,13 @@
-// @flow
-
-import Vue from 'vue';
-import VueCompositionApi, { ref, watch } from '@vue/composition-api';
+import { ref, watch } from 'vue';
+import useXhr from '../src/useXhr';
 import mockXhr from './mockXhr';
-import { useXhr, Xhr } from '../src';
-
-Vue.use(VueCompositionApi);
 
 describe('GIVEN `useAsync`', () => {
   const token = ref('FAKE_TOKEN');
 
   describe('WHEN run the function to resolve', () => {
     let get;
-    let xhr: Xhr<any>;
+    let xhr;
     beforeAll(() => {
       ({ get, xhr } = useXhr({ legacy: true, token }));
     });

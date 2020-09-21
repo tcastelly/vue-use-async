@@ -1,5 +1,3 @@
-// @flow
-
 import cache, { clearCache, cacheSize } from './cache';
 import Deferred from './Deferred';
 import useAsync from './useAsync';

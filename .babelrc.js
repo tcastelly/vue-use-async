@@ -9,7 +9,7 @@ module.exports = {
       targets:
         isProduction ? 'last 2 versions' : { node: 'current' },
     }],
-    [require.resolve('@babel/preset-flow')],
+    [require.resolve('@babel/preset-typescript')],
   ],
   plugins: [
     [require.resolve('@babel/plugin-proposal-class-properties'), { loose: true, }],

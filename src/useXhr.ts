@@ -6,36 +6,42 @@ import {
   onBeforeUnmount,
   watch,
   computed,
-  type Computed,
-  type Ref,
-} from '@vue/composition-api';
-import Xhr, { type XhrConfig, type XhrGet } from './Xhr';
+  ComputedRef,
+  Ref,
+} from 'vue';
+import {
+  CacheDuration,
+  GetConfig,
+  GetReturn, XhrConfig, XhrGet,
+} from '@/types';
+import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
 import useAsync from './useAsync';
-import type { GetConfig, GetReturn } from './useXhr.js.flow';
 
 // used as default `onError`
-function _blank(e: Error) { // eslint-disable-line no-unused-vars
+function _blank(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-vars
 }
 
-type UseXhr = {|
+type Token = Ref<string | null> | ComputedRef<string | null> | string | null
+
+type UseXhr = {
   onError?: (Error) => any,
   context?: any,
   legacy?: boolean,
-  token?: Ref<?string> | Computed<?string> | ?string,
-|};
+  token?: Token,
+};
 
-const getTokenValue: ($ElementType<UseXhr, 'token'>) => ?string = (token) => {
-  if (isRef(token) /*:: && token && typeof token === 'object' */) {
+const getTokenValue: (token: Token) => string | null = (token) => {
+  if (isRef(token)) {
     return token.value;
   }
 
   const tokenStr: any = token;
 
-  return (tokenStr: string);
+  return tokenStr;
 };
 
-export default function (args?: UseXhr) {
+export default function <T = any> (args?: UseXhr) {
   const {
     onError,
     context,
@@ -47,18 +53,18 @@ export default function (args?: UseXhr) {
     token: null,
   });
 
-  const error = ref<?Error | Object>();
+  const error = ref<Error | Object | null>();
 
-  let xhr: Xhr<mixed> = new Xhr<mixed>();
+  let xhr: Xhr<T> = new Xhr<T>();
 
   let isThrowDisabled = false;
 
-  const xhrList = ref<Array<Xhr<mixed>>>([]);
+  const xhrList = ref<Array<Xhr<T>>>([]);
 
   /**
    * For GET it's possible to add cache
    */
-  function get<T>(parametersObj: GetConfig, params?: Object | Ref<Object>): GetReturn<T> {
+  function get(parametersObj: GetConfig, params?: Object | Ref<Object>): GetReturn<T> {
     const isPending = ref<boolean>();
 
     const data = ref<T>();
@@ -66,7 +72,7 @@ export default function (args?: UseXhr) {
     const errorList = [];
 
     let url = '';
-    let duration = 0;
+    let duration: CacheDuration = 0;
     let _onError = (e) => (onError || _blank).bind(context, e);
 
     const retrieveGetParams = () => {
@@ -158,7 +164,7 @@ export default function (args?: UseXhr) {
     reload();
 
     return {
-      isPending,
+      isPending: computed(() => isPending.value),
       data,
       onError(cb: Function) {
         errorList.push(cb);
@@ -172,11 +178,11 @@ export default function (args?: UseXhr) {
     };
   }
 
-  const post = <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
+  const post = (xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
 
-  const put = <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
+  const put = (xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
 
-  const _delete = <T>(xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
+  const _delete = (xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
 
   if (!legacy) {
     onBeforeUnmount(() => {
@@ -206,7 +212,7 @@ export default function (args?: UseXhr) {
       return null;
     },
     () => {
-      xhr = new Xhr<mixed>();
+      xhr = new Xhr<any>();
       const token = args ? getTokenValue(args.token) : null;
       if (token) {
         xhr.token = token;

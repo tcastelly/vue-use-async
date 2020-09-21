@@ -4,7 +4,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
   target: 'web',
   context: __dirname,
-  entry: ['./src/index.js'],
+  entry: ['./src/index.ts'],
   // un-comment to generate source-map in the build
   // devtool: 'eval-source-map',
   output: {
@@ -13,20 +13,16 @@ module.exports = {
     filename: 'index.js',
   },
   externals: {
-    '@vue/composition-api': '@vue/composition-api',
     Vue: 'vue',
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx'],
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/env'],
-          },
-        },
+        test: /\.(ts|js)x?$/,
+        loader: 'babel-loader',
       },
     ],
   },
