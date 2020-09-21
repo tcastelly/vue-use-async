@@ -1,9 +1,11 @@
 // @flow
 
-import type Vue from 'vue';
+import vue from 'vue';
 import type { Ref, Computed } from 'vue';
 import type Xhr, { XhrConfig } from './Xhr.js.flow';
 import type { UseAsyncReturn } from './useAsync.js.flow';
+
+type Vue = typeof vue;
 
 export type GetConfig = string | (XhrConfig & $Shape<{|
   url?: string;
