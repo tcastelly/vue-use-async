@@ -2,6 +2,8 @@ import type { ComputedRef, Ref } from 'vue';
 
 type Obj = { [id: string]: any};
 
+type Func = () => void;
+
 export type XhrConfig = Partial<{
   url?: string;
 
@@ -73,7 +75,7 @@ export type XhrParams = Partial<{
 
   onAbort?: (e: ProgressEvent) => void;
 
-  onError?: (e: ProgressEvent) => void;
+  onError?: (e: ErrorEvent) => void;
 
   sendAs?: 'multipart' | 'json';
 

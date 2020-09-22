@@ -1,7 +1,7 @@
 export default class Deferred<T> {
-  resolve: Function;
+  resolve: (res: T) => void;
 
-  reject: Function;
+  reject: (e: any) => void;
 
   promise: Promise<T>;
 

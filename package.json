@@ -11,13 +11,13 @@
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "check-types": "tsc --noemit",
     "afterbuild": "node ./scripts/afterbuild.js",
     "beforebuild": "node ./scripts/beforeBuild.js",
     "build": "npm run beforebuild && tsc && npm run build:webpack && npm run afterbuild",
     "build:webpack": "webpack --mode=production",
-    "check-types": "tsc --noemit",
-    "lint": "eslint --ext .js,.ts src tests",
-    "lint:fix": "eslint --fix --ext .js,.ts src tests",
+    "lint": "npm run check-types && eslint --ext .js,.ts src tests",
+    "lint:fix": "npm run check-types && eslint --fix --ext .js,.ts src tests",
     "precommit": "lint-staged",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "test": "jest tests/** --no-cache"

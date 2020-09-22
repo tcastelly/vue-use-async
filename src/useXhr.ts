@@ -10,7 +10,7 @@ import {
 import {
   CacheDuration,
   GetConfig,
-  GetReturn, XhrConfig, XhrGet,
+  GetReturn, Obj, XhrConfig, XhrGet,
 } from '@/types';
 import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
@@ -51,7 +51,7 @@ export default function <T = any> (args?: UseXhr) {
     token: null,
   });
 
-  const error = ref<Error | Object | null>();
+  const error = ref<Error | Obj | null>();
 
   let xhr: Xhr<T> = new Xhr<T>();
 
@@ -62,7 +62,7 @@ export default function <T = any> (args?: UseXhr) {
   /**
    * For GET it's possible to add cache
    */
-  function get(parametersObj: GetConfig, params?: Object | Ref<Object>): GetReturn<T> {
+  function get(parametersObj: GetConfig, params?: Obj | Ref<Obj>): GetReturn<T> {
     const isPending = ref<boolean>();
 
     const data = ref<T>();
@@ -164,7 +164,7 @@ export default function <T = any> (args?: UseXhr) {
     return {
       isPending: computed(() => isPending.value),
       data,
-      onError(cb: Function) {
+      onError(cb) {
         errorList.push(cb);
       },
       error,
@@ -176,11 +176,11 @@ export default function <T = any> (args?: UseXhr) {
     };
   }
 
-  const post = (xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
+  const post = (xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
 
-  const put = (xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
+  const put = (xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
 
-  const _delete = (xhrConfig?: XhrConfig, params?: Object | Ref<Object>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
+  const _delete = (xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
 
   if (!legacy) {
     onBeforeUnmount(() => {

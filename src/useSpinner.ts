@@ -7,7 +7,7 @@ import {
   Ref,
 } from '@vue/composition-api';
 
-export default function (isPending: Ref<boolean>, duration: number = 400) {
+export default function (isPending: Ref<boolean>, duration = 400) {
   const isPendingSpinner = ref<boolean>(false);
 
   let timeoutId: ReturnType<typeof setTimeout>;

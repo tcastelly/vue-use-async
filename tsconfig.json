@@ -3,7 +3,6 @@
     "skipLibCheck": true,
     "declaration": true,
     "outDir": "./dist",
-    "emitDeclarationOnly": true,
     "target": "es6",
     "module": "CommonJS",
     "baseUrl": ".",

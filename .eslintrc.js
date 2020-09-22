@@ -22,6 +22,10 @@ module.exports = {
     'max-classes-per-file': 0,
     'space-before-function-paren': 0,
 
+    '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/no-empty-function': 0,
+    '@typescript-eslint/ban-ts-comment': 0,
+
     // fix airbnb conflicts
     'import/extensions': 'off',
     'import/no-unresolved': 'off',

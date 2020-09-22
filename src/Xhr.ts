@@ -1,8 +1,8 @@
-import { XhrGet, XhrParams } from '@/types';
+import { Obj, XhrGet, XhrParams } from '@/types';
 import Deferred from './Deferred';
 
 export default class Xhr<T> {
-  static parseResult (xhr: XMLHttpRequest) {
+  static parseResult(xhr: XMLHttpRequest): Response {
     let result = xhr.response;
     try {
       const contentType = xhr.getResponseHeader('Content-Type');
@@ -15,7 +15,7 @@ export default class Xhr<T> {
     return result;
   }
 
-  onError: (e: ProgressEvent) => void = () => {
+  onError: (e: ErrorEvent) => void = () => {
   };
 
   onStart: (e: ProgressEvent) => void = () => {
@@ -33,15 +33,15 @@ export default class Xhr<T> {
   // Bearer token
   token: string | null = null;
 
-  url: string = '';
+  url = '';
 
-  params: Object = {};
+  params: Obj = {};
 
   sendAs: 'multipart' | 'json' = 'json';
 
-  timeout: number = 10000;
+  timeout = 10000;
 
-  port: number = 80;
+  port = 80;
 
   responseType: 'arraybuffer' | 'blob' | 'json' | 'text' = 'text';
 
@@ -51,10 +51,10 @@ export default class Xhr<T> {
 
   _onEnd: (e: ProgressEvent) => void;
 
-  _onError (e: ProgressEvent) {
+  _onError(e: ErrorEvent): void {
     this.onError(e);
 
-    this._deferred.reject(e);
+    this._deferred.reject(e.error);
   }
 
   _deferred: Deferred<T>;
@@ -65,7 +65,7 @@ export default class Xhr<T> {
 
   _eventReady: boolean;
 
-  constructor (xhrParams?: XhrParams, params?: Object) {
+  constructor(xhrParams?: XhrParams, params?: Obj) {
     // `new` or all public methods can initialize events
     // variable used to avoid multiple same listeners
     this._eventsReady = false;
@@ -73,11 +73,11 @@ export default class Xhr<T> {
     this._constructor(xhrParams, params);
   }
 
-  static new (paramsObj: XhrParams) {
+  static new<Z>(paramsObj: XhrParams): Xhr<Z> {
     return new Xhr(paramsObj);
   }
 
-  removeEvents () {
+  removeEvents() {
     const removeEvents = () => {
       this._oXHR.removeEventListener('load', this._onEnd, false);
       this._oXHR.removeEventListener('error', this.onError, false);
@@ -92,7 +92,7 @@ export default class Xhr<T> {
     this._deferred.promise.then(removeEvents, removeEvents);
   }
 
-  post (paramsObj: XhrParams): Promise<any> {
+  post(paramsObj: XhrParams): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('POST', this.url, true);
     this._send();
@@ -100,7 +100,7 @@ export default class Xhr<T> {
     return this._deferred.promise;
   }
 
-  put (paramsObj: XhrParams): Promise<any> {
+  put(paramsObj: XhrParams): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('PUT', this.url, true);
     this._send();
@@ -114,7 +114,7 @@ export default class Xhr<T> {
    *
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
-  get (paramsObj?: XhrParams): XhrGet<T> {
+  get(paramsObj?: XhrParams): XhrGet<T> {
     this._constructor(paramsObj);
 
     this._oXHR.open('GET', Xhr.stringifyUrl(this.url, this.params), true);
@@ -139,7 +139,7 @@ export default class Xhr<T> {
    *
    * @returns {Promise}
    */
-  delete (paramsObj: XhrParams): Promise<any> {
+  delete(paramsObj: XhrParams): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('DELETE', Xhr.stringifyUrl(this.url, this.params), true);
     this._send();
@@ -150,7 +150,7 @@ export default class Xhr<T> {
   /**
    * Abort xhr query and reject promise
    */
-  abort () {
+  abort(): Promise<T> {
     // don t abort twice
     if (!this._isXhrResolved || this._isXhrRejected) {
       // @ts-ignore - preserve context for tests
@@ -165,7 +165,7 @@ export default class Xhr<T> {
     return this._deferred.promise;
   }
 
-  static stringifyUrl (url: string, params: Object = {}) {
+  static stringifyUrl(url: string, params: Obj = {}): string {
     const paramsInjected = Xhr._injectParamsInUrl(url, params);
     ({
       url,
@@ -176,11 +176,10 @@ export default class Xhr<T> {
     let queryParams = '';
 
     // Stringify get parameters
-    Object.keys(params)
-      .forEach((paramKey) => {
-        queryParams += `${separator + paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
-        separator = '&';
-      });
+    Object.keys(params).forEach((paramKey) => {
+      queryParams += `${separator + paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
+      separator = '&';
+    });
 
     // remove unresolved query parameters (:value)
     url = url.replace(/\/:[^/]*/gi, '');
@@ -191,26 +190,25 @@ export default class Xhr<T> {
   /**
    * return FormData
    */
-  static getFormData (data: Object) {
+  static getFormData(data: Obj): FormData {
     const formData = new FormData();
 
     let value;
-    Object.keys(data)
-      .forEach((key) => {
-        if (data[key] instanceof FileList) {
-          for (let i = 0; i < data[key].length; i += 1) {
-            formData.append(key, data[key][i]);
-          }
-        } else if (data[key] instanceof File) {
-          formData.append(key, data[key]);
-        } else {
-          value = data[key];
-          if ((typeof value === 'object' || Array.isArray(value)) && value !== null) {
-            value = JSON.stringify(value);
-          }
-          formData.append(key, value);
+    Object.keys(data).forEach((key) => {
+      if (data[key] instanceof FileList) {
+        for (let i = 0; i < data[key].length; i += 1) {
+          formData.append(key, data[key][i]);
         }
-      });
+      } else if (data[key] instanceof File) {
+        formData.append(key, data[key]);
+      } else {
+        value = data[key];
+        if ((typeof value === 'object' || Array.isArray(value)) && value !== null) {
+          value = JSON.stringify(value);
+        }
+        formData.append(key, value);
+      }
+    });
 
     return formData;
   }
@@ -219,7 +217,7 @@ export default class Xhr<T> {
    * Force to resolve deferred
    * @param res
    */
-  resolve (res: any): Promise<any> {
+  resolve(res: T): Promise<T> {
     this._deferred.resolve(res);
 
     return this._deferred.promise;
@@ -229,7 +227,7 @@ export default class Xhr<T> {
    * Force to reject deferred
    * @param res
    */
-  reject (res: any): Promise<any> {
+  reject(res: Error): Promise<any> {
     this._deferred.reject(res);
 
     return this._deferred.promise;
@@ -242,7 +240,7 @@ export default class Xhr<T> {
    * @return {{url: *, params}}
    * @private
    */
-  static _injectParamsInUrl (url: string, params?: Object) {
+  static _injectParamsInUrl(url: string, params?: Obj): { url: string, params: Obj } {
     // replace path params
     const unbindParams = { ...params };
 
@@ -274,7 +272,7 @@ export default class Xhr<T> {
    * @param {XMLHttpRequest} xhr
    * @private
    */
-  _setEvents (xhr: XMLHttpRequest) {
+  _setEvents(xhr: XMLHttpRequest): void {
     // don t redefine events
     if (this._eventsReady) {
       return;
@@ -295,7 +293,7 @@ export default class Xhr<T> {
    * Send xhr
    * If params contain files, use multipart, else JSON
    */
-  _send () {
+  _send(): void {
     let params;
 
     if (this.sendAs === 'multipart') {
@@ -316,7 +314,7 @@ export default class Xhr<T> {
   /**
    * The constructor can be called by the `new` or by each public method
    */
-  _constructor (paramsObj: XhrParams, params?: Object) {
+  _constructor(paramsObj: XhrParams, params?: Obj): void {
     if (paramsObj && typeof paramsObj === 'object') {
       this.sendAs = paramsObj.sendAs || this.sendAs;
       this.url = paramsObj.url || this.url;

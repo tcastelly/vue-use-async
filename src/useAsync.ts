@@ -1,18 +1,24 @@
 import {
-  computed, ComputedRef, isRef, Ref, ref, watch,
+  computed,
+  ComputedRef,
+  isRef,
+  Ref,
+  ref,
+  watch,
 } from '@vue/composition-api';
+import { Obj } from '@/types';
 import Deferred from './Deferred';
 
 function useAsync<T>(
   func: (...any) => Promise<T>,
   params: Ref<any> | any = {},
-  condition: (params: Ref<any> | any) => boolean = () => true,
+  condition: (_params: Ref<any> | any) => boolean = () => true,
 ): {
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<T>,
   reload: (any) => void,
-  onError: (cb: (Error) => void) => void,
+  onError: (cb: (e: Error) => void) => void,
   promise: ComputedRef<Promise<T>>,
 } {
   const isPending = ref();
@@ -43,7 +49,7 @@ function useAsync<T>(
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
 
-  const _reload = (_params: Object) => {
+  const _reload = (_params: Obj) => {
     if (condition(_params)) {
       d.value = new Deferred();
 
@@ -73,7 +79,7 @@ function useAsync<T>(
     }
   };
 
-  const onError = (cb: Function) => {
+  const onError = (cb) => {
     errorList.push(cb);
   };
 
