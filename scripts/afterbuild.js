@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const recursiveCopy = require('./_recursiveCopy');
 
 //
@@ -5,6 +6,7 @@ const recursiveCopy = require('./_recursiveCopy');
 
 const main = async () => {
   await recursiveCopy('src', 'dist');
+  await recursiveCopy('types/src', 'dist');
   console.log('Copy done');
 };
 

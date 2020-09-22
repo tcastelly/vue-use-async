@@ -1,5 +1,5 @@
 import Logger from './_base/Logger';
-import { XhrGet } from './types';
+import { XhrGet } from './index';
 
 const _cache: Map<string, XhrGet<any>> = new Map();
 

@@ -1,17 +1,15 @@
 import {
-  isRef,
-  ref,
-  onBeforeUnmount,
-  watch,
   computed,
   ComputedRef,
+  isRef,
+  onBeforeUnmount,
+  ref,
   Ref,
+  watch,
 } from '@vue/composition-api';
 import {
-  CacheDuration,
-  GetConfig,
-  GetReturn, Obj, XhrConfig, XhrGet,
-} from '@/types';
+  CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
+} from './index';
 import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
 import useAsync from './useAsync';
@@ -39,7 +37,7 @@ const getTokenValue: (token: Token) => string | null = (token) => {
   return tokenStr;
 };
 
-export default function <T = any> (args?: UseXhr) {
+export default function (args?: UseXhr) {
   const {
     onError,
     context,
@@ -53,16 +51,16 @@ export default function <T = any> (args?: UseXhr) {
 
   const error = ref<Error | Obj | null>();
 
-  let xhr: Xhr<T> = new Xhr<T>();
+  let xhr: Xhr<any> = new Xhr<any>();
 
   let isThrowDisabled = false;
 
-  const xhrList = ref<Array<Xhr<T>>>([]);
+  const xhrList = ref<Array<Xhr<any>>>([]);
 
   /**
    * For GET it's possible to add cache
    */
-  function get(parametersObj: GetConfig, params?: Obj | Ref<Obj>): GetReturn<T> {
+  function get<T>(parametersObj: GetConfig, params?: Obj | Ref<Obj>): GetReturn<T> {
     const isPending = ref<boolean>();
 
     const data = ref<T>();
@@ -176,11 +174,11 @@ export default function <T = any> (args?: UseXhr) {
     };
   }
 
-  const post = (xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
+  const post = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
 
-  const put = (xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
+  const put = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
 
-  const _delete = (xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
+  const _delete = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
 
   if (!legacy) {
     onBeforeUnmount(() => {

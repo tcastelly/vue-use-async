@@ -1,4 +1,4 @@
-import { Obj, XhrGet, XhrParams } from '@/types';
+import { Obj, XhrGet, XhrParams } from './index';
 import Deferred from './Deferred';
 
 export default class Xhr<T> {

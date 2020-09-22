@@ -4,7 +4,7 @@ node_modules/
 !/flow-typed/vue-composition-api.js
 
 # generat types
-/**/*.d.ts
+types/
 
 .env
 

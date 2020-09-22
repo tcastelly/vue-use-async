@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",
@@ -9,15 +9,16 @@
   "license": "MIT",
   "author": "Thomas CASTELLY",
   "main": "dist/index.js",
-  "types": "./dist/types.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "check-types": "tsc --noemit",
+    "tsc:check-types": "tsc --noemit",
+    "tsc:export-types": "tsc --outDir types",
     "afterbuild": "node ./scripts/afterbuild.js",
-    "beforebuild": "node ./scripts/beforeBuild.js",
-    "build": "npm run beforebuild && tsc && npm run build:webpack && npm run afterbuild",
+    "beforebuild": "node ./scripts/beforeBuild.js && npm run tsc:export-types",
+    "build": "npm run beforebuild && npm run build:webpack && npm run afterbuild",
     "build:webpack": "webpack --mode=production",
-    "lint": "npm run check-types && eslint --ext .js,.ts src tests",
-    "lint:fix": "npm run check-types && eslint --fix --ext .js,.ts src tests",
+    "lint": "npm run tsc:check-types && eslint --ext .js,.ts src tests",
+    "lint:fix": "npm run tsc:check-types && eslint --fix --ext .js,.ts src tests",
     "precommit": "lint-staged",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
     "test": "jest tests/** --no-cache"

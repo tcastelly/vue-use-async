@@ -6,7 +6,7 @@ import {
   ref,
   watch,
 } from '@vue/composition-api';
-import { Obj } from '@/types';
+import { Obj } from './index';
 import Deferred from './Deferred';
 
 function useAsync<T>(
