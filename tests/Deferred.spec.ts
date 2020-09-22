@@ -1,4 +1,4 @@
-import Deferred from '../src/Deferred';
+import Deferred from '@/Deferred';
 
 describe('Given Deferred', () => {
   describe('WHEN instance a Deferred and resolve it', () => {

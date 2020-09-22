@@ -1,5 +1,8 @@
-import { ref } from 'vue';
-import userSpinner from '../src/useSpinner';
+import Vue from 'vue';
+import CompositionApi, { ref } from '@vue/composition-api';
+import userSpinner from '@/useSpinner';
+
+Vue.use(CompositionApi);
 
 describe('GIVEN `isPendingSpinner`', () => {
   describe('WHEN resolve a pending right now', () => {

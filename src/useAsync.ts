@@ -1,6 +1,6 @@
 import {
   computed, ComputedRef, isRef, Ref, ref, watch,
-} from 'vue';
+} from '@vue/composition-api';
 import Deferred from './Deferred';
 
 function useAsync<T>(

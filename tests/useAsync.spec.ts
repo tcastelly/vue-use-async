@@ -1,5 +1,8 @@
-import { computed } from 'vue';
-import useAsync from '../src/useAsync';
+import Vue from 'vue';
+import CompositionApi, { computed } from '@vue/composition-api';
+import useAsync from '@/useAsync';
+
+Vue.use(CompositionApi);
 
 describe('GIVEN, `useAsync', () => {
   describe('WHEN resolve `useAsync`', () => {

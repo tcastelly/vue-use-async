@@ -1,5 +1,5 @@
-import { XhrGet } from './types';
 import Logger from './_base/Logger';
+import { XhrGet } from './types';
 
 const _cache: Map<string, XhrGet<any>> = new Map();
 
@@ -8,7 +8,7 @@ const _cache: Map<string, XhrGet<any>> = new Map();
  * @params {Promise} params.xhr
  * @params {Number} params.duration, in ms
  */
-export default function <T> (params: { id: string, xhr: () => XhrGet<T>, duration: number | 'max' | null }): XhrGet<T> {
+export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, duration?: number | 'max' | null }): XhrGet<T> {
   const { id, xhr } = params || {};
   let duration: number = typeof params.duration !== 'string' ? (params.duration || 200) : 200;
   let _d;

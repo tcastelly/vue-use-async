@@ -1,4 +1,4 @@
-import cache, { cacheSize, clearCache } from '../src/cache';
+import cache, { cacheSize, clearCache } from '@/cache';
 
 describe('Given Cache', () => {
   it('THEN no cache should be available', () => {
@@ -13,13 +13,19 @@ describe('Given Cache', () => {
   });
   describe('WHEN send a promise', () => {
     let query = null;
+
+    const p: any = new Promise((resolve) => {
+      resolve('ok');
+    });
+    p.abortXhr = () => {
+      console.log('has been abort');
+    };
+
     beforeAll(() => {
       query = cache({
         id: '/fake/',
         duration: 0,
-        xhr: () => new Promise((resolve) => {
-          resolve('ok');
-        }),
+        xhr: () => p,
       });
     });
     it('THEN cache should be inserted', () => expect(query).resolves.toEqual('ok'));

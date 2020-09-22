@@ -2,18 +2,19 @@ module.exports = {
   root: true,
   extends: [
     'airbnb-base',
+    'plugin:@typescript-eslint/recommended',
   ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module',
+  },
   env: {
     es6: true,
     jest: true,
     node: true,
     browser: true,
   },
-  parser: '@typescript-eslint/parser',
-  plugins: [
-    '@typescript-eslint',
-    'import',
-  ],
   rules: {
     'no-underscore-dangle': 0,
     'no-param-reassign': 0,
@@ -21,44 +22,24 @@ module.exports = {
     'max-classes-per-file': 0,
     'space-before-function-paren': 0,
 
-    // controller have to be prototyped
-    'class-methods-use-this': 0,
+    // fix airbnb conflicts
+    'import/extensions': 'off',
+    'import/no-unresolved': 'off',
 
-    // report false error because of typescript
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
+    '@typescript-eslint/no-unused-vars': 'error',
 
-    // report false error because of typescript
-    'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': ['error'],
-
-    // report false error because of typescript
-    'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': ['error'],
-
-    // because of airbnb
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-useless-constructor': 'error',
+  },
+  settings: {
     'import/extensions': ['error', 'ignorePackages', {
+      vue: 'never',
       js: 'never',
       mjs: 'never',
       jsx: 'never',
       ts: 'never',
       tsx: 'never',
     }],
-  },
-  settings: {
-    'import/resolver': {
-      typescript: {},
-      node: {
-        extensions: [
-          '.js',
-          '.jsx',
-          '.ts',
-          '.tsx',
-        ],
-      },
-      alias: [
-        ['@', './src'],
-      ],
-    },
   },
 };

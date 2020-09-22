@@ -1,5 +1,3 @@
-'use strict';
-
 const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
@@ -14,10 +12,9 @@ module.exports = {
   plugins: [
     [require.resolve('@babel/plugin-proposal-class-properties'), { loose: true, }],
     [require.resolve('babel-plugin-module-resolver'), {
-      root: ['./src'],
+      root: ["./src/"],
       alias: {
-        tests: './tests',
-        '@': './src',
+        "@": "./src"
       },
     }],
   ],

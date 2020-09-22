@@ -1,5 +1,3 @@
-// @flow
-
 import {
   isRef,
   ref,
@@ -8,7 +6,7 @@ import {
   computed,
   ComputedRef,
   Ref,
-} from 'vue';
+} from '@vue/composition-api';
 import {
   CacheDuration,
   GetConfig,

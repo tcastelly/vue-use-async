@@ -1,4 +1,4 @@
-import Xhr from '../src/Xhr';
+import Xhr from '@/Xhr';
 import mockXhr from './mockXhr';
 
 describe('Given Xhr and MockXhr', () => {

@@ -1,32 +1,6 @@
 import type { ComputedRef, Ref } from 'vue';
 
-interface CancellablePromise<T> extends Promise<T> {
-  abortXhr: Function
-}
-
-export type XhrGet<T> = CancellablePromise<T>;
-
-export type CacheDuration = 'max'| number
-
-export type GetConfig = string | (XhrConfig & Partial<{
-  url?: string;
-
-  params?: Object;
-
-  port?: number | null;
-
-  cacheDuration?: CacheDuration;
-}>);
-
-export type GetReturn<T> = {
-  isPending: ComputedRef<boolean>,
-  data: Ref<T>,
-  error: Ref<Error | Object | null>,
-  abort: Function,
-  promise: ComputedRef<Promise<T>>,
-  reload: Function,
-  onError: (cb: (Error) => void) => void,
-}
+type Obj = { [id: string]: any};
 
 export type XhrConfig = Partial<{
   url?: string;
@@ -35,15 +9,15 @@ export type XhrConfig = Partial<{
 
   port?: number | null;
 
-  params?: Object;
+  params?: Obj;
 
-  onStart?: Function;
+  onStart?: () => void;
 
-  onEnd?: Function;
+  onEnd?: () => void;
 
-  onProgress?: Function;
+  onProgress?: () => void;
 
-  onAbort?: Function;
+  onAbort?: () => void;
 
   onError?: (e: ProgressEvent) => any;
 
@@ -54,6 +28,34 @@ export type XhrConfig = Partial<{
   responseType?: 'arraybuffer' | 'blob',
 }>;
 
+interface CancellablePromise<T> extends Promise<T> {
+  abortXhr: () => void,
+}
+
+export type XhrGet<T> = CancellablePromise<T>;
+
+export type CacheDuration = 'max' | number
+
+export type GetConfig = string | (XhrConfig & Partial<{
+  url?: string;
+
+  params?: Obj;
+
+  port?: number | null;
+
+  cacheDuration?: CacheDuration;
+}>);
+
+export type GetReturn<T> = {
+  isPending: ComputedRef<boolean>,
+  data: Ref<T>,
+  error: Ref<Error | Obj | null>,
+  abort: () => void,
+  promise: ComputedRef<Promise<T>>,
+  reload: () => void,
+  onError: (cb: (Error) => void) => void,
+}
+
 export type XhrParams = Partial<{
   url?: string;
 
@@ -61,7 +63,7 @@ export type XhrParams = Partial<{
 
   port?: number | null;
 
-  params?: Object;
+  params?: Obj;
 
   onStart?: (e: ProgressEvent) => void;
 

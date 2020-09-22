@@ -1,6 +1,9 @@
-import { ref, watch } from 'vue';
-import useXhr from '../src/useXhr';
+import Vue from 'vue';
+import VueCompositionApi, { ref, watch } from '@vue/composition-api';
+import useXhr from '@/useXhr';
 import mockXhr from './mockXhr';
+
+Vue.use(VueCompositionApi);
 
 describe('GIVEN `useAsync`', () => {
   const token = ref('FAKE_TOKEN');

@@ -5,7 +5,7 @@ import {
   computed,
   ref,
   Ref,
-} from 'vue';
+} from '@vue/composition-api';
 
 export default function (isPending: Ref<boolean>, duration: number = 400) {
   const isPendingSpinner = ref<boolean>(false);
