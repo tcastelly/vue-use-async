@@ -1,7 +1,7 @@
 // @flow
 
 import vue from 'vue';
-import type { Ref, Computed } from 'vue';
+import type { Ref, Computed } from '@vue/composition-api';
 import type Xhr, { XhrConfig } from './Xhr.js.flow';
 import type { UseAsyncReturn } from './useAsync.js.flow';
 
