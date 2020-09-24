@@ -54,7 +54,7 @@ export default class Xhr<T> {
   _onError(e: ErrorEvent): void {
     this.onError(e);
 
-    this._deferred.reject(e.error);
+    this._deferred.reject(e);
   }
 
   _deferred: Deferred<T>;
@@ -73,7 +73,7 @@ export default class Xhr<T> {
     this._constructor(xhrParams, params);
   }
 
-  static new<Z>(paramsObj: XhrParams): Xhr<Z> {
+  static new<Z>(paramsObj?: XhrParams): Xhr<Z> {
     return new Xhr(paramsObj);
   }
 
