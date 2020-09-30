@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 
 module.exports = {
@@ -21,7 +22,13 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|js)x?$/,
-        loader: 'babel-loader',
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/env'],
+          },
+        },
       },
     ],
   },
