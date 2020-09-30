@@ -1,5 +1,5 @@
 export default class Deferred<T> {
-  resolve: (res: T) => void;
+  resolve: (res?: T | null) => void;
 
   reject: (e: any) => void;
 
