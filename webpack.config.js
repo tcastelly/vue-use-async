@@ -13,6 +13,7 @@ module.exports = {
     filename: 'index.js',
   },
   externals: {
+    '@vue/composition-api': '@vue/composition-api',
     Vue: 'vue',
   },
   resolve: {
