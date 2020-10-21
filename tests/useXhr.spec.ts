@@ -24,7 +24,9 @@ describe('GIVEN `useAsync`', () => {
       let reload;
       let isPending;
       beforeAll(async (done) => {
-        mocked = mockXhr.get({ url: '/fake/get' });
+        mocked = mockXhr.get({
+          url: '/fake/get/1',
+        });
         mocked.resolve('get-ok');
 
         const {
@@ -32,7 +34,10 @@ describe('GIVEN `useAsync`', () => {
           reload: _reload,
           isPending: _isPending,
           promise,
-        } = get('/fake/get', {});
+        } = get({
+          url: '/fake/get/:ok',
+          params: ref({ ok: 1 }),
+        });
 
         data = _data;
         reload = _reload;

@@ -8,7 +8,12 @@ import {
   watch,
 } from '@vue/composition-api';
 import {
-  CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
+  CacheDuration,
+  GetConfig,
+  GetReturn,
+  Obj,
+  XhrConfig,
+  XhrGet,
 } from './index';
 import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
@@ -77,6 +82,7 @@ export default function (args?: UseXhr) {
       if (typeof parametersObj === 'string') {
         url = parametersObj;
         _getParams.url = url;
+        _getParams.params = {};
       } else if (parametersObj && typeof parametersObj === 'object') {
         ({ url } = parametersObj);
 
@@ -101,7 +107,7 @@ export default function (args?: UseXhr) {
       // merge params
       if (params && typeof _getParams === 'object' && _getParams.params) {
         _getParams.params = {
-          ..._getParams.params,
+          ...(isRef(_getParams.params) ? _getParams.params.value : _getParams.params),
           ...(isRef(params) ? (params.value || {}) : params),
         };
       }
