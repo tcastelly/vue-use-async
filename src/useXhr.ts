@@ -71,12 +71,12 @@ export default function (args?: UseXhr) {
     let duration: CacheDuration = 0;
     let _onError = (e) => (onError || _blank).bind(context, e);
 
-    const retrieveGetParams = () => {
-      let getParams: GetConfig = {};
+    const getParams = computed(() => {
+      let _getParams: GetConfig = {};
 
-      if (typeof parametersObj === 'string' /*:: && typeof getParams === 'object' */) {
+      if (typeof parametersObj === 'string') {
         url = parametersObj;
-        getParams.url = url;
+        _getParams.url = url;
       } else if (parametersObj && typeof parametersObj === 'object') {
         ({ url } = parametersObj);
 
@@ -88,26 +88,26 @@ export default function (args?: UseXhr) {
         duration = parametersObj.cacheDuration;
         _onError = (parametersObj.onError || _onError).bind(context);
 
-        getParams = {
-          ...getParams,
+        _getParams = {
+          ..._getParams,
           ...parametersObj,
         };
       }
 
-      if (args && args.token /*:: && typeof getParams === 'object' */) {
-        getParams.token = getTokenValue(args.token);
+      if (args && args.token) {
+        _getParams.token = getTokenValue(args.token);
       }
 
       // merge params
-      if (params && typeof getParams === 'object' && getParams.params) {
-        getParams.params = {
-          ...getParams.params,
+      if (params && typeof _getParams === 'object' && _getParams.params) {
+        _getParams.params = {
+          ..._getParams.params,
           ...(isRef(params) ? (params.value || {}) : params),
         };
       }
 
-      return getParams;
-    };
+      return _getParams;
+    });
 
     let lastCacheId;
 
@@ -122,16 +122,19 @@ export default function (args?: UseXhr) {
       error.value = null;
       isThrowDisabled = false;
 
-      const getParams = retrieveGetParams();
       if (lastCacheId) {
         clearCache(lastCacheId);
       }
-      lastCacheId = decodeURIComponent(Xhr.stringifyUrl(url, typeof getParams === 'object' ? getParams.params : {}));
+
+      lastCacheId = decodeURIComponent(Xhr.stringifyUrl(
+        url,
+        typeof getParams.value.params === 'object' ? getParams.value.params : {},
+      ));
 
       // Preserve function extended in promise (abort)
       xhrPromise.value = cache<T>({
         id: lastCacheId,
-        xhr: xhr.get.bind(xhr, getParams),
+        xhr: xhr.get.bind(xhr, getParams.value),
         duration,
       });
 
@@ -157,7 +160,12 @@ export default function (args?: UseXhr) {
       });
     };
 
-    reload();
+    watch(
+      () => getParams.value,
+      reload, {
+        immediate: true,
+      },
+    );
 
     return {
       isPending: computed(() => isPending.value),

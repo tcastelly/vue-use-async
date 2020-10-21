@@ -45,7 +45,7 @@ export type CacheDuration = 'max' | number
 export type GetConfig = string | (XhrConfig & Partial<{
   url?: string;
 
-  params?: Obj;
+  params?: Ref<Obj> | Obj;
 
   port?: number | null;
 
