@@ -88,8 +88,6 @@ export type XhrParams = Partial<{
   responseType?: 'arraybuffer' | 'blob',
 }>
 
-export default useAsync;
-
 export {
   cache,
   clearCache,

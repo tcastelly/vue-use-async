@@ -7,8 +7,6 @@ import useXhr from './useXhr';
 import Xhr from './Xhr';
 import useSpinner from './useSpinner';
 
-export default useAsync;
-
 export {
   cache,
   clearCache,
