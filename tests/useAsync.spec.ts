@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import CompositionApi, { computed } from '@vue/composition-api';
+import CompositionApi, { computed, ref } from '@vue/composition-api';
 import useAsync from '@/useAsync';
 
 Vue.use(CompositionApi);
@@ -79,7 +79,7 @@ describe('GIVEN, `useAsync', () => {
       ({ data, promise } = useAsync(
         func,
         computed(() => 'msg'),
-        () => true,
+        ref(true),
       ));
       await promise.value;
       done();

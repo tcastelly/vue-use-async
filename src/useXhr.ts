@@ -8,12 +8,7 @@ import {
   watch,
 } from '@vue/composition-api';
 import {
-  CacheDuration,
-  GetConfig,
-  GetReturn,
-  Obj,
-  XhrConfig,
-  XhrGet,
+  CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
 } from './index';
 import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
@@ -65,7 +60,11 @@ export default function (args?: UseXhr) {
   /**
    * For GET it's possible to add cache
    */
-  function get<T>(parametersObj: GetConfig, params?: Obj | Ref<Obj>): GetReturn<T> {
+  function get<T>(
+    parametersObj: GetConfig,
+    params?: Ref<Obj> | Obj,
+    enabled?: Ref<boolean> | boolean,
+  ): GetReturn<T> {
     const isPending = ref<boolean>();
 
     const data = ref<T>();
@@ -114,6 +113,14 @@ export default function (args?: UseXhr) {
 
       return _getParams;
     });
+
+    let exec = ref(false);
+    const _exec = getParams.value?.enabled || enabled;
+    if (isRef(_exec)) {
+      exec = _exec;
+    } else {
+      exec = ref(_exec === undefined ? true : _exec);
+    }
 
     let lastCacheId;
 
@@ -166,10 +173,28 @@ export default function (args?: UseXhr) {
       });
     };
 
+    // reload if parameters changed
     watch(
       () => getParams.value,
-      reload, {
-        immediate: true,
+      () => {
+        if (exec.value) {
+          reload();
+        }
+      }, {
+        immediate: exec.value,
+      },
+    );
+
+    // reload if the query has been enabled
+    watch(
+      () => exec.value,
+      (v) => {
+        if (v) {
+          reload();
+        }
+      }, {
+        // avoid simultaneously query
+        immediate: false,
       },
     );
 

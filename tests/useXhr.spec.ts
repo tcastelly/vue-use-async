@@ -23,9 +23,15 @@ describe('GIVEN `useAsync`', () => {
       let data;
       let reload;
       let isPending;
+      const enabled = ref(false);
+
+      afterAll(() => {
+        mocked.restore();
+      });
       beforeAll(async (done) => {
         mocked = mockXhr.get({
           url: '/fake/get/1',
+          enabled,
         });
         mocked.resolve('get-ok');
 
@@ -38,6 +44,8 @@ describe('GIVEN `useAsync`', () => {
           url: '/fake/get/:ok',
           params: ref({ ok: 1 }),
         });
+
+        enabled.value = true;
 
         data = _data;
         reload = _reload;
@@ -82,6 +90,7 @@ describe('GIVEN `useAsync`', () => {
 
   describe('WHEN run the function to reject the query', () => {
     let get;
+
     beforeAll(() => {
       ({ get } = useXhr({ legacy: true, token }));
     });
@@ -92,6 +101,10 @@ describe('GIVEN `useAsync`', () => {
     describe('WHEN execute `get` Xhr', () => {
       let mocked;
       let error;
+
+      afterAll(() => {
+        mocked.restore();
+      });
       beforeAll(async (done) => {
         mocked = mockXhr.get({ url: '/fake/fail/get' });
         mocked.reject('ko');

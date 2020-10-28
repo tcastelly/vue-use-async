@@ -6,7 +6,7 @@ import useXhr from './useXhr';
 import Xhr from './Xhr';
 import useSpinner from './useSpinner';
 
-export type Obj = { [id: string]: any};
+export type Obj = { [id: string]: any };
 
 export type XhrConfig = Partial<{
   url?: string;
@@ -50,6 +50,8 @@ export type GetConfig = string | (XhrConfig & Partial<{
   port?: number | null;
 
   cacheDuration?: CacheDuration;
+
+  enabled?: Ref<boolean> | boolean;
 }>);
 
 export type GetReturn<T> = {

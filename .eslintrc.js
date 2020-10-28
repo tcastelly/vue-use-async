@@ -37,6 +37,17 @@ module.exports = {
     '@typescript-eslint/no-useless-constructor': 'error',
   },
   settings: {
+    'import/resolver': {
+      // Settings for eslint-import-resolver-typescript to resolve TypeScript path mapping.
+      typescript: {},
+      alias: [
+        ['tests', './tests'],
+        ['@', './src'],
+      ],
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
     'import/extensions': ['error', 'ignorePackages', {
       vue: 'never',
       js: 'never',
