@@ -188,7 +188,7 @@ export default function (args?: UseXhr) {
       xhrPromise.value.then((_data) => {
         data.value = _data;
       }, (err) => {
-        onErrorList.forEach((cb) => cb(error.value, this));
+        onErrorList.forEach((cb) => cb(err, xhr));
         error.value = err;
       });
       xhrPromise.value.finally(() => {
