@@ -1,4 +1,4 @@
-import { Obj, XhrGet, XhrParams } from './index';
+import { Obj, XhrGet, XhrConfig } from './index';
 import Deferred from './Deferred';
 
 export default class Xhr<T> {
@@ -65,7 +65,7 @@ export default class Xhr<T> {
 
   _eventReady: boolean;
 
-  constructor(xhrParams?: XhrParams, params?: Obj) {
+  constructor(xhrParams?: XhrConfig, params?: Obj) {
     // `new` or all public methods can initialize events
     // variable used to avoid multiple same listeners
     this._eventsReady = false;
@@ -73,8 +73,8 @@ export default class Xhr<T> {
     this._constructor(xhrParams, params);
   }
 
-  static new<Z>(paramsObj?: XhrParams): Xhr<Z> {
-    return new Xhr(paramsObj);
+  static new<Z>(paramsObj?: XhrConfig): Xhr<Z> {
+    return new Xhr<Z>(paramsObj);
   }
 
   removeEvents() {
@@ -92,7 +92,7 @@ export default class Xhr<T> {
     this._deferred.promise.then(removeEvents, removeEvents);
   }
 
-  post(paramsObj: XhrParams): Promise<any> {
+  post(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
     this._oXHR.open('POST', this.url, true);
     this._send();
@@ -100,7 +100,7 @@ export default class Xhr<T> {
     return this._deferred.promise;
   }
 
-  put(paramsObj: XhrParams): Promise<any> {
+  put(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
     this._oXHR.open('PUT', this.url, true);
     this._send();
@@ -114,7 +114,7 @@ export default class Xhr<T> {
    *
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
-  get(paramsObj?: XhrParams): XhrGet<T> {
+  get(paramsObj?: XhrConfig): XhrGet<T> {
     this._constructor(paramsObj);
 
     this._oXHR.open('GET', Xhr.stringifyUrl(this.url, this.params), true);
@@ -139,7 +139,7 @@ export default class Xhr<T> {
    *
    * @returns {Promise}
    */
-  delete(paramsObj: XhrParams): Promise<any> {
+  delete(paramsObj: XhrConfig): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('DELETE', Xhr.stringifyUrl(this.url, this.params), true);
     this._send();
@@ -314,7 +314,7 @@ export default class Xhr<T> {
   /**
    * The constructor can be called by the `new` or by each public method
    */
-  _constructor(paramsObj: XhrParams, params?: Obj): void {
+  _constructor(paramsObj: XhrConfig, params?: Obj): void {
     if (paramsObj && typeof paramsObj === 'object') {
       this.sendAs = paramsObj.sendAs || this.sendAs;
       this.url = paramsObj.url || this.url;
@@ -322,11 +322,11 @@ export default class Xhr<T> {
       this.params = paramsObj.params || this.params;
       this.timeout = paramsObj.timeout || this.timeout;
       this.responseType = paramsObj.responseType || this.responseType;
-      this.onProgress = paramsObj.onProgress || this.onProgress;
-      this.onStart = paramsObj.onStart || this.onStart;
-      this.onAbort = paramsObj.onAbort || this.onAbort;
-      this.onEnd = paramsObj.onEnd || this.onEnd;
-      this.onError = paramsObj.onError || this.onError;
+      this.onProgress = (paramsObj.onProgress || this.onProgress).bind(this, this);
+      this.onStart = (paramsObj.onStart || this.onStart).bind(this, this);
+      this.onAbort = (paramsObj.onAbort || this.onAbort).bind(this, this);
+      this.onEnd = (paramsObj.onEnd || this.onEnd).bind(this, this);
+      this.onError = (paramsObj.onError || this.onError).bind(this, this);
       this.token = paramsObj.token || this.token;
     } else if (paramsObj && typeof paramsObj === 'string') {
       this.url = paramsObj;

@@ -10,9 +10,8 @@ describe('GIVEN `useAsync`', () => {
 
   describe('WHEN run the function to resolve', () => {
     let get;
-    let xhr;
     beforeAll(() => {
-      ({ get, xhr } = useXhr({ legacy: true, token }));
+      ({ get } = useXhr({ legacy: true, token }));
     });
     it('THEN `get` should be a function', () => {
       expect(typeof get).toBe('function');
@@ -23,6 +22,7 @@ describe('GIVEN `useAsync`', () => {
       let data;
       let reload;
       let isPending;
+      let xhr;
       const enabled = ref(false);
 
       afterAll(() => {
@@ -40,10 +40,13 @@ describe('GIVEN `useAsync`', () => {
           reload: _reload,
           isPending: _isPending,
           promise,
+          xhr: _xhr,
         } = get({
           url: '/fake/get/:ok',
           params: ref({ ok: 1 }),
         });
+
+        xhr = _xhr;
 
         enabled.value = true;
 

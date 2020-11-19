@@ -8,31 +8,7 @@ import useSpinner from './useSpinner';
 
 export type Obj = { [id: string]: any };
 
-export type XhrConfig = Partial<{
-  url?: string;
-
-  timeout?: number | null;
-
-  port?: number | null;
-
-  params?: Obj;
-
-  onStart?: () => void;
-
-  onEnd?: () => void;
-
-  onProgress?: () => void;
-
-  onAbort?: () => void;
-
-  onError?: (e: ProgressEvent) => any;
-
-  sendAs?: 'multipart' | 'json';
-
-  token?: string;
-
-  responseType?: 'arraybuffer' | 'blob',
-}>;
+export type Func = (...any) => any;
 
 interface CancellablePromise<T> extends Promise<T> {
   abortXhr: () => void,
@@ -41,6 +17,32 @@ interface CancellablePromise<T> extends Promise<T> {
 export type XhrGet<T> = CancellablePromise<T>;
 
 export type CacheDuration = 'max' | number
+
+export type XhrConfig<T = any> = Partial<{
+  url?: string;
+
+  timeout?: number | null;
+
+  port?: number | null;
+
+  params?: Obj;
+
+  onStart?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+
+  onEnd?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+
+  onProgress?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+
+  onAbort?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+
+  onError?: (e: ErrorEvent, xhr: Xhr<T>) => void;
+
+  sendAs?: 'multipart' | 'json';
+
+  token?: string;
+
+  responseType?: 'arraybuffer' | 'blob',
+}>
 
 export type GetConfig = string | (XhrConfig & Partial<{
   url?: string;
@@ -61,34 +63,11 @@ export type GetReturn<T> = {
   abort: () => void,
   promise: ComputedRef<Promise<T>>,
   reload: () => void,
-  onError: (cb: (Error) => void) => void,
+  onError: (cb: (e: Error) => void) => void,
+  onStart?: (cb: (xhr: Xhr<T>) => any) => any,
+  onEnd?: (cb: (xhr: Xhr<T>) => any) => any,
+  xhr: Xhr<T>,
 }
-
-export type XhrParams = Partial<{
-  url?: string;
-
-  timeout?: number | null;
-
-  port?: number | null;
-
-  params?: Obj;
-
-  onStart?: (e: ProgressEvent) => void;
-
-  onEnd?: (e: ProgressEvent) => void;
-
-  onProgress?: (e: ProgressEvent) => void;
-
-  onAbort?: (e: ProgressEvent) => void;
-
-  onError?: (e: ErrorEvent) => void;
-
-  sendAs?: 'multipart' | 'json';
-
-  token?: string;
-
-  responseType?: 'arraybuffer' | 'blob',
-}>
 
 export {
   cache,

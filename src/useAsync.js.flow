@@ -1,13 +1,16 @@
 // @flow
 
-import { type Ref, type Computed } from '@vue/composition-api';
+import { type Computed, type Ref } from '@vue/composition-api';
+import type Xhr from './Xhr'
 
 export type UseAsyncReturn<T> = {|
+  onError?: ((Error | Object) => any) => any,
+  onStart?: ((ProgressEvent, Xhr<U>) => any) => any,
+  onEnd?: ((ProgressEvent, Xhr<U>) => any) => any;
   isPending: Ref<boolean>,
   error: Ref<?Error | Object>,
   data: Ref<T>,
   reload: (any) => void,
-  onError: ((Error | Object) => void) => void,
   promise: Computed<Promise<T>>,
 |}
 
@@ -21,4 +24,8 @@ declare export default function useAsync<T>(
 useAsync.config = {
   onError(Error) { // eslint-disable-line no-unused-vars
   },
+  onStart() {
+  },
+  onEnd() {
+  }
 };

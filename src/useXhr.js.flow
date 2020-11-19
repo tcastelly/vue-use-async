@@ -30,7 +30,11 @@ export type GetReturn<T> = {|
 |}
 
 declare export default function useXhr<U: mixed>(?{|
-  onError?: (Error) => any,
+  onError?: (Error, Xhr<U>) => any,
+  onStart?: (ProgressEvent, Xhr<U>) => any,
+  onEnd?: (ProgressEvent, Xhr<U>) => any;
+  onProgress?: (ProgressEvent, Xhr<U>) => any;
+  onAbort?: (ProgressEvent, Xhr<U>) => any;
   context?: Vue,
   legacy?: boolean, // can be used for VueJS 2.x without composition-api
   token?: Ref<?string> | Computed<?string> | ?string,

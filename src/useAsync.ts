@@ -1,7 +1,7 @@
 import {
   computed, ComputedRef, isRef, Ref, ref, watch,
 } from '@vue/composition-api';
-import { Obj } from './index';
+import { Func, Obj } from './index';
 import Deferred from './Deferred';
 
 function useAsync<T>(
@@ -9,11 +9,13 @@ function useAsync<T>(
   params: Ref<any> | any = {},
   enabled = ref(true),
 ): {
+  onError: (cb: (e: Error) => any) => void,
+  onStart: (cb: Func) => any,
+  onEnd: (cb: Func) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<T>,
   reload: (any) => void,
-  onError: (cb: (e: Error) => void) => void,
   promise: ComputedRef<Promise<T>>,
 } {
   const isPending = ref();
@@ -22,21 +24,26 @@ function useAsync<T>(
 
   const error = ref<Error | null>();
 
-  let isThrowDisabled = false;
-
   const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
 
-  const errorList = [];
+  const onErrorList = [];
+
+  const onStartList = [];
+
+  const onEndList = [];
 
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
 
+  // generate new xhr/promise
   const _reload = (_params: Obj) => {
+    useAsync.config.onStart();
+    onStartList.forEach((cb) => cb(error.value));
+
     d.value = new Deferred();
 
     isPending.value = true;
     error.value = null;
-    isThrowDisabled = false;
 
     // it's possible to pass multiple args by using an array as params
     const p = Array.isArray(_params)
@@ -48,34 +55,21 @@ function useAsync<T>(
       d.value.resolve(res);
     }, (_error) => {
       error.value = _error || null;
-      errorList.forEach((cb) => cb(error.value));
+
       useAsync.config.onError(_error);
+      onErrorList.forEach((cb) => cb(error.value));
+
       d.value.reject(_error);
       error.value = _error;
     });
 
     p.finally(() => {
       isPending.value = false;
+
+      useAsync.config.onEnd();
+      onEndList.forEach((cb) => cb());
     });
   };
-
-  const onError = (cb) => {
-    errorList.push(cb);
-  };
-
-  watch(
-    () => error.value,
-    (e) => {
-      if (e && !isThrowDisabled) {
-        // throw error break success of watch
-        // force to disable it, else infinite loop
-        isThrowDisabled = true;
-        throw e;
-      }
-    }, {
-      immediate: true,
-    },
-  );
 
   watch(
     () => wrapParams.value,
@@ -107,13 +101,20 @@ function useAsync<T>(
     data,
     error,
     reload: () => _reload(wrapParams.value),
-    onError,
+    onError: (cb) => onErrorList.push(cb),
+    onStart: (cb) => onStartList.push(cb),
+    onEnd: (cb) => onEndList.push(cb),
     promise: computed(() => d.value.promise),
   };
 }
 
+// static object in function, when Main.js will be migrated to composition API, will be replaced by inject
 useAsync.config = {
   onError(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-vars
+  },
+  onStart() {
+  },
+  onEnd() {
   },
 };
 

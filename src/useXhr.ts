@@ -1,11 +1,5 @@
 import {
-  computed,
-  ComputedRef,
-  isRef,
-  onBeforeUnmount,
-  ref,
-  Ref,
-  watch,
+  computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, watch,
 } from '@vue/composition-api';
 import {
   CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
@@ -20,8 +14,12 @@ function _blank(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-
 
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
-type UseXhr = {
-  onError?: (Error) => any,
+type UseXhr<T = any> = {
+  onError?: (cb: (e: Error, xhr: Xhr<T>) => any) => any,
+  onStart?: (cb: (xhr: Xhr<T>) => any) => any,
+  onEnd?: (cb: (xhr: Xhr<T>) => any) => any,
+  onProgress?: (cb: (e: ProgressEvent, xhr: Xhr<T>) => any) => any,
+  onAbort?: (cb: (e: ProgressEvent, xhr: Xhr<T>) => any) => any;
   context?: any,
   legacy?: boolean,
   token?: Token,
@@ -40,20 +38,37 @@ const getTokenValue: (token: Token) => string | null = (token) => {
 export default function (args?: UseXhr) {
   const {
     onError,
+    onStart,
+    onEnd,
     context,
     legacy,
+    token,
   } = (args || {
-    onError: (e) => e,
+    onError: () => {
+    },
+    onStart: () => {
+    },
+    onEnd: () => {
+    },
     context: null,
     legacy: false,
     token: null,
   });
 
-  const error = ref<Error | Obj | null>();
+  const mergeParamsWithToken = (params: Obj | Ref<Obj>) => {
+    const _token = getTokenValue(token);
+    if (!_token) {
+      return params;
+    }
 
-  let xhr: Xhr<any> = new Xhr<any>();
+    if (isRef(params)) {
+      params.value.token = _token;
+    } else {
+      params.token = _token;
+    }
 
-  let isThrowDisabled = false;
+    return params;
+  };
 
   const xhrList = ref<Array<Xhr<any>>>([]);
 
@@ -65,15 +80,26 @@ export default function (args?: UseXhr) {
     params?: Ref<Obj> | Obj,
     enabled?: Ref<boolean> | boolean,
   ): GetReturn<T> {
+    const xhr: Xhr<any> = new Xhr<any>();
+
+    const _onError = (onError || _blank).bind(context);
+    const _onStart = (onStart || _blank).bind(context);
+    const _onEnd = (onEnd || _blank).bind(context);
+
+    const onErrorList = [_onError];
+    const onStartList = [_onStart];
+    const onEndList = [_onEnd];
+
+    const error = ref<Error | Obj | null>();
+
+    xhrList.value.push(xhr);
+
     const isPending = ref<boolean>();
 
     const data = ref<T>();
 
-    const errorList = [];
-
     let url = '';
     let duration: CacheDuration = 0;
-    let _onError = (e) => (onError || _blank).bind(context, e);
 
     const getParams = computed(() => {
       let _getParams: GetConfig = {};
@@ -91,7 +117,6 @@ export default function (args?: UseXhr) {
         }
 
         duration = parametersObj.cacheDuration;
-        _onError = (parametersObj.onError || _onError).bind(context);
 
         _getParams = {
           ..._getParams,
@@ -99,7 +124,7 @@ export default function (args?: UseXhr) {
         };
       }
 
-      if (args && args.token) {
+      if (token) {
         _getParams.token = getTokenValue(args.token);
       }
 
@@ -131,9 +156,10 @@ export default function (args?: UseXhr) {
         xhr.abort();
       }
 
+      onStartList.forEach((cb) => cb(xhr));
+
       isPending.value = true;
       error.value = null;
-      isThrowDisabled = false;
 
       if (lastCacheId) {
         clearCache(lastCacheId);
@@ -160,16 +186,15 @@ export default function (args?: UseXhr) {
       };
 
       xhrPromise.value.then((_data) => {
-        removeHttpXhrList();
         data.value = _data;
       }, (err) => {
-        removeHttpXhrList();
-        errorList.forEach((cb) => cb(error.value));
-        _onError(err);
+        onErrorList.forEach((cb) => cb(error.value, this));
         error.value = err;
       });
       xhrPromise.value.finally(() => {
+        removeHttpXhrList();
         isPending.value = false;
+        onEndList.forEach((cb) => cb(xhr));
       });
     };
 
@@ -201,68 +226,65 @@ export default function (args?: UseXhr) {
     return {
       isPending: computed(() => isPending.value),
       data,
-      onError(cb) {
-        errorList.push(cb);
-      },
+      onError: (cb) => onErrorList.push(cb),
+      onStart: (cb) => onStartList.push(cb),
+      onEnd: (cb) => onEndList.push(cb),
       error,
       abort() {
         return xhrPromise.value.abortXhr();
       },
       promise: computed(() => xhrPromise.value),
       reload,
+      xhr,
     };
   }
 
-  const post = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.post.bind(xhr, xhrConfig), params);
+  const post = <T = any>(xhrConfig?: XhrConfig, params: Obj | Ref<Obj> = {}) => {
+    const xhr = new Xhr<T>();
 
-  const put = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.put.bind(xhr, xhrConfig), params);
+    return {
+      ...useAsync<T>(
+        () => xhr.post(xhrConfig),
+        mergeParamsWithToken(params),
+      ),
+      xhr,
+    };
+  };
 
-  const _delete = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => useAsync<T>(xhr.delete.bind(xhr, xhrConfig), params);
+  const put = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => {
+    const xhr = new Xhr<T>();
+
+    return {
+      ...useAsync<T>(
+        () => xhr.put(xhrConfig),
+        mergeParamsWithToken(params),
+      ),
+      xhr,
+    };
+  };
+
+  const _delete = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => {
+    const xhr = new Xhr<T>();
+
+    return {
+      ...useAsync<T>(
+        () => xhr.delete(xhrConfig),
+        mergeParamsWithToken(params),
+      ),
+      xhr,
+    };
+  };
 
   if (!legacy) {
     onBeforeUnmount(() => {
-      xhrList.value.forEach((_xhr) => _xhr.abort());
+      xhrList.value.forEach((xhr) => xhr.abort());
     });
-
-    watch(
-      () => error.value,
-      (e) => {
-        if (e && !isThrowDisabled) {
-          // throw error break success of watch
-          // force to disable it, else infinite loop
-          isThrowDisabled = true;
-          throw e;
-        }
-      }, {
-        immediate: true,
-      },
-    );
   }
-
-  watch(
-    () => {
-      if (args) {
-        return getTokenValue(args.token);
-      }
-      return null;
-    },
-    () => {
-      xhr = new Xhr<any>();
-      const token = args ? getTokenValue(args.token) : null;
-      if (token) {
-        xhr.token = token;
-      }
-    }, {
-      immediate: true,
-    },
-  );
 
   return {
     get,
     post,
     put,
     delete: _delete,
-    abort: xhr.abort.bind(xhr),
-    xhr,
   };
 }
