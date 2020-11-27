@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueCompositionApi, { ref, watch } from '@vue/composition-api';
+import VueCompositionApi, { computed, ref, watch } from '@vue/composition-api';
 import useXhr from '@/useXhr';
 import mockXhr from './mockXhr';
 
@@ -23,7 +23,7 @@ describe('GIVEN `useAsync`', () => {
       let reload;
       let isPending;
       let xhr;
-      const enabled = ref(false);
+      const params = ref({ ok: 0 });
 
       afterAll(() => {
         mocked.restore();
@@ -31,7 +31,6 @@ describe('GIVEN `useAsync`', () => {
       beforeAll(async (done) => {
         mocked = mockXhr.get({
           url: '/fake/get/1',
-          enabled,
         });
         mocked.resolve('get-ok');
 
@@ -41,21 +40,25 @@ describe('GIVEN `useAsync`', () => {
           isPending: _isPending,
           promise,
           xhr: _xhr,
-        } = get({
-          url: '/fake/get/:ok',
-          params: ref({ ok: 1 }),
-        });
+        } = get(
+          '/fake/get/:ok',
+          params,
+          computed(() => !!params.value.ok),
+        );
+
+        params.value.ok = 1;
 
         xhr = _xhr;
-
-        enabled.value = true;
 
         data = _data;
         reload = _reload;
         isPending = _isPending;
 
         await promise.value;
-        done();
+        watch(
+          () => _data.value,
+          () => done(),
+        );
       });
       it('THEN query should be retrieved with good value', async () => {
         expect(data.value).toBe('get-ok');

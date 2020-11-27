@@ -214,7 +214,9 @@ export default function (args?: UseXhr) {
     watch(
       () => exec.value,
       (v) => {
-        if (v) {
+        // we don't want to execute twice if params changed AND exec changed
+        // we don't want to abort the previous query
+        if (!isPending.value && v) {
           reload();
         }
       }, {
