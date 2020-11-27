@@ -55,10 +55,9 @@ describe('GIVEN `useAsync`', () => {
         isPending = _isPending;
 
         await promise.value;
-        watch(
-          () => _data.value,
-          () => done(),
-        );
+        setTimeout(() => {
+          done();
+        }, 1000);
       });
       it('THEN query should be retrieved with good value', async () => {
         expect(data.value).toBe('get-ok');

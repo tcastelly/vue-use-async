@@ -87,7 +87,8 @@ function useAsync<T>(
   watch(
     () => enabled.value,
     (v) => {
-      if (v) {
+      // we don't want to execute twice if params changed AND exec changed
+      if (!isPending.value && v) {
         _reload(wrapParams.value);
       }
     }, {
