@@ -23,7 +23,8 @@ describe('GIVEN `useAsync`', () => {
       let reload;
       let isPending;
       let xhr;
-      const params = ref({ ok: 0 });
+      let undefinedParam;
+      const params = ref({ ok: 0, t: undefinedParam });
 
       afterAll(() => {
         mocked.restore();

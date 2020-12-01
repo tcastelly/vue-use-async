@@ -1,4 +1,4 @@
-import { Obj, XhrGet, XhrConfig } from './index';
+import { Obj, XhrConfig, XhrGet } from './index';
 import Deferred from './Deferred';
 
 export default class Xhr<T> {
@@ -176,10 +176,13 @@ export default class Xhr<T> {
     let queryParams = '';
 
     // Stringify get parameters
-    Object.keys(params).forEach((paramKey) => {
-      queryParams += `${separator + paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
-      separator = '&';
-    });
+    Object.keys(params)
+      // remove undefined param
+      .filter((paramKey) => params[paramKey] !== undefined)
+      .forEach((paramKey) => {
+        queryParams += `${separator + paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
+        separator = '&';
+      });
 
     // remove unresolved query parameters (:value)
     url = url.replace(/\/:[^/]*/gi, '');
