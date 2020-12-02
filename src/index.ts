@@ -1,7 +1,8 @@
 import type { ComputedRef, Ref } from '@vue/composition-api';
-import cache, { clearCache, cacheSize } from './cache';
+import cache, { cacheSize, clearCache } from './cache';
 import Deferred from './Deferred';
 import useAsync from './useAsync';
+import useMutation from './useMutation';
 import useXhr from './useXhr';
 import Xhr from './Xhr';
 import useSpinner from './useSpinner';
@@ -75,6 +76,7 @@ export {
   cacheSize,
   Deferred,
   useAsync,
+  useMutation,
   useXhr,
   Xhr,
   useSpinner,

@@ -23,8 +23,7 @@ describe('GIVEN `useAsync`', () => {
       let reload;
       let isPending;
       let xhr;
-      let undefinedParam;
-      const params = ref({ ok: 0, t: undefinedParam });
+      const params = ref({ ok: 0, undefinedParam: undefined });
 
       afterAll(() => {
         mocked.restore();
@@ -41,11 +40,11 @@ describe('GIVEN `useAsync`', () => {
           isPending: _isPending,
           promise,
           xhr: _xhr,
-        } = get(
-          '/fake/get/:ok',
+        } = get({
+          url: '/fake/get/:ok',
           params,
-          computed(() => !!params.value.ok),
-        );
+          enabled: computed(() => !!params.value.ok),
+        });
 
         params.value.ok = 1;
 
