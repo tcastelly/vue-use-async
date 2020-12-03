@@ -245,7 +245,7 @@ export default class Xhr<T> {
    */
   static _injectParamsInUrl(url: string, params?: Obj): { url: string, params: Obj } {
     // replace path params
-    const unbindParams = { ...params };
+    const unbindParams = JSON.parse(JSON.stringify(params));
 
     // escape hash character
     url = url.replace(/#/, '%23');
