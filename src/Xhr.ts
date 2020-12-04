@@ -247,12 +247,14 @@ export default class Xhr<T> {
     //
     // replace path params
 
-    // TODO - `getOwnPropertyNames` used to keep compatibility with VueJS 2
-    // can be removed for VueJS 3
-    const unbindParams = Object.getOwnPropertyNames(params).reduce((acc, v) => {
-      acc[v] = params[v];
-      return acc;
-    }, {});
+    // TODO - `getOwnPropertyNames` used to keep compatibility with VueJS 2 and ES6 Proxy
+    // can be replaced by Object.keys with VueJS 3
+    const unbindParams = Object.getOwnPropertyNames(params)
+      .filter((attr) => !attr.match(/__[a-zA-Z0-9_]+__/gi)) // can be removed for VueJS 3
+      .reduce((acc, v) => {
+        acc[v] = params[v];
+        return acc;
+      }, {});
 
     // escape hash character
     url = url.replace(/#/, '%23');
