@@ -56,7 +56,7 @@ function useMutation<T>(
     p.finally(() => {
       isPending.value = false;
 
-      onEndList.forEach((cb) => cb());
+      onEndList.forEach((cb) => cb(data, params));
     });
   };
 
