@@ -243,9 +243,12 @@ export default class Xhr<T> {
    * @return {{url: *, params}}
    * @private
    */
-  static _injectParamsInUrl(url: string, params?: Obj): { url: string, params: Obj } {
+  static _injectParamsInUrl(url: string, params: Obj = {}): { url: string, params: Obj } {
     // replace path params
-    const unbindParams = JSON.parse(JSON.stringify(params));
+    const unbindParams = Object.keys(params).reduce((acc, v) => {
+      acc[v] = params[v];
+      return acc;
+    }, {});
 
     // escape hash character
     url = url.replace(/#/, '%23');
