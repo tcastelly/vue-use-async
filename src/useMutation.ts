@@ -6,9 +6,8 @@ import Deferred from '@/Deferred';
 
 function useMutation<T>(
   func: (...any) => Promise<T>,
-  params: Ref<any> | any = {},
 ): {
-  mutate: () => void,
+  mutate: (params: Ref<any> | any) => void,
   onError: (cb: (e: Error) => any) => void,
   onEnd: (cb: Func) => any,
   isPending: Ref<boolean>,
@@ -22,8 +21,6 @@ function useMutation<T>(
 
   const error = ref<Error | null>();
 
-  const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
-
   const onErrorList = [];
 
   const onEndList = [];
@@ -31,7 +28,9 @@ function useMutation<T>(
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
 
-  const mutate = () => {
+  const mutate = (params) => {
+    const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
+
     d.value = new Deferred();
 
     isPending.value = true;

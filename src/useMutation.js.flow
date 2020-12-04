@@ -1,19 +1,19 @@
 // @flow
 
 import { type Computed, type Ref } from '@vue/composition-api';
-import type Xhr from './Xhr'
+import { Func } from './index'
 
 export type UseMutationReturn<T> = {|
-  onError?: ((Error | Object) => any) => any,
-  onEnd?: ((ProgressEvent, Xhr<U>) => any) => any;
+  mutate: (params: Ref<any> | any) => void,
+  onError: (cb: (e: Error) => any) => void,
+  onEnd: (cb: Func) => any,
   isPending: Ref<boolean>,
-  error: Ref<?Error | Object>,
+  error: Ref<Error | null>,
   data: Ref<T>,
   promise: Computed<Promise<T>>,
 |}
 
 declare export default function useMutation<T>(
   func: (...any) => Promise<T>,
-  params?: Ref<any> | any,
 ): UseMutationReturn<T>;
 
