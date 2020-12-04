@@ -59,7 +59,7 @@ describe('GIVEN `useAsync`', () => {
           done();
         }, 1000);
       });
-      it('THEN query should be retrieved with good value', async () => {
+      it('THEN query should be retrieved with good value', () => {
         expect(data.value).toBe('get-ok');
       });
       it('AND token should be in the `xhr` instance', () => {
