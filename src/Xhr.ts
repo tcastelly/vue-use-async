@@ -244,8 +244,12 @@ export default class Xhr<T> {
    * @private
    */
   static _injectParamsInUrl(url: string, params: Obj = {}): { url: string, params: Obj } {
+    //
     // replace path params
-    const unbindParams = Object.keys(params).reduce((acc, v) => {
+
+    // TODO - `getOwnPropertyNames` used to keep compatibility with VueJS 2
+    // can be removed for VueJS 3
+    const unbindParams = Object.getOwnPropertyNames(params).reduce((acc, v) => {
       acc[v] = params[v];
       return acc;
     }, {});
