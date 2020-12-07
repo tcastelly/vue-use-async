@@ -3,6 +3,7 @@ import cache, { cacheSize, clearCache } from './cache';
 import Deferred from './Deferred';
 import useAsync from './useAsync';
 import useMutation from './useMutation';
+import useResult from './useResult';
 import useXhr from './useXhr';
 import Xhr from './Xhr';
 import useSpinner from './useSpinner';
@@ -77,6 +78,7 @@ export {
   Deferred,
   useAsync,
   useMutation,
+  useResult,
   useXhr,
   Xhr,
   useSpinner,
