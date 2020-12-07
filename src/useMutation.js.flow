@@ -4,7 +4,7 @@ import { type Computed, type Ref } from '@vue/composition-api';
 import { Func } from './index'
 
 export type UseMutationReturn<T> = {|
-  mutate: (params: Ref<any> | any) => void,
+  mutate: (params: Ref<any> | any) => Promise<T>,
   onError: (cb: (e: Error) => any) => void,
   onEnd: (cb: Func) => any,
   isPending: Ref<boolean>,

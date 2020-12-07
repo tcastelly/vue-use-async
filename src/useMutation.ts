@@ -7,7 +7,7 @@ import Deferred from '@/Deferred';
 function useMutation<T>(
   func: (...any) => Promise<T>,
 ): {
-  mutate: (params: Ref<any> | any) => void,
+  mutate: (params: Ref<any> | any) => Promise<T>,
   onError: (cb: (e: Error) => any) => void,
   onEnd: (cb: Func) => any,
   isPending: Ref<boolean>,
@@ -58,6 +58,8 @@ function useMutation<T>(
 
       onEndList.forEach((cb) => cb(data, params));
     });
+
+    return p;
   };
 
   return {
