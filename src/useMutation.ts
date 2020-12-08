@@ -44,6 +44,7 @@ function useMutation<T>(
     p.then((res) => {
       data.value = res;
       d.value.resolve(res);
+      onEndList.forEach((cb) => cb(data, params));
     }, (_error) => {
       error.value = _error || null;
 
@@ -55,8 +56,6 @@ function useMutation<T>(
 
     p.finally(() => {
       isPending.value = false;
-
-      onEndList.forEach((cb) => cb(data, params));
     });
 
     return p;
