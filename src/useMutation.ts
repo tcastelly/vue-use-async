@@ -44,7 +44,7 @@ function useMutation<T>(
     p.then((res) => {
       data.value = res;
       d.value.resolve(res);
-      onEndList.forEach((cb) => cb(data, params));
+      onEndList.forEach((cb) => cb(data.value, wrapParams.value));
     }, (_error) => {
       error.value = _error || null;
 
