@@ -1,7 +1,6 @@
 import {
   computed, ComputedRef, isRef, ref, Ref,
 } from '@vue/composition-api';
-import { Func } from '@/index';
 import Deferred from '@/Deferred';
 
 function useMutation<T>(
@@ -9,7 +8,7 @@ function useMutation<T>(
 ): {
   mutate: (params: Ref<any> | any) => Promise<T>,
   onError: (cb: (e: Error) => any) => void,
-  onEnd: (cb: Func) => any,
+  onEnd: (cb: (res: any, params: any) => void) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<T>,

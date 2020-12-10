@@ -6,7 +6,7 @@ import { Func } from './index'
 export type UseMutationReturn<T> = {|
   mutate: (params: Ref<any> | any) => Promise<T>,
   onError: (cb: (e: Error) => any) => void,
-  onEnd: (cb: Func) => any,
+  onEnd: (cb: (res: any, params: any) => void) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<T>,

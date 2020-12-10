@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",

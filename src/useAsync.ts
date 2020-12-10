@@ -11,7 +11,7 @@ function useAsync<T>(
 ): {
   onError: (cb: (e: Error) => any) => void,
   onStart: (cb: Func) => any,
-  onEnd: (cb: Func) => any,
+  onEnd: (cb: (res: any) => void) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<T>,
@@ -53,6 +53,9 @@ function useAsync<T>(
     p.then((res) => {
       data.value = res;
       d.value.resolve(res);
+
+      useAsync.config.onEnd(res);
+      onEndList.forEach((cb) => cb(res));
     }, (_error) => {
       error.value = _error || null;
 
@@ -65,9 +68,6 @@ function useAsync<T>(
 
     p.finally(() => {
       isPending.value = false;
-
-      useAsync.config.onEnd();
-      onEndList.forEach((cb) => cb());
     });
   };
 
@@ -115,7 +115,7 @@ useAsync.config = {
   },
   onStart() {
   },
-  onEnd() {
+  onEnd(res: any) { // eslint-disable-line @typescript-eslint/no-unused-vars
   },
 };
 

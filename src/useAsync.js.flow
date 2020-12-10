@@ -5,8 +5,8 @@ import type Xhr from './Xhr'
 
 export type UseAsyncReturn<T> = {|
   onError?: ((Error | Object) => any) => any,
-  onStart?: ((ProgressEvent, Xhr<U>) => any) => any,
-  onEnd?: ((ProgressEvent, Xhr<U>) => any) => any;
+  onStart?: (() => any) => any,
+  onEnd?: (cb: (res: any) => void) => any,
   isPending: Ref<boolean>,
   error: Ref<?Error | Object>,
   data: Ref<T>,
@@ -26,6 +26,6 @@ useAsync.config = {
   },
   onStart() {
   },
-  onEnd() {
+  onEnd(any) { // eslint-disable-line no-unused-vars
   }
 };
