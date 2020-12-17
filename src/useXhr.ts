@@ -14,15 +14,15 @@ function _blank(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-
 
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
-type UseXhr<T = any> = {
-  onError?: (cb: (e: Error, xhr: Xhr<T>) => any) => any,
-  onStart?: (cb: (xhr: Xhr<T>) => any) => any,
-  onEnd?: (cb: (xhr: Xhr<T>) => any) => any,
-  onProgress?: (cb: (e: ProgressEvent, xhr: Xhr<T>) => any) => any,
-  onAbort?: (cb: (e: ProgressEvent, xhr: Xhr<T>) => any) => any;
-  context?: any,
-  legacy?: boolean,
-  token?: Token,
+declare type UseXhr<T = any> = {
+  onError?: (e: { [id: string]: any } | string, xhr: Xhr<T>) => any,
+  onStart?: (xhr: Xhr<T>) => any,
+  onEnd?: (xhr: Xhr<T>) => any,
+  onProgress?: (e: ProgressEvent, xhr: Xhr<T>) => any,
+  onAbort?: (e: ProgressEvent, xhr: Xhr<T>) => any,
+  context?: any;
+  legacy?: boolean;
+  token?: Token;
 };
 
 const getTokenValue: (token: Token) => string | null = (token) => {
