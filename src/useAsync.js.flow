@@ -10,7 +10,7 @@ export type UseAsyncReturn<T> = {|
   isPending: Ref<boolean>,
   error: Ref<?Error | Object>,
   data: Ref<T>,
-  reload: (any) => void,
+  reload: () => void,
   promise: Computed<Promise<T>>,
 |}
 

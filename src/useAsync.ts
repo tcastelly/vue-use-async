@@ -15,7 +15,7 @@ function useAsync<T>(
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<T>,
-  reload: (any) => void,
+  reload: () => void,
   promise: ComputedRef<Promise<T>>,
 } {
   const isPending = ref();
