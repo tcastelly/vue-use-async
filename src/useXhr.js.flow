@@ -7,17 +7,13 @@ import type { UseAsyncReturn } from './useAsync.js.flow';
 
 type Vue = typeof vue;
 
-export type GetConfig = string | (XhrConfig & $Shape<{|
-  url?: string;
-
-  params?: Object;
-
-  port?: ?number;
-
-  cacheDuration?: 'max' | number;
-
-  enabled?: Ref<boolean> | boolean,
-|}>);
+export type GetConfig = string | $Shape<{|
+  ...XhrConfig,
+  ...{|
+    cacheDuration?: 'max' | number;
+    enabled?: Ref<boolean> | boolean,
+  |}
+|}>;
 
 export type GetReturn<T> = {|
   isPending: Computed<boolean>,
@@ -30,11 +26,6 @@ export type GetReturn<T> = {|
 |}
 
 declare export default function useXhr<U: mixed>(?{|
-  onError?: (Error, Xhr<U>) => any,
-  onStart?: (ProgressEvent, Xhr<U>) => any,
-  onEnd?: (ProgressEvent, Xhr<U>) => any;
-  onProgress?: (ProgressEvent, Xhr<U>) => any;
-  onAbort?: (ProgressEvent, Xhr<U>) => any;
   context?: Vue,
   legacy?: boolean, // can be used for VueJS 2.x without composition-api
   token?: Ref<?string> | Computed<?string> | ?string,
