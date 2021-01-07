@@ -40,11 +40,11 @@ describe('GIVEN `useAsync`', () => {
           isPending: _isPending,
           promise,
           xhr: _xhr,
-        } = get({
-          url: '/fake/get/:ok',
+        } = get(
+          '/fake/get/:ok',
           params,
-          enabled: computed(() => !!params.value.ok),
-        });
+          computed(() => !!params.value.ok),
+        );
 
         params.value.ok = 1;
 
