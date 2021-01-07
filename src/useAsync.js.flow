@@ -4,9 +4,9 @@ import { type Computed, type Ref } from '@vue/composition-api';
 import type Xhr from './Xhr'
 
 export type UseAsyncReturn<T> = {|
-  onError?: ((Error | Object) => any) => any,
-  onStart?: (() => any) => any,
-  onEnd?: (cb: (res: any) => any) => any,
+  onError: ((Error | Object) => any) => any,
+  onStart: (() => any) => any,
+  onEnd: (cb: (res: any) => any) => any,
   isPending: Ref<boolean>,
   error: Ref<?Error | Object>,
   data: Ref<T>,

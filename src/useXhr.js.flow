@@ -7,13 +7,15 @@ import type { UseAsyncReturn } from './useAsync.js.flow';
 
 type Vue = typeof vue;
 
-export type GetConfig = string | $Shape<{|
+type $GetConfig = string | $Shape<{|
   ...XhrConfig,
   ...{|
     cacheDuration?: 'max' | number;
     enabled?: Ref<boolean> | boolean,
   |}
 |}>;
+
+export type GetConfig = $GetConfig | Computed<$GetConfig>;
 
 export type GetReturn<T> = {|
   isPending: Computed<boolean>,

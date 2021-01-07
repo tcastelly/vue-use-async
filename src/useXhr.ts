@@ -1,5 +1,11 @@
 import {
-  computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, watch,
+  computed,
+  ComputedRef,
+  isRef,
+  onBeforeUnmount,
+  ref,
+  Ref,
+  watch,
 } from '@vue/composition-api';
 import {
   CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
@@ -104,23 +110,25 @@ export default function (args?: UseXhr) {
     const getParams = computed(() => {
       let _getParams: GetConfig = {};
 
-      if (typeof parametersObj === 'string') {
-        url = parametersObj;
+      const unwrapParametersObj = isRef(parametersObj) ? parametersObj.value : parametersObj;
+
+      if (typeof unwrapParametersObj === 'string') {
+        url = unwrapParametersObj;
         _getParams.url = url;
         _getParams.params = {};
-      } else if (parametersObj && typeof parametersObj === 'object') {
-        ({ url } = parametersObj);
+      } else {
+        ({ url } = unwrapParametersObj);
 
         // use params from second args of get function
         if (!params) {
-          params = parametersObj.params || {};
+          params = unwrapParametersObj.params || {};
         }
 
-        duration = parametersObj.cacheDuration;
+        duration = unwrapParametersObj.cacheDuration;
 
         _getParams = {
           ..._getParams,
-          ...parametersObj,
+          ...unwrapParametersObj,
         };
       }
 
@@ -131,7 +139,7 @@ export default function (args?: UseXhr) {
       // merge params
       if (params && typeof _getParams === 'object' && _getParams.params) {
         _getParams.params = {
-          ...(isRef(_getParams.params) ? _getParams.params.value : _getParams.params),
+          ..._getParams.params,
           ...(isRef(params) ? (params.value || {}) : params),
         };
       }
@@ -279,7 +287,11 @@ export default function (args?: UseXhr) {
 
   if (!legacy) {
     onBeforeUnmount(() => {
-      xhrList.value.forEach((xhr) => xhr.abort());
+      xhrList.value.forEach((xhr) => {
+        if (xhr.isPending) {
+          xhr.abort();
+        }
+      });
     });
   }
 

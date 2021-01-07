@@ -45,6 +45,8 @@ export default class Xhr<T> {
 
   responseType: 'arraybuffer' | 'blob' | 'json' | 'text' = 'text';
 
+  isPending = false;
+
   _eventsReady: boolean;
 
   _oXHR: XMLHttpRequest;
@@ -308,6 +310,8 @@ export default class Xhr<T> {
   _send(): void {
     let params;
 
+    this.isPending = true;
+
     if (this.sendAs === 'multipart') {
       params = Xhr.getFormData(this.params);
     } else if (this.sendAs === 'json') {
@@ -350,6 +354,9 @@ export default class Xhr<T> {
     }
 
     this._deferred = new Deferred();
+    this._deferred.promise.finally(() => {
+      this.isPending = false;
+    });
     this._oXHR = new XMLHttpRequest();
     this._oXHR.timeout = this.timeout;
     this._oXHR.responseType = this.responseType;

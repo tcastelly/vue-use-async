@@ -46,17 +46,13 @@ export type XhrConfig<T = any> = Partial<{
   responseType?: 'arraybuffer' | 'blob',
 }>
 
-export type GetConfig = string | (XhrConfig & Partial<{
-  url?: string;
-
-  params?: Ref<Obj> | Obj;
-
-  port?: number | null;
-
+export type $GetConfig = string | (XhrConfig & Partial<{
   cacheDuration?: CacheDuration;
 
-  enabled?: Ref<boolean> | boolean;
+  enabled?: boolean;
 }>);
+
+export type GetConfig = $GetConfig | Ref<$GetConfig>
 
 export type GetReturn<T> = {
   isPending: ComputedRef<boolean>,
