@@ -49,7 +49,7 @@ export type XhrConfig<T = any> = Partial<{
 export type $GetConfig = string | (XhrConfig & Partial<{
   cacheDuration?: CacheDuration;
 
-  enabled?: boolean;
+  enabled?: boolean | ComputedRef<boolean>;
 }>);
 
 export type GetConfig = $GetConfig | Ref<$GetConfig>
