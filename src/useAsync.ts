@@ -1,7 +1,7 @@
 import {
   computed, ComputedRef, isRef, Ref, ref, watch,
 } from '@vue/composition-api';
-import { Func, Obj } from './index';
+import { Func, Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
 
 function useAsync<T>(
@@ -14,9 +14,9 @@ function useAsync<T>(
   onEnd: (cb: (res: any) => void) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
-  data: Ref<T>,
+  data: Ref<UnwrappedPromiseType<typeof func>>;
   reload: () => void,
-  promise: ComputedRef<Promise<T>>,
+  promise: ComputedRef<ReturnType<typeof func>>,
 } {
   const isPending = ref();
 

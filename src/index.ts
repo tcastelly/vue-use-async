@@ -12,6 +12,10 @@ export type Obj = { [id: string]: any };
 
 export type Func = (...any) => any;
 
+export type UnwrappedPromiseType <T extends (...args: any) => any> =
+  T extends (...args: any) => Promise<infer U> ? U :
+    T extends (...args: any) => infer U ? U : any
+
 interface CancellablePromise<T> extends Promise<T> {
   abortXhr: () => void,
 }

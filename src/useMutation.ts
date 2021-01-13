@@ -2,6 +2,7 @@ import {
   computed, ComputedRef, isRef, ref, Ref,
 } from '@vue/composition-api';
 import Deferred from '@/Deferred';
+import { UnwrappedPromiseType } from '@/index';
 
 function useMutation<T>(
   func: (...any) => Promise<T>,
@@ -11,7 +12,7 @@ function useMutation<T>(
   onEnd: (cb: (res: any, params: any) => void) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
-  data: Ref<T>,
+  data: Ref<UnwrappedPromiseType<typeof func>>;
   promise: ComputedRef<Promise<T>>,
 } {
   const isPending = ref();
