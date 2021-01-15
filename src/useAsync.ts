@@ -1,21 +1,30 @@
 import {
   computed, ComputedRef, isRef, Ref, ref, watch,
 } from '@vue/composition-api';
-import { Func, Obj, UnwrappedPromiseType } from './index';
+import {
+  Obj,
+  UnwrappedPromiseType,
+} from './index';
 import Deferred from './Deferred';
+
+type OnErrorCb = (e: Error, params: any) => any;
+
+type OnStartCb = (params: any) => any;
+
+type OnEndCb <T> = (res: T, params: any) => any;
 
 function useAsync<T>(
   func: (...any) => Promise<T>,
   params: Ref<any> | any = {},
   enabled = ref(true),
 ): {
-  onError: (cb: (e: Error) => any) => void,
-  onStart: (cb: Func) => any,
-  onEnd: (cb: (res: any) => void) => any,
+  onError: (cb: OnErrorCb) => any,
+  onStart: (cb: OnStartCb) => any,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<UnwrappedPromiseType<typeof func>>;
-  reload: () => void,
+  reload: () => any,
   promise: ComputedRef<ReturnType<typeof func>>,
 } {
   const isPending = ref();
@@ -26,11 +35,11 @@ function useAsync<T>(
 
   const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
 
-  const onErrorList = [];
+  const onErrorList: Array<OnErrorCb> = [];
 
-  const onStartList = [];
+  const onStartList: Array<OnStartCb> = [];
 
-  const onEndList = [];
+  const onEndList: Array<OnEndCb<T>> = [];
 
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
@@ -38,7 +47,7 @@ function useAsync<T>(
   // generate new xhr/promise
   const _reload = (_params: Obj) => {
     useAsync.config.onStart();
-    onStartList.forEach((cb) => cb(error.value));
+    onStartList.forEach((cb) => cb(wrapParams.value));
 
     d.value = new Deferred();
 
@@ -55,12 +64,12 @@ function useAsync<T>(
       d.value.resolve(res);
 
       useAsync.config.onEnd(res);
-      onEndList.forEach((cb) => cb(res));
+      onEndList.forEach((cb) => cb(res, wrapParams.value));
     }, (_error) => {
       error.value = _error || null;
 
       useAsync.config.onError(_error);
-      onErrorList.forEach((cb) => cb(error.value));
+      onErrorList.forEach((cb) => cb(error.value, wrapParams.value));
 
       d.value.reject(_error);
       error.value = _error;

@@ -69,9 +69,9 @@ export type GetReturn<T> = {
   abort: () => void,
   promise: ComputedRef<Promise<T>>,
   reload: () => void,
-  onError: (cb: (e: Error) => void) => void,
-  onStart?: (cb: (xhr: Xhr<T>) => any) => any,
-  onEnd?: (cb: (xhr: Xhr<T>) => any) => any,
+  onError: (cb: (e: Error, xhr: Xhr<T>) => void) => void,
+  onStart?: (cb: (params: any, xhr: Xhr<T>) => any) => any,
+  onEnd?: (cb: (res: T, params: any, xhr: Xhr<T>) => any) => any,
   xhr: Xhr<T>,
 }
 
