@@ -19,9 +19,20 @@ import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
 import useAsync from './useAsync';
 
+// used as default `onError`
+function _blank(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-vars
+}
+
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
-declare type UseXhr = {
+declare type UseXhr<T = any> = {
+  // global callback for VueJS 2 plugin compatibility
+  onError?: (e: { [id: string]: any } | string, xhr: Xhr<T>) => any,
+  onStart?: (xhr: Xhr<T>) => any,
+  onEnd?: (xhr: Xhr<T>) => any,
+  onProgress?: (e: ProgressEvent, xhr: Xhr<T>) => any,
+  onAbort?: (e: ProgressEvent, xhr: Xhr<T>) => any,
+  //
   context?: any;
   legacy?: boolean;
   token?: Token;
@@ -39,9 +50,20 @@ const getTokenValue: (token: Token) => string | null = (token) => {
 
 export default function (args?: UseXhr) {
   const {
+    onError,
+    onStart,
+    onEnd,
+    context,
     legacy,
     token,
   } = (args || {
+    onError: () => {
+    },
+    onStart: () => {
+    },
+    onEnd: () => {
+    },
+    context: null,
     legacy: false,
     token: null,
   });
@@ -73,9 +95,14 @@ export default function (args?: UseXhr) {
   ): GetReturn<T> {
     const xhr: Xhr<any> = new Xhr<any>();
 
-    const onErrorList = [];
-    const onStartList = [];
-    const onEndList = [];
+    // Global cb for VueJS 2 Plugin Compatibility
+    const _onError = (onError || _blank).bind(context);
+    const _onStart = (onStart || _blank).bind(context);
+    const _onEnd = (onEnd || _blank).bind(context);
+
+    const onErrorList = [_onError];
+    const onStartList = [_onStart];
+    const onEndList = [_onEnd];
 
     const error = ref<Error | Obj | null>();
 
