@@ -46,7 +46,9 @@ describe('GIVEN `useAsync`', () => {
           enabled: computed(() => !!params.value.ok),
         });
 
-        params.value.ok = 1;
+        Vue.nextTick(() => {
+          params.value.ok = 1;
+        });
 
         xhr = _xhr;
 
@@ -54,10 +56,10 @@ describe('GIVEN `useAsync`', () => {
         reload = _reload;
         isPending = _isPending;
 
-        await promise.value;
-        setTimeout(() => {
-          done();
-        }, 1000);
+        watch(
+          () => _data.value,
+          () => done(),
+        );
       });
       it('THEN query should be retrieved with good value', () => {
         expect(data.value).toBe('get-ok');

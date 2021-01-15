@@ -197,7 +197,7 @@ export default function (args?: UseXhr) {
       // Preserve function extended in promise (abort)
       xhrPromise.value = cache<T>({
         id: lastCacheId,
-        xhr: xhr.get.bind(xhr, xhrParams),
+        xhr: xhr.get.bind(xhr, getParams.value),
         duration,
       });
 
