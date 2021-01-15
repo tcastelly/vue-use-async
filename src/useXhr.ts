@@ -25,11 +25,17 @@ function _blank(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-
 
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
+type OnErrorCb <T> = (e: { [id: string]: any } | string, xhr: Xhr<T>) => any
+
+type OnStartCb <T> = (params: any, xhr: Xhr<T>) => any;
+
+type OnEndCb <T> = (res: T, params: any, xhr: Xhr<T>) => any
+
 declare type UseXhr<T = any> = {
   // global callback for VueJS 2 plugin compatibility
-  onError?: (e: { [id: string]: any } | string, xhr: Xhr<T>) => any,
-  onStart?: (xhr: Xhr<T>) => any,
-  onEnd?: (xhr: Xhr<T>) => any,
+  onError?: OnErrorCb<T>,
+  onStart?: OnStartCb<T>,
+  onEnd?: OnEndCb<T>,
   onProgress?: (e: ProgressEvent, xhr: Xhr<T>) => any,
   onAbort?: (e: ProgressEvent, xhr: Xhr<T>) => any,
   //
@@ -100,9 +106,9 @@ export default function (args?: UseXhr) {
     const _onStart = (onStart || _blank).bind(context);
     const _onEnd = (onEnd || _blank).bind(context);
 
-    const onErrorList = [_onError];
-    const onStartList = [_onStart];
-    const onEndList = [_onEnd];
+    const onErrorList: Array<OnErrorCb<T>> = [_onError];
+    const onStartList: Array<OnStartCb<T>> = [_onStart];
+    const onEndList: Array<OnEndCb<T>> = [_onEnd];
 
     const error = ref<Error | Obj | null>();
 
@@ -172,7 +178,9 @@ export default function (args?: UseXhr) {
         xhr.abort();
       }
 
-      onStartList.forEach((cb) => cb(xhr));
+      const xhrParams = typeof getParams.value.params === 'object' ? getParams.value.params : {};
+
+      onStartList.forEach((cb) => cb(xhrParams, xhr));
 
       isPending.value = true;
       error.value = null;
@@ -183,13 +191,13 @@ export default function (args?: UseXhr) {
 
       lastCacheId = decodeURIComponent(Xhr.stringifyUrl(
         url,
-        typeof getParams.value.params === 'object' ? getParams.value.params : {},
+        xhrParams,
       ));
 
       // Preserve function extended in promise (abort)
       xhrPromise.value = cache<T>({
         id: lastCacheId,
-        xhr: xhr.get.bind(xhr, getParams.value),
+        xhr: xhr.get.bind(xhr, xhrParams),
         duration,
       });
 
@@ -210,7 +218,7 @@ export default function (args?: UseXhr) {
       xhrPromise.value.finally(() => {
         removeHttpXhrList();
         isPending.value = false;
-        onEndList.forEach((cb) => cb(data.value, getParams.value, xhr));
+        onEndList.forEach((cb) => cb(data.value, xhrParams, xhr));
       });
     };
 
