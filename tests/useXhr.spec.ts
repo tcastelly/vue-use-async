@@ -38,7 +38,6 @@ describe('GIVEN `useAsync`', () => {
           data: _data,
           reload: _reload,
           isPending: _isPending,
-          promise,
           xhr: _xhr,
         } = get({
           url: '/fake/get/:ok',
