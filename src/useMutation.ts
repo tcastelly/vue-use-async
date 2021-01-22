@@ -1,15 +1,23 @@
 import {
-  computed, ComputedRef, isRef, ref, Ref,
+  computed,
+  ComputedRef,
+  isRef,
+  ref,
+  Ref,
 } from '@vue/composition-api';
 import Deferred from '@/Deferred';
-import { UnwrappedPromiseType } from '@/index';
+import { UnwrappedPromiseType } from './index';
+
+type OnErrorCb = (e: Error, params: any) => any;
+
+type OnEndCb <T> = (res: T, params: any) => any;
 
 function useMutation<T>(
   func: (...any) => Promise<T>,
 ): {
-  mutate: (params: Ref<any> | any) => Promise<T>,
-  onError: (cb: (e: Error) => any) => void,
-  onEnd: (cb: (res: any, params: any) => void) => any,
+  mutate: (params: Ref<any> | any) => Promise<UnwrappedPromiseType<typeof func>>,
+  onError: (cb: OnErrorCb) => any,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
   isPending: Ref<boolean>,
   error: Ref<Error | null>,
   data: Ref<UnwrappedPromiseType<typeof func>>;
