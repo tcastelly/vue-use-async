@@ -82,8 +82,8 @@ function useAsync<T>(
 
   watch(
     () => wrapParams.value,
-    (v) => {
-      if (enabled.value) {
+    (v, oldV) => {
+      if (enabled.value && JSON.stringify(v) !== JSON.stringify(oldV)) {
         _reload(v);
       }
     }, {
