@@ -1,17 +1,12 @@
-import {
-  computed, ComputedRef, isRef, Ref, ref, watch,
-} from '@vue/composition-api';
-import {
-  Obj,
-  UnwrappedPromiseType,
-} from './index';
+import { computed, ComputedRef, isRef, Ref, ref, watch } from '@vue/composition-api';
+import { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
 
 type OnErrorCb = (e: Error, params: any) => any;
 
 type OnStartCb = (params: any) => any;
 
-type OnEndCb <T> = (res: T, params: any) => any;
+type OnEndCb<T> = (res: T, params: any) => any;
 
 function useAsync<T>(
   func: (...any) => Promise<T>,
@@ -83,7 +78,9 @@ function useAsync<T>(
   watch(
     () => wrapParams.value,
     (v, oldV) => {
-      if (enabled.value && JSON.stringify(v) !== JSON.stringify(oldV)) {
+      if ((enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
+        // fix if there is no change. Just undefined as value
+        || (v === undefined && oldV === undefined)) {
         _reload(v);
       }
     }, {
