@@ -1,4 +1,11 @@
-import { computed, ComputedRef, isRef, Ref, ref, watch } from '@vue/composition-api';
+import {
+  computed,
+  ComputedRef,
+  isRef,
+  Ref,
+  ref,
+  watch,
+} from '@vue/composition-api';
 import { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
 
