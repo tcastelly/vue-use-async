@@ -36,8 +36,8 @@ declare type UseXhr<T = any> = {
   onError?: OnErrorCb<T>,
   onStart?: OnStartCb<T>,
   onEnd?: OnEndCb<T>,
-  onProgress?: (e: ProgressEvent, xhr: Xhr<T>) => any,
-  onAbort?: (e: ProgressEvent, xhr: Xhr<T>) => any,
+  onProgress?: (e: ProgressEvent) => any,
+  onAbort?: (e: ProgressEvent) => any,
   //
   context?: any;
   legacy?: boolean;
