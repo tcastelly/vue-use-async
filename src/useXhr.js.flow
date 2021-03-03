@@ -26,8 +26,8 @@ export type GetReturn<T> = {|
   promise: Computed<Promise<T>>,
   reload: () => any,
   onError: (cb: (e: Error, xhr: Xhr<T>) => any) => any,
-  onStart?: (cb: (params: any, xhr: Xhr<T>) => any) => any,
-  onEnd?: (cb: (res: T, params: any, xhr: Xhr<T>) => any) => any,
+  onStart: (cb: (params: any, xhr: Xhr<T>) => any) => any,
+  onEnd: (cb: (res: T, params: any, xhr: Xhr<T>) => any) => any,
   xhr: Xhr<T>,
 |}
 
