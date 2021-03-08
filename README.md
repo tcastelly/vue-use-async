@@ -1,4 +1,4 @@
-# Xhr helpers to use in a client (VueJS) projects
+# Xhr helpers to use in VueJS 3 projects
 
 # Navigation
 

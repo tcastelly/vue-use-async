@@ -4,7 +4,7 @@ import {
   isRef,
   ref,
   Ref,
-} from '@vue/composition-api';
+} from 'vue';
 import Deferred from '@/Deferred';
 import { UnwrappedPromiseType } from './index';
 

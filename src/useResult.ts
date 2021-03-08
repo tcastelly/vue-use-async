@@ -1,4 +1,4 @@
-import { Ref } from '@vue/composition-api';
+import { Ref } from 'vue';
 
 export default function <T>(res: null | Ref<T>, defaultRes: null | T) {
   return new Proxy(res, {

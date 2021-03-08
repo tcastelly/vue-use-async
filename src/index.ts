@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from '@vue/composition-api';
+import type { ComputedRef, Ref } from 'vue';
 import cache, { cacheSize, clearCache } from './cache';
 import Deferred from './Deferred';
 import useAsync from './useAsync';

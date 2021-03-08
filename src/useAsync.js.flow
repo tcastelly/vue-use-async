@@ -1,6 +1,6 @@
 // @flow
 
-import { type Computed, type Ref } from '@vue/composition-api';
+import { type Computed, type Ref } from 'vue';
 import type Xhr from './Xhr'
 
 export type UseAsyncReturn<T> = {|

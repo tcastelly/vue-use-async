@@ -1,6 +1,6 @@
 // @flow
 
-import { type Ref } from '@vue/composition-api';
+import { type Ref } from 'vue';
 
 declare export default function useResult<T>(
   res: null | Ref<T>,

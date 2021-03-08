@@ -5,7 +5,7 @@ import {
   Ref,
   ref,
   watch,
-} from '@vue/composition-api';
+} from 'vue';
 import { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
 

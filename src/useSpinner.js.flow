@@ -1,5 +1,5 @@
 // @flow
 
-import { type Ref, type Computed } from '@vue/composition-api';
+import { type Ref, type Computed } from 'vue';
 
 declare export default function useSpinner(isPending: Ref<boolean>, duration?: number): Computed<boolean>;

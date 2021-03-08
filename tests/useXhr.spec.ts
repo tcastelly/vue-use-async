@@ -1,12 +1,14 @@
-import Vue from 'vue';
-import VueCompositionApi, { computed, ref, watch } from '@vue/composition-api';
+import {
+  computed,
+  nextTick,
+  ref,
+  watch,
+} from 'vue';
 import useXhr from '@/useXhr';
 import mockXhr from './mockXhr';
 
-Vue.use(VueCompositionApi);
-
 describe('GIVEN `useAsync`', () => {
-  const token = ref('FAKE_TOKEN');
+  const token = ref<string>('FAKE_TOKEN');
 
   describe('WHEN run the function to resolve', () => {
     let get;
@@ -45,7 +47,7 @@ describe('GIVEN `useAsync`', () => {
           enabled: computed(() => !!params.value.ok),
         });
 
-        Vue.nextTick(() => {
+        nextTick(() => {
           params.value.ok = 1;
         });
 

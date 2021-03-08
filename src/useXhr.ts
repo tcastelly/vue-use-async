@@ -6,7 +6,7 @@ import {
   ref,
   Ref,
   watch,
-} from '@vue/composition-api';
+} from 'vue';
 import {
   CacheDuration,
   GetConfig,
