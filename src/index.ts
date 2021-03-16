@@ -57,7 +57,7 @@ export type $GetConfig = string | (XhrConfig & Partial<{
 
   params?: Obj | ComputedRef<Obj>,
 
-  enabled?: boolean | ComputedRef<boolean>,
+  enabled?: boolean | ComputedRef<boolean> | Ref<boolean>,
 }>);
 
 export type GetConfig = $GetConfig | Ref<$GetConfig>

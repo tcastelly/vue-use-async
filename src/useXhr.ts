@@ -97,7 +97,7 @@ export default function (args?: UseXhr) {
   function get<T>(
     parametersObj: GetConfig,
     params?: Ref<Obj> | Obj,
-    enabled?: Ref<boolean> | boolean,
+    enabled?: Ref<boolean> | ComputedRef<boolean> | boolean,
   ): GetReturn<T> {
     const xhr: Xhr<any> = new Xhr<any>();
 
