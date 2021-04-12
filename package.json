@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "0.4.24",
+  "version": "0.4.25",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",
@@ -35,34 +35,34 @@
     ]
   },
   "dependencies": {
-    "@vue/composition-api": "^1.0.0-beta.19"
+    "@vue/composition-api": "^1.0.0-rc.6"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/preset-env": "^7.13.9",
+    "@babel/preset-env": "^7.13.15",
     "@babel/preset-typescript": "^7.13.0",
-    "@types/jest": "^26.0.20",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
+    "@types/jest": "^26.0.22",
+    "@typescript-eslint/eslint-plugin": "^4.21.0",
+    "@typescript-eslint/parser": "^4.21.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "babel-plugin-module-resolver": "^4.1.0",
-    "eslint": "^7.21.0",
+    "eslint": "^7.24.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-typescript": "^2.4.0",
     "eslint-plugin-import": "^2.22.1",
-    "husky": "^5.1.3",
+    "husky": "^6.0.0",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
-    "typescript": "^4.2.2",
+    "typescript": "^4.2.4",
     "vue": "^2.6.12",
-    "webpack": "^5.24.2",
-    "webpack-cli": "^4.5.0"
+    "webpack": "^5.31.2",
+    "webpack-cli": "^4.6.0"
   },
   "peerDependencies": {
     "@vue/composition-api": "*",
-    "vue": "*"
+    "vue": "^2.6.12"
   },
   "engines": {
     "node": ">=10"

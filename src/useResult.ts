@@ -1,12 +1,26 @@
-import { Ref } from '@vue/composition-api';
+import {
+  Ref,
+  ref,
+  unref,
+  watchEffect,
+} from '@vue/composition-api';
 
-export default function <T>(res: null | Ref<T>, defaultRes: null | T) {
-  return new Proxy(res, {
-    get(target, prop, receiver) {
-      if (prop === 'value') {
-        return target.value ? target.value : defaultRes;
+export default function <T>(res: Ref<T>, defaultRes: T): Ref<T> {
+  const _res = ref<T>();
+
+  if (defaultRes) {
+    _res.value = defaultRes;
+  }
+
+  watchEffect(() => {
+    if (res) {
+      const unWrapRes = unref(res);
+
+      if (unWrapRes) {
+        _res.value = unWrapRes;
       }
-      return Reflect.get(target, prop, receiver);
-    },
+    }
   });
+
+  return _res;
 }
