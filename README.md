@@ -98,6 +98,3 @@ export default function () {
 
 ### error handler
 It's possible to capture rejected promise with [errorCaptured](https://vuejs.org/v2/api/#errorCaptured)
-
-# Types
-Typescript and FlowJS are supported.

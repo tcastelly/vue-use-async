@@ -1,8 +1,0 @@
-// @flow
-
-import { type Ref } from 'vue';
-
-declare export default function useResult<T>(
-  res: null | Ref<T>,
-  defaultRes: null | T,
-): Ref<T>;
