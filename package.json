@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",
@@ -11,6 +11,7 @@
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "prepare": "husky install",
     "beforebuild": "node ./scripts/beforeBuild.js && npm run tsc:export-types",
     "afterbuild": "node ./scripts/afterbuild.js",
     "build": "npm run beforebuild && npm run build:webpack && npm run afterbuild",
@@ -23,49 +24,37 @@
     "tsc:check-types": "tsc --noemit",
     "tsc:export-types": "tsc --outDir types"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run precommit"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
   "dependencies": {
     "vue": "^3.0.11"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-env": "^7.14.2",
     "@babel/preset-typescript": "^7.13.0",
-    "@types/jest": "^26.0.22",
-    "@typescript-eslint/eslint-plugin": "^4.21.0",
-    "@typescript-eslint/parser": "^4.21.0",
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^26.6.3",
+    "babel-jest": "^27.0.1",
     "babel-loader": "^8.2.2",
     "babel-plugin-module-resolver": "^4.1.0",
-    "eslint": "^7.24.0",
+    "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-typescript": "^2.4.0",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.3",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
-    "lint-staged": "^10.5.4",
-    "typescript": "^4.2.4",
-    "vue": "^2.6.12",
-    "webpack": "^5.31.2",
-    "webpack-cli": "^4.6.0"
+    "lint-staged": "^11.0.0",
+    "typescript": "^4.3.2",
+    "vue": "^3.0.11",
+    "webpack": "^5.38.0",
+    "webpack-cli": "^4.7.0"
   },
   "peerDependencies": {
-    "@vue/composition-api": "*",
     "vue": "^3.0.11"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "os": [
     "darwin",
