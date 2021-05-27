@@ -12,7 +12,7 @@ export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, durati
   const { id, xhr } = params || {};
   let duration: number = typeof params.duration !== 'string' ? (params.duration || 200) : 200;
   let _d;
-  let timer;
+  let timer: NodeJS.Timer;
 
   // By default 1h of cache
   if (params.duration === 'max') {

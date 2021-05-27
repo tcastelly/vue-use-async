@@ -9,14 +9,14 @@ import {
 import { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
 
-type OnErrorCb = (e: Error, params: any) => any;
+type OnErrorCb = (e: undefined | null | Error, params: any) => any;
 
 type OnStartCb = (params: any) => any;
 
 type OnEndCb<T> = (res: T, params: any) => any;
 
 function useAsync<T>(
-  func: (...any) => Promise<T>,
+  func: (...args: any[]) => Promise<T>,
   params: Ref<any> | any = {},
   enabled = ref(true),
 ): {
@@ -24,8 +24,8 @@ function useAsync<T>(
   onStart: (cb: OnStartCb) => any,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
   isPending: Ref<boolean>,
-  error: Ref<Error | null>,
-  data: Ref<UnwrappedPromiseType<typeof func>>;
+  error: Ref<undefined | null | Error>,
+  data: Ref<undefined | UnwrappedPromiseType<typeof func>>;
   reload: () => any,
   promise: ComputedRef<ReturnType<typeof func>>,
 } {
@@ -33,7 +33,7 @@ function useAsync<T>(
 
   const data = ref<T>();
 
-  const error = ref<Error | null>();
+  const error = ref<null | Error>();
 
   const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
 

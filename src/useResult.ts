@@ -22,5 +22,5 @@ export default function <T>(res: Ref<T>, defaultRes: T): Ref<T> {
     }
   });
 
-  return _res;
+  return _res as Ref<T>;
 }

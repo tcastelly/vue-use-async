@@ -1,20 +1,19 @@
-import { computed, ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 import useAsync from '@/useAsync';
 
 describe('GIVEN, `useAsync', () => {
   describe('WHEN resolve `useAsync`', () => {
-    const func = () => new Promise((resolve) => {
+    const func = () => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve('ok');
       });
     });
-    let data;
+    let data: Ref<undefined | string>;
     let promise;
 
-    beforeAll(async (done) => {
-      ({ data, promise } = useAsync(func));
+    beforeAll(async () => {
+      ({ data, promise } = useAsync<string>(func));
       await promise.value;
-      done();
     });
 
     it('THEN `data` should be resolved', () => {
@@ -28,35 +27,35 @@ describe('GIVEN, `useAsync', () => {
         reject(Error('ko'));
       });
     });
-    let error;
+
+    let error: Ref<undefined | null | Error>;
     let promise;
-    beforeAll(async (done) => {
+    beforeAll(async () => {
       ({ error, promise } = useAsync(func));
       try {
         await promise.value;
       } catch (e) {
-        done();
+        //
       }
     });
 
     it('THEN `data` should be resolved', () => {
-      // $FlowFixMe - there is an error
-      expect(error.value.message).toBe('ko');
+      expect(error.value?.message).toBe('ko');
     });
   });
 
   describe('WHEN `func` expect params', () => {
-    const func = (arg) => new Promise((resolve) => {
+    const func = (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 200);
     });
-    let data;
+
+    let data: Ref<undefined | null | string>;
     let promise;
-    beforeAll(async (done) => {
-      ({ data, promise } = useAsync(func, computed(() => 'msg')));
+    beforeAll(async () => {
+      ({ data, promise } = useAsync<string>(func, computed(() => 'msg')));
       await promise.value;
-      done();
     });
 
     it('THEN `data` should be resolved', () => {
@@ -65,21 +64,21 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect params and `condition`', () => {
-    const func = (arg) => new Promise((resolve) => {
+    const func = (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 200);
     });
-    let data;
+
+    let data: Ref<undefined | null | string>;
     let promise;
-    beforeAll(async (done) => {
-      ({ data, promise } = useAsync(
+    beforeAll(async () => {
+      ({ data, promise } = useAsync<string>(
         func,
         computed(() => 'msg'),
         ref(true),
       ));
       await promise.value;
-      done();
     });
 
     it('THEN `data` should be resolved', () => {
@@ -88,17 +87,17 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect multiple params', () => {
-    const func = (arg1, arg2) => new Promise((resolve) => {
+    const func = (arg1: string, arg2: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg1} ${arg2}`);
       }, 200);
     });
-    let data;
+
+    let data: Ref<undefined | null | string>;
     let promise;
-    beforeAll(async (done) => {
-      ({ data, promise } = useAsync(func, computed(() => ['msg', 'msg2'])));
+    beforeAll(async () => {
+      ({ data, promise } = useAsync<string>(func, computed(() => ['msg', 'msg2'])));
       await promise.value;
-      done();
     });
 
     it('THEN `data` should be resolved', () => {

@@ -1,12 +1,31 @@
+import { Func } from '@/index';
 import Logger from '../src/_base/Logger';
 import Deferred from '../src/Deferred';
 import Xhr from '../src/Xhr';
 
+type Condition = Partial<{
+  method: string;
+  url: string;
+  params: { [id: string]: any };
+  getAttribute: (arg0: string) => any;
+}>;
+
 const {
-  send, abort, open, setRequestHeader,
+  send,
+  abort,
+  open,
+  setRequestHeader,
 } = XMLHttpRequest.prototype;
 
 class MockXhr {
+  header: Array<any>;
+
+  xhr: null | XMLHttpRequest;
+
+  method: null | string;
+
+  pending: Deferred<any>;
+
   constructor() {
     this.header = [];
     this.xhr = null;
@@ -14,36 +33,36 @@ class MockXhr {
     this.pending = new Deferred();
   }
 
-  get(condition) {
+  get(condition: Condition) {
     condition.method = 'GET';
     return this._mockXMLHttpRequest(condition);
   }
 
-  post(condition) {
+  post(condition: Condition) {
     condition.method = 'POST';
     return this._mockXMLHttpRequest(condition);
   }
 
-  delete(condition) {
+  delete(condition: Condition) {
     condition.method = 'DELETE';
     return this._mockXMLHttpRequest(condition);
   }
 
-  put(condition) {
+  put(condition: Condition) {
     condition.method = 'PUT';
     return this._mockXMLHttpRequest(condition);
   }
 
-  sendForm(form) {
-    const condition = {
-      method: form.getAttribute('method'),
-      url: form.getAttribute('action'),
+  sendForm(form: Condition) {
+    const condition: Condition = {
+      method: form?.getAttribute?.('method'),
+      url: form?.getAttribute?.('action'),
     };
 
     return this._mockXMLHttpRequest(condition);
   }
 
-  abort(fakeResult) {
+  abort(fakeResult: any) {
     XMLHttpRequest.prototype.abort = () => {
       Logger.info('[Log] Fake xhr abort');
 
@@ -51,7 +70,7 @@ class MockXhr {
     };
   }
 
-  resolve(fakeResult, delay = 0) {
+  resolve(fakeResult: any, delay = 0) {
     this.pending.promise.then((xhr) => {
       setTimeout(() => {
         xhr.resolve(fakeResult);
@@ -59,7 +78,7 @@ class MockXhr {
     });
   }
 
-  reject(fakeResult, delay = 0) {
+  reject(fakeResult: any, delay = 0) {
     this.pending.promise.then((xhr) => {
       setTimeout(() => {
         xhr.reject(fakeResult);
@@ -74,24 +93,27 @@ class MockXhr {
     XMLHttpRequest.prototype.setRequestHeader = setRequestHeader;
   }
 
-  _mockXMLHttpRequest(condition) {
+  _mockXMLHttpRequest(this: MockXhr, condition: Condition) {
     XMLHttpRequest.prototype.open = (method, url) => {
       Logger.info('[Log] Fake xhr open');
-      if (Xhr.stringifyUrl(condition.url, condition.params) === url && condition.method === method) {
+      if (Xhr.stringifyUrl(condition.url || '', condition.params) === url && condition.method === method) {
         this.method = method;
       } else {
-        /* eslint-disable-next-line prefer-rest-params */
+        // @ts-ignore
+        // eslint-disable-next-line prefer-rest-params
         open.apply(this, arguments);
       }
     };
 
-    XMLHttpRequest.prototype.send = (params, xhr) => {
+    // @ts-ignore - implement fake send
+    XMLHttpRequest.prototype.send = (params: any, xhr: XMLHttpRequest | null) => {
       Logger.info('[Log] Fake xhr sent');
-      if (Xhr.stringifyUrl(condition.url, condition.params) && this.method === condition.method) {
+      if (Xhr.stringifyUrl(condition.url || '', condition.params) && this.method === condition.method) {
         this.xhr = xhr;
         this.pending.resolve(xhr);
       } else {
-        /* eslint-disable-next-line prefer-rest-params */
+        // @ts-ignore
+        // eslint-disable-next-line prefer-rest-params
         send.apply(this, arguments);
       }
     };
@@ -110,19 +132,19 @@ class MockXhr {
 }
 
 export default {
-  get(condition) {
+  get(condition: Condition) {
     return new MockXhr().get(condition);
   },
-  post(condition) {
+  post(condition: Condition) {
     return new MockXhr().post(condition);
   },
-  delete(condition) {
+  delete(condition: Condition) {
     return new MockXhr().delete(condition);
   },
-  put(condition) {
+  put(condition: Condition) {
     return new MockXhr().put(condition);
   },
-  sendForm(condition) {
+  sendForm(condition: Condition) {
     return new MockXhr().sendForm(condition);
   },
   restore() {

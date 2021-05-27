@@ -1,12 +1,9 @@
-import cache, { clearCache } from '../src/cache';
+import cache from '../src/cache';
 import Deferred from '../src/Deferred';
 
-export default (id, fake, pending = 0) => {
+export default (id: string, fake: any, pending = 0) => {
   try {
-    const cachedData = cache({ id });
-    if (cachedData) {
-      clearCache(id);
-    }
+    cache({ id });
   } catch (e) {
     console.warn(e);
   }
@@ -16,6 +13,7 @@ export default (id, fake, pending = 0) => {
 
   cache({
     id,
+    // @ts-ignore - fake xhr
     xhr: () => _d.promise,
     duration: 'max',
   });

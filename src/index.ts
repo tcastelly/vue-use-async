@@ -10,7 +10,7 @@ import useSpinner from './useSpinner';
 
 export type Obj = { [id: string]: any };
 
-export type Func = (...any) => any;
+export type Func = (...args: any[]) => any;
 
 export type UnwrappedPromiseType <T extends (...args: any) => any> =
   T extends (...args: any) => Promise<infer U> ? U :

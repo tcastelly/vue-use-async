@@ -1,5 +1,3 @@
-// @flow
-
 const isConsoleDisabled = process.env.NODE_ENV === 'production';
 
 export default {

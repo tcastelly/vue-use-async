@@ -1,5 +1,5 @@
 export default class Deferred<T> {
-  resolve: (res?: T | null) => void;
+  resolve: (value: (T | PromiseLike<T>)) => void;
 
   reject: (e: any) => void;
 

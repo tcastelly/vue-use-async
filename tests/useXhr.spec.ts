@@ -1,17 +1,21 @@
 import {
   computed,
+  ComputedRef,
   nextTick,
+  Ref,
   ref,
   watch,
 } from 'vue';
+import Xhr from '@/Xhr';
 import useXhr from '@/useXhr';
+import type { Func } from '@/index';
 import mockXhr from './mockXhr';
 
 describe('GIVEN `useAsync`', () => {
   const token = ref<string>('FAKE_TOKEN');
 
   describe('WHEN run the function to resolve', () => {
-    let get;
+    let get: Func;
     beforeAll(() => {
       ({ get } = useXhr({ legacy: true, token }));
     });
@@ -20,11 +24,11 @@ describe('GIVEN `useAsync`', () => {
     });
 
     describe('WHEN execute `get` Xhr', () => {
-      let mocked;
-      let data;
-      let reload;
-      let isPending;
-      let xhr;
+      let mocked: any;
+      let data: Ref<undefined | null | string>;
+      let reload: Func;
+      let isPending: ComputedRef<boolean>;
+      let xhr: Xhr<any>;
       const params = ref({ ok: 0, undefinedParam: undefined });
 
       afterAll(() => {
@@ -72,7 +76,7 @@ describe('GIVEN `useAsync`', () => {
       });
 
       describe('WHEN execute `reload`', () => {
-        let _isPending;
+        let _isPending: boolean;
         beforeAll((done) => {
           reload();
 
@@ -97,7 +101,7 @@ describe('GIVEN `useAsync`', () => {
   });
 
   describe('WHEN run the function to reject the query', () => {
-    let get;
+    let get: Func;
 
     beforeAll(() => {
       ({ get } = useXhr({ legacy: true, token }));
@@ -107,13 +111,13 @@ describe('GIVEN `useAsync`', () => {
     });
 
     describe('WHEN execute `get` Xhr', () => {
-      let mocked;
-      let error;
+      let mocked: any;
+      let error: Ref<undefined | null | Error>;
 
       afterAll(() => {
         mocked.restore();
       });
-      beforeAll(async (done) => {
+      beforeAll(async () => {
         mocked = mockXhr.get({ url: '/fake/fail/get' });
         mocked.reject('ko');
 
@@ -127,7 +131,7 @@ describe('GIVEN `useAsync`', () => {
         try {
           await promise.value;
         } catch (e) {
-          done();
+          //
         }
       });
       it('THEN error should be retrieved with good value', async () => {

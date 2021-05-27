@@ -1,4 +1,5 @@
 import cache, { cacheSize, clearCache } from '@/cache';
+import { XhrGet } from '@/index';
 
 describe('Given Cache', () => {
   it('THEN no cache should be available', () => {
@@ -12,7 +13,7 @@ describe('Given Cache', () => {
     }
   });
   describe('WHEN send a promise', () => {
-    let query = null;
+    let query: XhrGet<any>;
 
     const p: any = new Promise((resolve) => {
       resolve('ok');
@@ -30,12 +31,10 @@ describe('Given Cache', () => {
     });
     it('THEN cache should be inserted', () => expect(query).resolves.toEqual('ok'));
     describe('WHEN destroy a specific cache', () => {
-      let xhr;
+      let xhr: () => XhrGet<any>;
       beforeAll(() => {
-        // create the cache
-        xhr = () => new Promise((resolve) => {
-          resolve('ok');
-        });
+        // @ts-ignore - fake xhr
+        xhr = () => new Promise((resolve) => resolve('ok'));
         cache({
           id: '/fake-canceled/',
           xhr,
