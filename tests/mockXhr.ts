@@ -1,4 +1,3 @@
-import { Func } from '@/index';
 import Logger from '../src/_base/Logger';
 import Deferred from '../src/Deferred';
 import Xhr from '../src/Xhr';

@@ -1,4 +1,5 @@
 import Xhr from '@/Xhr';
+import type { XhrGet } from '@/index';
 import mockXhr from './mockXhr';
 
 describe('Given Xhr and MockXhr', () => {
@@ -6,7 +7,7 @@ describe('Given Xhr and MockXhr', () => {
     expect(new Xhr()).not.toBe(null);
   });
   describe('WHEN send GET query', () => {
-    let query;
+    let query: Promise<any>;
     beforeAll(() => {
       mockXhr
         .get({ url: '/fake/get' })
@@ -21,7 +22,7 @@ describe('Given Xhr and MockXhr', () => {
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('get-ok'));
   });
   describe('WHEN send POST query', () => {
-    let query;
+    let query: Promise<any>;
     beforeAll(() => {
       mockXhr
         .post({ url: '/fake/post' })
@@ -38,7 +39,7 @@ describe('Given Xhr and MockXhr', () => {
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-ok'));
   });
   describe('WHEN send put query', () => {
-    let query;
+    let query: Promise<any>;
     beforeAll(() => {
       mockXhr
         .put({ url: '/fake/put' })
@@ -50,7 +51,7 @@ describe('Given Xhr and MockXhr', () => {
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('put-ok'));
   });
   describe('WHEN send DELETE query', () => {
-    let query;
+    let query: Promise<any>;
     beforeAll(() => {
       mockXhr
         .delete({ url: '/fake/delete' })
@@ -65,7 +66,7 @@ describe('Given Xhr and MockXhr', () => {
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('delete-ok'));
   });
   describe('WHEN send ABORT query', () => {
-    let query;
+    let query: XhrGet<any>;
     beforeAll(() => {
       mockXhr
         .get({

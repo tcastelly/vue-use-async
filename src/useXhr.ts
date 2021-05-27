@@ -4,7 +4,7 @@ import {
   isRef,
   onBeforeUnmount,
   ref,
-  Ref,
+  Ref, unref,
   watch,
 } from 'vue';
 import {
@@ -19,17 +19,16 @@ import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
 import useAsync from './useAsync';
 
-// used as default `onError`
-function _blank(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-vars
-}
-
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
-type OnErrorCb <T> = (e: { [id: string]: any } | string, xhr: Xhr<T>) => any
+type OnErrorCb <T> = (e: Error, xhr: Xhr<T>) => any
 
 type OnStartCb <T> = (params: any, xhr: Xhr<T>) => any;
 
-type OnEndCb <T> = (res: T, params: any, xhr: Xhr<T>) => any
+type OnEndCb <T> = (res: undefined | T, params: any, xhr: Xhr<T>) => any
+
+// used as default `onError`
+const _blank = () => {};
 
 declare type UseXhr<T = any> = {
   // global callback for VueJS 2 plugin compatibility
@@ -61,7 +60,7 @@ export default function (args?: UseXhr) {
     onEnd,
     context,
     legacy,
-    token,
+    token = null,
   } = (args || {
     onError: () => {
     },
@@ -102,29 +101,29 @@ export default function (args?: UseXhr) {
     const xhr: Xhr<any> = new Xhr<any>();
 
     // Global cb for VueJS 2 Plugin Compatibility
-    const _onError = (onError || _blank).bind(context);
-    const _onStart = (onStart || _blank).bind(context);
-    const _onEnd = (onEnd || _blank).bind(context);
+    const _onError = (onError || _blank as unknown as OnErrorCb<T>).bind(context);
+    const _onStart = (onStart || _blank as unknown as OnStartCb<T>).bind(context);
+    const _onEnd = (onEnd || _blank as unknown as OnEndCb<T>).bind(context);
 
-    const onErrorList: Array<OnErrorCb<T>> = [_onError];
-    const onStartList: Array<OnStartCb<T>> = [_onStart];
-    const onEndList: Array<OnEndCb<T>> = [_onEnd];
+    const onErrorList: OnErrorCb<T>[] = [_onError];
+    const onStartList: OnStartCb<T>[] = [_onStart];
+    const onEndList: OnEndCb<T>[] = [_onEnd];
 
     const error = ref<Error | Obj | null>();
 
     xhrList.value.push(xhr);
 
-    const isPending = ref<boolean>();
+    const isPending = ref<undefined | boolean>();
 
     const data = ref<T>();
 
-    let url = '';
-    let duration: CacheDuration = 0;
+    let url: undefined | string = '';
+    let duration: undefined | CacheDuration = 0;
 
     const getParams = computed(() => {
       let _getParams: GetConfig = {};
 
-      const unwrapParametersObj = isRef(parametersObj) ? parametersObj.value : parametersObj;
+      const unwrapParametersObj = unref(parametersObj);
 
       if (typeof unwrapParametersObj === 'string') {
         url = unwrapParametersObj;
@@ -133,7 +132,7 @@ export default function (args?: UseXhr) {
       } else {
         const _url = unwrapParametersObj.url;
 
-        url = isRef(_url) ? _url.value : _url;
+        url = unref(_url);
 
         // use params from second args of get function
         if (!params) {
@@ -149,7 +148,7 @@ export default function (args?: UseXhr) {
       }
 
       if (token) {
-        _getParams.token = getTokenValue(args.token);
+        _getParams.token = getTokenValue(token);
       }
 
       // merge params
@@ -169,7 +168,7 @@ export default function (args?: UseXhr) {
       exec = ref(_exec === undefined ? true : _exec);
     }
 
-    let lastCacheId;
+    let lastCacheId: null | string;
 
     const xhrPromise = ref<XhrGet<T>>();
 
@@ -190,7 +189,7 @@ export default function (args?: UseXhr) {
       }
 
       lastCacheId = decodeURIComponent(Xhr.stringifyUrl(
-        url,
+        String(url),
         xhrParams,
       ));
 
@@ -257,9 +256,10 @@ export default function (args?: UseXhr) {
       onEnd: (cb) => onEndList.push(cb),
       error,
       abort() {
-        return xhrPromise.value.abortXhr();
+        return xhrPromise.value?.abortXhr();
       },
-      promise: computed(() => xhrPromise.value),
+      promise: computed(() => xhrPromise.value || new Promise(() => {
+      })),
       reload,
       xhr,
     };
@@ -270,7 +270,7 @@ export default function (args?: UseXhr) {
 
     return {
       ...useAsync<T>(
-        () => xhr.post(xhrConfig),
+        () => xhr.post(xhrConfig || {}),
         mergeParamsWithToken(params),
       ),
       xhr,
@@ -282,8 +282,8 @@ export default function (args?: UseXhr) {
 
     return {
       ...useAsync<T>(
-        () => xhr.put(xhrConfig),
-        mergeParamsWithToken(params),
+        () => xhr.put(xhrConfig || {}),
+        mergeParamsWithToken(params || {}),
       ),
       xhr,
     };
@@ -294,8 +294,8 @@ export default function (args?: UseXhr) {
 
     return {
       ...useAsync<T>(
-        () => xhr.delete(xhrConfig),
-        mergeParamsWithToken(params),
+        () => xhr.delete(xhrConfig || {}),
+        mergeParamsWithToken(params || {}),
       ),
       xhr,
     };

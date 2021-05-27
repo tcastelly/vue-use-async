@@ -24,7 +24,7 @@ export type XhrGet<T> = CancellablePromise<T>;
 
 export type CacheDuration = 'max' | number
 
-export type XhrConfig<T = any> = Partial<{
+export type XhrConfig = Partial<{
   url?: string;
 
   timeout?: number | null;
@@ -33,19 +33,19 @@ export type XhrConfig<T = any> = Partial<{
 
   params?: Obj;
 
-  onStart?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+  onStart?: (e: ProgressEvent) => void;
 
-  onEnd?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+  onEnd?: (e: ProgressEvent) => void;
 
-  onProgress?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+  onProgress?: (e: ProgressEvent) => void;
 
-  onAbort?: (e: ProgressEvent, xhr: Xhr<T>) => void;
+  onAbort?: (e: ProgressEvent) => void;
 
-  onError?: (e: ErrorEvent, xhr: Xhr<T>) => void;
+  onError?: (e: ProgressEvent) => void;
 
   sendAs?: 'multipart' | 'json';
 
-  token?: string;
+  token?: null | string;
 
   responseType?: 'arraybuffer' | 'blob',
 }>
@@ -63,15 +63,15 @@ export type $GetConfig = string | (XhrConfig & Partial<{
 export type GetConfig = $GetConfig | Ref<$GetConfig>
 
 export type GetReturn<T> = {
-  isPending: ComputedRef<boolean>,
-  data: Ref<T>,
-  error: Ref<Error | Obj | null>,
+  isPending: ComputedRef<undefined | boolean>,
+  data: Ref<undefined | T>,
+  error: Ref<undefined | null | Error | Obj>,
   abort: () => void,
   promise: ComputedRef<Promise<T>>,
   reload: () => void,
   onError: (cb: (e: Error, xhr: Xhr<T>) => void) => void,
   onStart: (cb: (params: any, xhr: Xhr<T>) => any) => any,
-  onEnd: (cb: (res: T, params: any, xhr: Xhr<T>) => any) => any,
+  onEnd: (cb: (res: undefined | T, params: any, xhr: Xhr<T>) => any) => any,
   xhr: Xhr<T>,
 }
 

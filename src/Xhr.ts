@@ -15,7 +15,7 @@ export default class Xhr<T> {
     return result;
   }
 
-  onError: (e: ErrorEvent) => void = () => {
+  onError: (e: ProgressEvent) => void = () => {
   };
 
   onStart: (e: ProgressEvent) => void = () => {
@@ -49,22 +49,28 @@ export default class Xhr<T> {
 
   _eventsReady: boolean;
 
+  // @ts-ignore - declared in _constructor
   _oXHR: XMLHttpRequest;
 
+  // @ts-ignore - declared in _constructor
   _onEnd: (e: ProgressEvent) => void;
 
-  _onError(e: ErrorEvent): void {
+  _onError(e: ProgressEvent): void {
     this.onError(e);
 
     this._deferred.reject(e);
   }
 
+  // @ts-ignore - declared in _constructor
   _deferred: Deferred<T>;
 
+  // @ts-ignore - declared in _constructor
   _isXhrResolved: boolean;
 
+  // @ts-ignore - declared in _constructor
   _isXhrRejected: boolean;
 
+  // @ts-ignore - declared in _constructor
   _eventReady: boolean;
 
   constructor(xhrParams?: XhrConfig, params?: Obj) {
@@ -72,7 +78,7 @@ export default class Xhr<T> {
     // variable used to avoid multiple same listeners
     this._eventsReady = false;
 
-    this._constructor(xhrParams, params);
+    this._constructor(xhrParams || {}, params);
   }
 
   static new<Z>(paramsObj?: XhrConfig): Xhr<Z> {
@@ -117,7 +123,7 @@ export default class Xhr<T> {
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
   get(paramsObj?: XhrConfig): XhrGet<T> {
-    this._constructor(paramsObj);
+    this._constructor(paramsObj || {});
 
     this._oXHR.open('GET', Xhr.stringifyUrl(this.url, this.params), true);
     this._send();
@@ -129,18 +135,6 @@ export default class Xhr<T> {
     return _d as XhrGet<T>;
   }
 
-  /**
-   * @param {Object} paramsObj
-   * @param {String} paramsObj.url
-   * @param {String} paramsObj.sendAs
-   * @param {Function} paramsObj.onStart
-   * @param {Function} paramsObj.onEnd
-   * @param {Function} paramsObj.onProgress
-   * @param {Function} paramsObj.onAbort
-   * @param {Object} paramsObj.params
-   *
-   * @returns {Promise}
-   */
   delete(paramsObj: XhrConfig): Promise<any> {
     this._constructor(paramsObj);
     this._oXHR.open('DELETE', Xhr.stringifyUrl(this.url, this.params), true);
@@ -256,7 +250,7 @@ export default class Xhr<T> {
       .reduce((acc, v) => {
         acc[v] = params[v];
         return acc;
-      }, {});
+      }, {} as {[id: string]: any});
 
     // escape hash character
     url = url.replace(/#/, '%23');

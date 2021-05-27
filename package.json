@@ -17,6 +17,7 @@
     "build": "npm run beforebuild && npm run build:webpack && npm run afterbuild",
     "build:webpack": "webpack --mode=production",
     "lint": "npm run tsc:check-types && eslint --ext .js,.ts src tests",
+    "lint:quiet": "eslint --quiet \"{tests,src}/**/*.{js,ts,tsx,vue}\" && npm run tsc:check-types",
     "lint:fix": "npm run tsc:check-types && eslint --fix --ext .js,.ts src tests",
     "precommit": "lint-staged",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
