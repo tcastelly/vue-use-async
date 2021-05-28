@@ -10,7 +10,7 @@ module.exports = {
     [require.resolve('@babel/preset-typescript')],
   ],
   plugins: [
-    [require.resolve('@babel/plugin-proposal-class-properties'), { loose: true, }],
+    [require.resolve('@babel/plugin-proposal-class-properties')],
     [require.resolve('babel-plugin-module-resolver'), {
       root: ["./src/"],
       alias: {
