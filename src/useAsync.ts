@@ -1,41 +1,34 @@
 import {
-  computed,
-  ComputedRef,
-  isRef,
-  Ref,
-  ref,
-  watch,
+  computed, ComputedRef, Ref, ref, unref, watch,
 } from 'vue';
-import { Obj, UnwrappedPromiseType } from './index';
+import type { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
 
-type OnErrorCb = (e: undefined | null | Error, params: any) => any;
+type OnErrorCb = (e: null | Error, params: any) => any;
 
 type OnStartCb = (params: any) => any;
 
 type OnEndCb<T> = (res: T, params: any) => any;
 
-function useAsync<T>(
+export default function useAsync<T>(
   func: (...args: any[]) => Promise<T>,
-  params: Ref<any> | any = {},
-  enabled = ref(true),
+  params: Ref<any> | (() => any) | any = {},
+  enabled: Ref<boolean> | (() => boolean) = ref(true),
 ): {
   onError: (cb: OnErrorCb) => any,
   onStart: (cb: OnStartCb) => any,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
   isPending: Ref<boolean>,
-  error: Ref<undefined | null | Error>,
-  data: Ref<undefined | UnwrappedPromiseType<typeof func>>;
+  error: Ref<null | Error>,
+  data: Ref<UnwrappedPromiseType<typeof func>>;
   reload: () => any,
   promise: ComputedRef<ReturnType<typeof func>>,
 } {
   const isPending = ref();
 
-  const data = ref<T>();
+  const data = ref<T>() as Ref<T>;
 
-  const error = ref<null | Error>();
-
-  const wrapParams: Ref<any> = isRef(params) ? params : ref(params);
+  const error = ref<null | Error>(null);
 
   const onErrorList: Array<OnErrorCb> = [];
 
@@ -43,12 +36,25 @@ function useAsync<T>(
 
   const onEndList: Array<OnEndCb<T>> = [];
 
-  // for legacy use case (Vue xhr Plugin)
+  // for legacy use case
   const d = ref<Deferred<T>>(new Deferred());
+
+  const wrapParams = computed(() => {
+    if (typeof params === 'function') {
+      return params();
+    }
+    return unref(params);
+  });
+
+  const _enabled = computed(() => {
+    if (typeof enabled === 'function') {
+      return enabled();
+    }
+    return unref(enabled);
+  });
 
   // generate new xhr/promise
   const _reload = (_params: Obj) => {
-    useAsync.config.onStart();
     onStartList.forEach((cb) => cb(wrapParams.value));
 
     d.value = new Deferred();
@@ -65,12 +71,10 @@ function useAsync<T>(
       data.value = res;
       d.value.resolve(res);
 
-      useAsync.config.onEnd(res);
       onEndList.forEach((cb) => cb(res, wrapParams.value));
     }, (_error) => {
       error.value = _error || null;
 
-      useAsync.config.onError(_error);
       onErrorList.forEach((cb) => cb(error.value, wrapParams.value));
 
       d.value.reject(_error);
@@ -82,23 +86,9 @@ function useAsync<T>(
     });
   };
 
-  watch(
-    () => wrapParams.value,
-    (v, oldV) => {
-      if ((enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
-        // fix if there is no change. Just undefined as value
-        || (v === undefined && oldV === undefined)) {
-        _reload(v);
-      }
-    }, {
-      immediate: enabled.value,
-      deep: true,
-    },
-  );
-
   // reload if the query has been enabled
   watch(
-    () => enabled.value,
+    () => _enabled.value,
     (v) => {
       // we don't want to execute twice if params changed AND exec changed
       if (!isPending.value && v) {
@@ -107,6 +97,22 @@ function useAsync<T>(
     }, {
       // avoid simultaneously query
       immediate: false,
+    },
+  );
+
+  watch(
+    () => wrapParams.value,
+    (v, oldV) => {
+      if (
+        ((_enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
+        // fix if there is no change. Just undefined as value
+        || (v === undefined && oldV === undefined))
+      ) {
+        _reload(v);
+      }
+    }, {
+      immediate: _enabled.value,
+      deep: true,
     },
   );
 
@@ -121,15 +127,3 @@ function useAsync<T>(
     promise: computed(() => d.value.promise),
   };
 }
-
-// static object in function, when Main.js will be migrated to composition API, will be replaced by inject
-useAsync.config = {
-  onError(e: Error) { // eslint-disable-line @typescript-eslint/no-unused-vars
-  },
-  onStart() {
-  },
-  onEnd(res: any) { // eslint-disable-line @typescript-eslint/no-unused-vars
-  },
-};
-
-export default useAsync;

@@ -8,7 +8,7 @@ describe('GIVEN, `useAsync', () => {
         resolve('ok');
       });
     });
-    let data: Ref<undefined | string>;
+    let data: Ref<string>;
     let promise;
 
     beforeAll(async () => {
@@ -28,7 +28,7 @@ describe('GIVEN, `useAsync', () => {
       });
     });
 
-    let error: Ref<undefined | null | Error>;
+    let error: Ref<null | Error>;
     let promise;
     beforeAll(async () => {
       ({ error, promise } = useAsync(func));
@@ -51,7 +51,7 @@ describe('GIVEN, `useAsync', () => {
       }, 200);
     });
 
-    let data: Ref<undefined | null | string>;
+    let data: Ref<null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync<string>(func, computed(() => 'msg')));
@@ -63,14 +63,84 @@ describe('GIVEN, `useAsync', () => {
     });
   });
 
-  describe('WHEN `func` expect params and `condition`', () => {
+  describe('WHEN wait enabled', () => {
+    const func = (arg: string) => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve(`ok ${arg}`);
+      }, 5);
+    });
+
+    const enabled = ref(true);
+
+    const params = ref('');
+
+    let data: Ref<null | string>;
+    beforeAll((done) => {
+      let onEnd;
+      ({ data, onEnd } = useAsync<string>(
+        func,
+        params,
+        enabled,
+      ));
+
+      setTimeout(() => {
+        params.value = 'msg2';
+        enabled.value = false;
+
+        setTimeout(() => {
+          params.value = 'msg';
+        }, 20);
+
+        setTimeout(() => {
+          enabled.value = true;
+        }, 10);
+      }, 100);
+
+      let i = 0;
+      onEnd(() => {
+        if (i > 1) {
+          done();
+        }
+        i += 1;
+      });
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok msg');
+    });
+  });
+
+  describe('WHEN `func` expect params and `condition` as callback', () => {
     const func = (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 200);
     });
 
-    let data: Ref<undefined | null | string>;
+    let data: Ref<null | string>;
+    let promise;
+    beforeAll(async () => {
+      ({ data, promise } = useAsync<string>(
+        func,
+        () => 'msg',
+        () => true,
+      ));
+      await promise.value;
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok msg');
+    });
+  });
+
+  describe('WHEN `func` expect params and `condition` as Ref', () => {
+    const func = (arg: string) => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve(`ok ${arg}`);
+      }, 200);
+    });
+
+    let data: Ref<null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync<string>(
@@ -93,7 +163,7 @@ describe('GIVEN, `useAsync', () => {
       }, 200);
     });
 
-    let data: Ref<undefined | null | string>;
+    let data: Ref<null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync<string>(func, computed(() => ['msg', 'msg2'])));

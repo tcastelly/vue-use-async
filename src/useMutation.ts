@@ -1,10 +1,14 @@
 import {
-  computed, ComputedRef, isRef, ref, Ref,
+  computed,
+  ComputedRef,
+  isRef,
+  ref,
+  Ref,
 } from 'vue';
 import Deferred from '@/Deferred';
-import { UnwrappedPromiseType } from './index';
+import type { UnwrappedPromiseType } from './index';
 
-type OnErrorCb = (e: undefined | null | Error) => unknown;
+type OnErrorCb = (e: null | Error) => unknown;
 
 type OnEndCb<T> = (res: T, params: unknown) => unknown;
 
@@ -13,21 +17,21 @@ function useMutation<T>(
 ): {
   mutate: (params: Ref<any> | any) => Promise<UnwrappedPromiseType<typeof func>>,
   onError: (cb: OnErrorCb) => unknown,
-  onEnd: (cb: OnEndCb<undefined | UnwrappedPromiseType<typeof func>>) => unknown,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => unknown,
   isPending: Ref<boolean>,
-  error: Ref<undefined | null | Error>,
-  data: Ref<undefined | UnwrappedPromiseType<typeof func>>;
+  error: Ref<null | Error>,
+  data: Ref<UnwrappedPromiseType<typeof func>>;
   promise: ComputedRef<Promise<T>>,
 } {
   const isPending = ref();
 
-  const data = ref<T>();
+  const data = ref<T>() as Ref<T>;
 
-  const error = ref<Error | null>();
+  const error = ref<null | Error>() as Ref<null | Error>;
 
   const onErrorList: OnErrorCb[] = [];
 
-  const onEndList: OnEndCb<undefined | T>[] = [];
+  const onEndList: OnEndCb<T>[] = [];
 
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());

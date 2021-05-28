@@ -7,7 +7,7 @@ import {
   Ref, unref,
   watch,
 } from 'vue';
-import {
+import type {
   CacheDuration,
   GetConfig,
   GetReturn,
@@ -25,7 +25,7 @@ type OnErrorCb <T> = (e: Error, xhr: Xhr<T>) => any
 
 type OnStartCb <T> = (params: any, xhr: Xhr<T>) => any;
 
-type OnEndCb <T> = (res: undefined | T, params: any, xhr: Xhr<T>) => any
+type OnEndCb <T> = (res: T, params: any, xhr: Xhr<T>) => any
 
 // used as default `onError`
 const _blank = () => {};
@@ -109,13 +109,13 @@ export default function (args?: UseXhr) {
     const onStartList: OnStartCb<T>[] = [_onStart];
     const onEndList: OnEndCb<T>[] = [_onEnd];
 
-    const error = ref<Error | Obj | null>();
+    const error = ref<null | Error | Obj>(null);
 
     xhrList.value.push(xhr);
 
     const isPending = ref<undefined | boolean>();
 
-    const data = ref<T>();
+    const data = ref<T>() as Ref<T>;
 
     let url: undefined | string = '';
     let duration: undefined | CacheDuration = 0;

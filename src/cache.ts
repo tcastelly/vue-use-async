@@ -1,8 +1,7 @@
 import Logger from './_base/Logger';
-import { XhrGet } from './index';
+import type { XhrGet } from './index';
 
 const _cache: Map<string, XhrGet<any>> = new Map();
-
 /**
  * @params {String} params.id
  * @params {Promise} params.xhr
