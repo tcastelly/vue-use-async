@@ -5,10 +5,6 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
-  },
   env: {
     es6: true,
     jest: true,
@@ -37,24 +33,22 @@ module.exports = {
     '@typescript-eslint/no-useless-constructor': 'error',
   },
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx', '.vue'],
+    },
     'import/resolver': {
-      // Settings for eslint-import-resolver-typescript to resolve TypeScript path mapping.
-      typescript: {},
-      alias: [
-        ['tests', './tests'],
-        ['@', './src'],
-      ],
-      node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      typescript: {
+        project: '.',
       },
     },
-    'import/extensions': ['error', 'ignorePackages', {
-      vue: 'never',
-      js: 'never',
-      mjs: 'never',
-      jsx: 'never',
-      ts: 'never',
-      tsx: 'never',
-    }],
+  },
+  parserOptions: {
+    ecmaVersion: 2021,
+    parser: '@typescript-eslint/parser',
+    sourceType: 'module',
+    typescript: {
+      // use a glob pattern
+      project: './tsconfig.json',
+    },
   },
 };
