@@ -1,5 +1,10 @@
 import {
-  computed, ComputedRef, Ref, ref, unref, watch,
+  computed,
+  ComputedRef,
+  Ref,
+  ref,
+  unref,
+  watch,
 } from 'vue';
 import type { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
@@ -104,7 +109,8 @@ export default function useAsync<T>(
     () => wrapParams.value,
     (v, oldV) => {
       if (
-        ((_enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
+        !isPending.value
+        && ((_enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
         // fix if there is no change. Just undefined as value
         || (v === undefined && oldV === undefined))
       ) {
