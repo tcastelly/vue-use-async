@@ -62,6 +62,44 @@ describe('GIVEN, `useAsync', () => {
       expect(data.value).toBe('ok msg');
     });
   });
+  describe('WHEN change params', () => {
+    const func = (arg: string) => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve(`ok ${arg}`);
+      }, 5);
+    });
+
+    const params = ref('');
+
+    let data: Ref<null | string>;
+    beforeAll((done) => {
+      let onEnd;
+      ({ data, onEnd } = useAsync<string>(
+        func,
+        params,
+      ));
+
+      setTimeout(() => {
+        params.value = 'msg2';
+
+        setTimeout(() => {
+          params.value = 'msg';
+        }, 20);
+      }, 100);
+
+      let i = 0;
+      onEnd(() => {
+        if (i > 1) {
+          done();
+        }
+        i += 1;
+      });
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok msg');
+    });
+  });
 
   describe('WHEN wait enabled', () => {
     const func = (arg: string) => new Promise<string>((resolve) => {

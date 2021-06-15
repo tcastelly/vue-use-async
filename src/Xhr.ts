@@ -30,6 +30,12 @@ export default class Xhr<T> {
   onEnd: (result: any | null, e: ProgressEvent) => void = () => {
   };
 
+  static onBeforeSendList: Array<(params: Obj) => Obj> = [];
+
+  static onBeforeSend(cb: (params: Obj) => Obj) {
+    Xhr.onBeforeSendList.push(cb);
+  }
+
   // Bearer token
   token: string | null = null;
 
@@ -85,6 +91,12 @@ export default class Xhr<T> {
     return new Xhr<Z>(paramsObj);
   }
 
+  _getUrl(initial: Obj = {}): string {
+    const params = Xhr.onBeforeSendList.reduce((acc, v) => v(acc || {}), initial);
+
+    return Xhr.stringifyUrl(this.url, params);
+  }
+
   removeEvents() {
     const removeEvents = () => {
       this._oXHR.removeEventListener('load', this._onEnd, false);
@@ -102,7 +114,7 @@ export default class Xhr<T> {
 
   post(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
-    this._oXHR.open('POST', this.url, true);
+    this._oXHR.open('POST', this._getUrl(), true);
     this._send();
 
     return this._deferred.promise;
@@ -110,7 +122,7 @@ export default class Xhr<T> {
 
   put(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
-    this._oXHR.open('PUT', this.url, true);
+    this._oXHR.open('PUT', this._getUrl(), true);
     this._send();
 
     return this._deferred.promise;
@@ -125,7 +137,11 @@ export default class Xhr<T> {
   get(paramsObj?: XhrConfig): XhrGet<T> {
     this._constructor(paramsObj || {});
 
-    this._oXHR.open('GET', Xhr.stringifyUrl(this.url, this.params), true);
+    this._oXHR.open(
+      'GET',
+      this._getUrl(this.sendAs === 'multipart' ? {} : this.params),
+      true,
+    );
     this._send();
 
     // add to the promise, way to cancel xhr query
@@ -137,7 +153,7 @@ export default class Xhr<T> {
 
   delete(paramsObj: XhrConfig): Promise<any> {
     this._constructor(paramsObj);
-    this._oXHR.open('DELETE', Xhr.stringifyUrl(this.url, this.params), true);
+    this._oXHR.open('DELETE', this._getUrl(this.params), true);
     this._send();
 
     return this._deferred.promise;
@@ -250,7 +266,7 @@ export default class Xhr<T> {
       .reduce((acc, v) => {
         acc[v] = params[v];
         return acc;
-      }, {} as {[id: string]: any});
+      }, {} as { [id: string]: any });
 
     // escape hash character
     url = url.replace(/#/, '%23');

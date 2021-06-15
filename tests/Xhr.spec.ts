@@ -4,13 +4,27 @@ import mockXhr from './mockXhr';
 
 describe('Given Xhr and MockXhr', () => {
   it('THEN constructor should not be null', () => {
-    expect(new Xhr()).not.toBe(null);
+    expect(Xhr.new()).not.toBe(null);
   });
   describe('WHEN send GET query', () => {
     let query: Promise<any>;
+    afterAll(() => {
+      Xhr.onBeforeSendList = [];
+    });
+
     beforeAll(() => {
+      Xhr.onBeforeSend((o) => ({
+        ...o,
+        attr: 'ok',
+      }));
+
+      Xhr.onBeforeSend((o) => ({
+        ...o,
+        attr2: 'ok',
+      }));
+
       mockXhr
-        .get({ url: '/fake/get' })
+        .get({ url: '/fake/get?attr=%22ok%22&attr2=%22ok%22' })
         .resolve('get-ok');
 
       query = new Xhr().get({
