@@ -62,7 +62,7 @@ export type $GetConfigArgs = (Omit<XhrConfig, 'url'> & Partial<{
 
 export type $GetConfig = string | $GetConfigArgs;
 
-export type GetConfig = $GetConfig | Ref<$GetConfig>
+export type GetConfig = $GetConfig | Ref<$GetConfig> | ComputedRef<$GetConfig>
 
 export type GetReturn<T> = {
   isPending: ComputedRef<undefined | boolean>,
