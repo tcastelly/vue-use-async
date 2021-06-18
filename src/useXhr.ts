@@ -1,34 +1,26 @@
 import {
-  computed,
-  ComputedRef,
-  isRef,
-  onBeforeUnmount,
-  ref,
-  Ref, unref,
-  watch,
+  computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, unref, watch,
 } from 'vue';
 import type {
-  CacheDuration,
-  GetConfig,
-  GetReturn,
-  Obj,
-  XhrConfig,
-  XhrGet,
+  CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
 } from './index';
 import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
 import useAsync from './useAsync';
 
+type Enabled = undefined | null | (() => boolean) | Ref<boolean> | ComputedRef<boolean> | boolean;
+
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
-type OnErrorCb <T> = (e: Error, xhr: Xhr<T>) => any
+type OnErrorCb<T> = (e: Error, xhr: Xhr<T>) => any
 
-type OnStartCb <T> = (params: any, xhr: Xhr<T>) => any;
+type OnStartCb<T> = (params: any, xhr: Xhr<T>) => any;
 
-type OnEndCb <T> = (res: T, params: any, xhr: Xhr<T>) => any
+type OnEndCb<T> = (res: T, params: any, xhr: Xhr<T>) => any
 
 // used as default `onError`
-const _blank = () => {};
+const _blank = () => {
+};
 
 declare type UseXhr<T = any> = {
   // global callback for VueJS 2 plugin compatibility
@@ -96,7 +88,7 @@ export default function (args?: UseXhr) {
   function get<T>(
     parametersObj: GetConfig,
     params?: Ref<Obj> | Obj,
-    enabled?: Ref<boolean> | ComputedRef<boolean> | boolean,
+    enabled?: Enabled,
   ): GetReturn<T> {
     const xhr: Xhr<any> = new Xhr<any>();
 
@@ -160,12 +152,16 @@ export default function (args?: UseXhr) {
       return _getParams;
     });
 
-    let exec = ref(false);
-    const _exec = getParams.value?.enabled || enabled;
-    if (isRef(_exec)) {
+    let exec: Ref<boolean>;
+    const _exec: Enabled = getParams.value?.enabled || enabled;
+    if (_exec === undefined) {
+      exec = ref(true);
+    } else if (isRef(_exec)) {
       exec = _exec;
+    } else if (typeof _exec === 'function') {
+      exec = ref(_exec());
     } else {
-      exec = ref(_exec === undefined ? true : _exec);
+      exec = ref(_exec === true);
     }
 
     let lastCacheId: null | string;

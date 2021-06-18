@@ -12,7 +12,7 @@ export type Obj = { [id: string]: any };
 
 export type Func = (...args: any[]) => any;
 
-export type UnwrappedPromiseType <T extends (...args: any) => any> =
+export type UnwrappedPromiseType<T extends (...args: any) => any> =
   T extends (...args: any) => Promise<infer U> ? U :
     T extends (...args: any) => infer U ? U : any
 
@@ -57,7 +57,7 @@ export type $GetConfig = string | (XhrConfig & Partial<{
 
   params?: Obj | ComputedRef<Obj>,
 
-  enabled?: boolean | ComputedRef<boolean> | Ref<boolean>,
+  enabled?: undefined | null | (() => boolean) | boolean | ComputedRef<boolean> | Ref<boolean>,
 }>);
 
 export type GetConfig = $GetConfig | Ref<$GetConfig>
