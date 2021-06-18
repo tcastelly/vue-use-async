@@ -2,7 +2,13 @@ import {
   computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, unref, watch,
 } from 'vue';
 import type {
-  CacheDuration, GetConfig, GetReturn, Obj, XhrConfig, XhrGet,
+  $GetConfigArgs,
+  CacheDuration,
+  GetConfig,
+  GetReturn,
+  Obj,
+  XhrConfig,
+  XhrGet,
 } from './index';
 import Xhr from './Xhr';
 import cache, { clearCache } from './cache';
@@ -17,6 +23,11 @@ type OnErrorCb<T> = (e: Error, xhr: Xhr<T>) => any
 type OnStartCb<T> = (params: any, xhr: Xhr<T>) => any;
 
 type OnEndCb<T> = (res: T, params: any, xhr: Xhr<T>) => any
+
+// override url to have string used by Xhr
+type $$GetConfigArg = Omit<$GetConfigArgs, 'url'> & Partial<{
+  url: undefined | string,
+}>
 
 // used as default `onError`
 const _blank = () => {
@@ -113,18 +124,17 @@ export default function (args?: UseXhr) {
     let duration: undefined | CacheDuration = 0;
 
     const getParams = computed(() => {
-      let _getParams: GetConfig = {};
+      const _getParams: $$GetConfigArg = {};
 
       const unwrapParametersObj = unref(parametersObj);
 
+      let _url;
+
       if (typeof unwrapParametersObj === 'string') {
-        url = unwrapParametersObj;
-        _getParams.url = url;
+        _url = unwrapParametersObj;
         _getParams.params = {};
       } else {
-        const _url = unwrapParametersObj.url;
-
-        url = unref(_url);
+        _url = unwrapParametersObj.url;
 
         // use params from second args of get function
         if (!params) {
@@ -133,10 +143,8 @@ export default function (args?: UseXhr) {
 
         duration = unwrapParametersObj.cacheDuration;
 
-        _getParams = {
-          ..._getParams,
-          ...unwrapParametersObj,
-        };
+        _getParams.params = params;
+        _getParams.cacheDuration = duration;
       }
 
       if (token) {
@@ -145,9 +153,12 @@ export default function (args?: UseXhr) {
 
       // merge params
       _getParams.params = {
-        ...isRef(_getParams.params) ? _getParams.params.value : _getParams.params,
+        ...unref(_getParams.params),
         ...(isRef(params) ? (params.value || {}) : params),
       };
+
+      url = typeof _url === 'function' ? _url(_getParams.params) : unref(_url);
+      _getParams.url = url;
 
       return _getParams;
     });

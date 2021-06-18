@@ -50,15 +50,17 @@ export type XhrConfig = Partial<{
   responseType?: 'arraybuffer' | 'blob',
 }>
 
-export type $GetConfig = string | (XhrConfig & Partial<{
+export type $GetConfigArgs = (Omit<XhrConfig, 'url'> & Partial<{
   cacheDuration?: CacheDuration;
 
-  url: string | ComputedRef<string>,
+  url: string | ((params: Obj) => string) | ComputedRef<string>,
 
   params?: Obj | ComputedRef<Obj>,
 
   enabled?: undefined | null | (() => boolean) | boolean | ComputedRef<boolean> | Ref<boolean>,
 }>);
+
+export type $GetConfig = string | $GetConfigArgs;
 
 export type GetConfig = $GetConfig | Ref<$GetConfig>
 

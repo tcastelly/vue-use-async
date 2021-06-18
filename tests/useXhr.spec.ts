@@ -1,10 +1,5 @@
 import {
-  computed,
-  ComputedRef,
-  nextTick,
-  Ref,
-  ref,
-  watch,
+  computed, ComputedRef, nextTick, Ref, ref, watch,
 } from 'vue';
 import Xhr from '@/Xhr';
 import useXhr from '@/useXhr';
@@ -15,7 +10,7 @@ describe('GIVEN `useAsync`', () => {
   const token = ref<string>('FAKE_TOKEN');
 
   describe('WHEN run the function to resolve', () => {
-    let get: Func;
+    let get: ReturnType<typeof useXhr>['get'];
     beforeAll(() => {
       ({ get } = useXhr({ legacy: true, token }));
     });
@@ -27,9 +22,9 @@ describe('GIVEN `useAsync`', () => {
       let mocked: any;
       let data: Ref<undefined | null | string>;
       let reload: Func;
-      let isPending: ComputedRef<boolean>;
+      let isPending: ComputedRef<undefined | null | boolean>;
       let xhr: Xhr<any>;
-      const params = ref({ ok: 0, undefinedParam: undefined });
+      const params = ref({ ok: 1, undefinedParam: undefined });
 
       afterAll(() => {
         mocked.restore();
@@ -45,8 +40,8 @@ describe('GIVEN `useAsync`', () => {
           reload: _reload,
           isPending: _isPending,
           xhr: _xhr,
-        } = get({
-          url: '/fake/get/:ok',
+        } = get<any>({
+          url: () => '/fake/get/:ok',
           params,
           enabled: computed(() => !!params.value.ok),
         });
@@ -76,7 +71,7 @@ describe('GIVEN `useAsync`', () => {
       });
 
       describe('WHEN execute `reload`', () => {
-        let _isPending: boolean;
+        let _isPending: undefined | null | boolean;
         beforeAll((done) => {
           reload();
 
