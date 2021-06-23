@@ -1,23 +1,23 @@
 import {
   computed,
   ComputedRef,
-  isRef,
   ref,
   Ref,
+  unref,
 } from 'vue';
 import Deferred from '@/Deferred';
 import type { UnwrappedPromiseType } from './index';
 
 type OnErrorCb = (e: null | Error) => unknown;
 
-type OnEndCb<T> = (res: T, params: unknown) => unknown;
+type OnEndCb<T, A> = (res: T, params: A) => unknown;
 
-function useMutation<T>(
-  func: (...args: any[]) => Promise<T>,
+function useMutation<A, T>(
+  func: (...args: A[]) => Promise<T>,
 ): {
-  mutate: (params: Ref<any> | any) => Promise<UnwrappedPromiseType<typeof func>>,
+  mutate: (params: ComputedRef<A> | Ref<A> | A) => Promise<UnwrappedPromiseType<typeof func>>,
   onError: (cb: OnErrorCb) => unknown,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => unknown,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, A>) => unknown,
   isPending: Ref<boolean>,
   error: Ref<null | Error>,
   data: Ref<UnwrappedPromiseType<typeof func>>;
@@ -31,13 +31,13 @@ function useMutation<T>(
 
   const onErrorList: OnErrorCb[] = [];
 
-  const onEndList: OnEndCb<T>[] = [];
+  const onEndList: OnEndCb<T, A>[] = [];
 
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
 
-  const mutate = (params: T | Ref<T>) => {
-    const wrapParams = isRef(params) ? params : ref(params);
+  const mutate = (params: ComputedRef<A> | Ref<A> | A) => {
+    const unwrapParams = unref(params) as A;
 
     d.value = new Deferred();
 
@@ -45,14 +45,14 @@ function useMutation<T>(
     error.value = null;
 
     // it's possible to pass multiple args by using an array as params
-    const p = Array.isArray(wrapParams.value)
-      ? func.call(null, ...wrapParams.value)
-      : func(wrapParams.value);
+    const p = Array.isArray(unwrapParams)
+      ? func.call(null, ...unwrapParams)
+      : func(unwrapParams);
 
     p.then((res) => {
       data.value = res;
       d.value.resolve(res);
-      onEndList.forEach((cb) => cb(data.value, wrapParams.value));
+      onEndList.forEach((cb) => cb(data.value, unwrapParams));
     }, (_error) => {
       error.value = _error || null;
 
