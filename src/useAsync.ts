@@ -1,10 +1,5 @@
 import {
-  computed,
-  ComputedRef,
-  Ref,
-  ref,
-  unref,
-  watch,
+  computed, ComputedRef, Ref, ref, unref, watch,
 } from 'vue';
 import type { Obj, UnwrappedPromiseType } from './index';
 import Deferred from './Deferred';
@@ -15,9 +10,19 @@ type OnStartCb = (params: any) => any;
 
 type OnEndCb<T> = (res: T, params: any) => any;
 
-export default function useAsync<T>(
-  func: (...args: any[]) => Promise<T>,
-  params: Ref<any> | (() => any) | any = {},
+// params: ComputedRef<A> | Ref<A> | (() => A) | A = {} as A,
+
+type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
+  ComputedRef<Z | [...A]> |
+  Ref<Z | [...A]> |
+  Z |
+  [...A]
+
+type TypeAllowed = string | number | Obj
+
+export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
+  func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
+  params?: Params<Z, A>,
   enabled: Ref<boolean> | (() => boolean) = ref(true),
 ): {
   onError: (cb: OnErrorCb) => any,
@@ -59,7 +64,7 @@ export default function useAsync<T>(
   });
 
   // generate new xhr/promise
-  const _reload = (_params: Obj) => {
+  const _reload = (_params: Z | [...A]) => {
     onStartList.forEach((cb) => cb(wrapParams.value));
 
     d.value = new Deferred();
@@ -67,10 +72,16 @@ export default function useAsync<T>(
     isPending.value = true;
     error.value = null;
 
+    // possible to call with rest params
+    const funcDefault = func as ((args: Z) => Promise<T>);
+
+    // call with only one param
+    const funcRest = func as ((...args: A) => Promise<T>);
+
     // it's possible to pass multiple args by using an array as params
     const p = Array.isArray(_params)
-      ? func.call(null, ..._params)
-      : func(_params);
+      ? funcRest(..._params)
+      : funcDefault(_params);
 
     p.then((res) => {
       data.value = res;

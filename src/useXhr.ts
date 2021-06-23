@@ -96,12 +96,12 @@ export default function (args?: UseXhr) {
   /**
    * For GET it's possible to add cache
    */
-  function get<T>(
+  function get<T = any>(
     parametersObj: GetConfig,
     params?: Ref<Obj> | Obj,
     enabled?: Enabled,
   ): GetReturn<T> {
-    const xhr: Xhr<any> = new Xhr<any>();
+    const xhr: Xhr<T> = new Xhr<T>();
 
     // Global cb for VueJS 2 Plugin Compatibility
     const _onError = (onError || _blank as unknown as OnErrorCb<T>).bind(context);
@@ -276,7 +276,7 @@ export default function (args?: UseXhr) {
     const xhr = new Xhr<T>();
 
     return {
-      ...useAsync<T>(
+      ...useAsync(
         () => xhr.post(xhrConfig || {}),
         mergeParamsWithToken(params),
       ),
@@ -288,7 +288,7 @@ export default function (args?: UseXhr) {
     const xhr = new Xhr<T>();
 
     return {
-      ...useAsync<T>(
+      ...useAsync(
         () => xhr.put(xhrConfig || {}),
         mergeParamsWithToken(params || {}),
       ),
@@ -300,7 +300,7 @@ export default function (args?: UseXhr) {
     const xhr = new Xhr<T>();
 
     return {
-      ...useAsync<T>(
+      ...useAsync(
         () => xhr.delete(xhrConfig || {}),
         mergeParamsWithToken(params || {}),
       ),
