@@ -7,7 +7,7 @@ import {
 
 type NonNullable<T> = Exclude<T, null | undefined>;
 
-export default function <T>(res: Ref<T>, defaultRes: T): Ref<NonNullable<T>> {
+export default function <T, Z extends T>(res: Ref<T>, defaultRes: Z): Ref<NonNullable<Z>> {
   const _res = ref<T>();
 
   if (defaultRes) {
@@ -24,5 +24,5 @@ export default function <T>(res: Ref<T>, defaultRes: T): Ref<NonNullable<T>> {
     }
   });
 
-  return _res as Ref<NonNullable<T>>;
+  return _res as Ref<NonNullable<Z>>;
 }
