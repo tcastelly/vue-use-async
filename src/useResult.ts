@@ -5,7 +5,9 @@ import {
   watchEffect,
 } from 'vue';
 
-export default function <T>(res: Ref<T>, defaultRes: T): Ref<T> {
+type NonNullable<T> = Exclude<T, null | undefined>;
+
+export default function <T>(res: Ref<T>, defaultRes: T): Ref<NonNullable<T>> {
   const _res = ref<T>();
 
   if (defaultRes) {
@@ -22,5 +24,5 @@ export default function <T>(res: Ref<T>, defaultRes: T): Ref<T> {
     }
   });
 
-  return _res as Ref<T>;
+  return _res as Ref<NonNullable<T>>;
 }

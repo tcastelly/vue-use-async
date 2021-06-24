@@ -1,23 +1,21 @@
 import {
-  computed,
-  ComputedRef,
-  ref,
-  Ref,
-  unref,
+  computed, ComputedRef, ref, Ref,
 } from 'vue';
 import Deferred from '@/Deferred';
-import type { UnwrappedPromiseType } from './index';
+import type { Obj, UnwrappedPromiseType } from './index';
+
+type TypeAllowed = undefined | boolean | null | string | number | Obj
 
 type OnErrorCb = (e: null | Error) => unknown;
 
-type OnEndCb<T, A> = (res: T, params: A) => unknown;
+type OnEndCb<T, Z, A extends TypeAllowed[]> = (res: T, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
-function useMutation<A, T>(
-  func: (...args: A[]) => Promise<T>,
+export default function useMutation<T, Z, A extends TypeAllowed[]>(
+  func: (arg: Z, ...args: A) => Promise<T>,
 ): {
-  mutate: (params: ComputedRef<A> | Ref<A> | A) => Promise<UnwrappedPromiseType<typeof func>>,
+  mutate: (param: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>,
   onError: (cb: OnErrorCb) => unknown,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, A>) => unknown,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown,
   isPending: Ref<boolean>,
   error: Ref<null | Error>,
   data: Ref<UnwrappedPromiseType<typeof func>>;
@@ -31,28 +29,29 @@ function useMutation<A, T>(
 
   const onErrorList: OnErrorCb[] = [];
 
-  const onEndList: OnEndCb<T, A>[] = [];
+  const onEndList: OnEndCb<T, Z, A>[] = [];
 
   // for legacy use case (Vue xhr Plugin)
   const d = ref<Deferred<T>>(new Deferred());
 
-  const mutate = (params: ComputedRef<A> | Ref<A> | A) => {
-    const unwrapParams = unref(params) as A;
-
+  const mutate = (param: Z, ...params: A) => {
     d.value = new Deferred();
 
     isPending.value = true;
     error.value = null;
 
     // it's possible to pass multiple args by using an array as params
-    const p = Array.isArray(unwrapParams)
-      ? func.call(null, ...unwrapParams)
-      : func(unwrapParams);
+    const funcRes = func as (...args: TypeAllowed[]) => Promise<T>;
+    const p = funcRes(...[param, ...params]);
 
     p.then((res) => {
       data.value = res;
       d.value.resolve(res);
-      onEndList.forEach((cb) => cb(data.value, unwrapParams));
+      onEndList.forEach((cb: OnEndCb<T, Z, A>) => cb(
+        data.value,
+        // @ts-ignore - how test `Z extends []`?
+        params.length ? [param, ...params] : param,
+      ));
     }, (_error) => {
       error.value = _error || null;
 
@@ -79,5 +78,3 @@ function useMutation<A, T>(
     promise: computed(() => d.value.promise),
   };
 }
-
-export default useMutation;

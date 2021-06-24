@@ -8,7 +8,7 @@ describe('GIVEN, `useAsync', () => {
         resolve('ok');
       });
     });
-    let data: Ref<string>;
+    let data:Ref<undefined | null | string>;
     let promise;
 
     beforeAll(async () => {
@@ -51,7 +51,7 @@ describe('GIVEN, `useAsync', () => {
       }, 200);
     });
 
-    let data: Ref<null | string>;
+    let data: Ref<undefined | null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync(func, computed(() => 'msg')));
@@ -71,7 +71,7 @@ describe('GIVEN, `useAsync', () => {
 
     const params = ref('');
 
-    let data: Ref<null | string>;
+    let data: Ref<undefined | null | string>;
     beforeAll((done) => {
       let onEnd;
       ({ data, onEnd } = useAsync(
@@ -112,7 +112,7 @@ describe('GIVEN, `useAsync', () => {
 
     const params = ref('');
 
-    let data: Ref<null | string>;
+    let data: Ref<undefined | null | string>;
     beforeAll((done) => {
       let onEnd;
       ({ data, onEnd } = useAsync(
@@ -155,7 +155,7 @@ describe('GIVEN, `useAsync', () => {
       }, 200);
     });
 
-    let data: Ref<null | string>;
+    let data: Ref<undefined | null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync(
@@ -178,7 +178,7 @@ describe('GIVEN, `useAsync', () => {
       }, 200);
     });
 
-    let data: Ref<null | string>;
+    let data: Ref<undefined | null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync(
@@ -201,7 +201,7 @@ describe('GIVEN, `useAsync', () => {
       }, 200);
     });
 
-    let data: Ref<null | string>;
+    let data: Ref<undefined | null | string>;
     let promise;
     beforeAll(async () => {
       ({ data, promise } = useAsync(
