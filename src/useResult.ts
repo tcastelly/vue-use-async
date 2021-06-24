@@ -7,14 +7,21 @@ import {
 
 type NonNullable<T> = Exclude<T, null | undefined>;
 
-export default function <T, Z extends T>(res: Ref<T>, defaultRes: NonNullable<Z>, map?: (r: NonNullable<Z>) => NonNullable<Z>): Ref<NonNullable<Z>> {
+type Res<T, Z extends T> = NonNullable<Z extends never[] ? T : Z>;
+
+export default function <T, Z extends T>(
+  res: Ref<T>,
+  defaultRes: NonNullable<Z>,
+  map?: (r: Res<T, Z>) => Res<T, Z>,
+): Ref<Res<T, Z>> {
   const _res = ref<Z>();
 
   if (!map) {
-    map = (a) => a as NonNullable<Z>;
+    map = (a) => a;
   }
 
   if (defaultRes) {
+    // @ts-ignore
     _res.value = map(defaultRes);
   }
 
@@ -23,10 +30,12 @@ export default function <T, Z extends T>(res: Ref<T>, defaultRes: NonNullable<Z>
       const unWrapRes = unref(res) as NonNullable<Z>;
 
       if (unWrapRes) {
+        // @ts-ignore
         _res.value = map?.(unWrapRes);
       }
     }
   });
 
-  return _res as Ref<NonNullable<Z>>;
+  // @ts-ignore
+  return _res;
 }
