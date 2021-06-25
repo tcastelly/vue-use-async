@@ -14,15 +14,14 @@ export default function <T, Z extends T>(
   defaultRes: NonNullable<Z>,
   map?: (r: Res<T, Z>) => Res<T, Z>,
 ): Ref<Res<T, Z>> {
-  const _res = ref<Z>();
+  const _res = ref(defaultRes);
 
   if (!map) {
     map = (a) => a;
   }
 
   if (defaultRes) {
-    // @ts-ignore
-    _res.value = map(defaultRes);
+    _res.value = map(defaultRes as Res<T, Z>);
   }
 
   watchEffect(() => {
@@ -30,12 +29,10 @@ export default function <T, Z extends T>(
       const unWrapRes = unref(res) as NonNullable<Z>;
 
       if (unWrapRes) {
-        // @ts-ignore
-        _res.value = map?.(unWrapRes);
+        _res.value = map?.(unWrapRes as Res<T, Z>) as Res<T, Z>;
       }
     }
   });
 
-  // @ts-ignore
-  return _res;
+  return _res as Ref<Res<T, Z>>;
 }
