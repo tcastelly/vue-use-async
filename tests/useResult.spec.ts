@@ -29,7 +29,7 @@ describe('GIVEN useResult', () => {
 
     const res = useResult(
       _res,
-      [],
+      [1],
       (r) => r.map((item) => item * 100),
     );
     it('THEN is should be used', () => {
