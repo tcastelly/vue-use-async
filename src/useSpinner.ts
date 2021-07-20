@@ -5,7 +5,7 @@ import {
   Ref,
 } from 'vue';
 
-export default function (isPending: Ref<boolean>, duration = 400) {
+export default function (isPending: Ref<undefined | boolean>, duration = 400) {
   const isPendingSpinner = ref<boolean>(false);
 
   let timeoutId: ReturnType<typeof setTimeout>;
@@ -19,15 +19,15 @@ export default function (isPending: Ref<boolean>, duration = 400) {
           clearTimeout(timeoutId);
         }
         timeoutId = setTimeout(() => {
-          isPendingSpinner.value = isPending.value;
+          isPendingSpinner.value = isPending.value === true;
         }, duration);
       } else {
-        isPendingSpinner.value = isPending.value;
+        isPendingSpinner.value = isPending.value === true;
       }
     }, {
       immediate: true,
     },
   );
 
-  return computed<boolean>(() => isPendingSpinner.value);
+  return computed(() => isPendingSpinner.value);
 }
