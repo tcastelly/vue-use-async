@@ -28,13 +28,13 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   onError: (cb: OnErrorCb) => any,
   onStart: (cb: OnStartCb) => any,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
-  isPending: Ref<boolean>,
+  isPending: Ref<undefined | boolean>,
   error: Ref<null | Error>,
   data: Ref<undefined | null | UnwrappedPromiseType<typeof func>>;
   reload: () => any,
   promise: ComputedRef<ReturnType<typeof func>>,
 } {
-  const isPending = ref();
+  const isPending = ref<undefined | boolean>();
 
   const data = ref<T>() as Ref<T>;
 
