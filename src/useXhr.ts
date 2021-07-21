@@ -143,6 +143,14 @@ export default function (args?: UseXhr) {
 
         duration = unwrapParametersObj.cacheDuration;
 
+        if (unwrapParametersObj.enabled !== undefined) {
+          _getParams.enabled = unwrapParametersObj.enabled;
+        }
+
+        if (_getParams.enabled === undefined) {
+          _getParams.enabled = enabled;
+        }
+
         _getParams.params = params;
         _getParams.cacheDuration = duration;
       }
@@ -164,7 +172,7 @@ export default function (args?: UseXhr) {
     });
 
     let exec: Ref<boolean>;
-    const _exec: Enabled = getParams.value?.enabled || enabled;
+    const _exec: Enabled = getParams.value.enabled !== undefined ? getParams.value.enabled : enabled;
     if (_exec === undefined) {
       exec = ref(true);
     } else if (isRef(_exec)) {
@@ -232,6 +240,7 @@ export default function (args?: UseXhr) {
     watch(
       () => getParams.value,
       () => {
+        console.log(exec.value);
         if (exec.value) {
           reload();
         }
