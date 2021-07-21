@@ -159,9 +159,15 @@ export default function (args?: UseXhr) {
         _getParams.token = getTokenValue(token);
       }
 
+      let p = unref(_getParams.params);
+
+      if (typeof p === 'function') {
+        p = p();
+      }
+
       // merge params
       _getParams.params = {
-        ...unref(_getParams.params),
+        ...p,
         ...(isRef(params) ? (params.value || {}) : params),
       };
 
