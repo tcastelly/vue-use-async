@@ -132,7 +132,6 @@ export default function (args?: UseXhr) {
 
       if (typeof unwrapParametersObj === 'string') {
         _url = unwrapParametersObj;
-        _getParams.params = {};
       } else {
         _url = unwrapParametersObj.url;
 
@@ -159,7 +158,7 @@ export default function (args?: UseXhr) {
         _getParams.token = getTokenValue(token);
       }
 
-      let p = unref(_getParams.params);
+      let p = unref(_getParams.params || params || {});
 
       if (typeof p === 'function') {
         p = p();

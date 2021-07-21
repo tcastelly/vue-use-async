@@ -113,13 +113,18 @@ describe('GIVEN `useAsync`', () => {
         mocked.restore();
       });
       beforeAll(async () => {
-        mocked = mockXhr.get({ url: '/fake/fail/get' });
+        mocked = mockXhr.get({ url: '/fake/fail/get/1' });
         mocked.reject('ko');
 
         const {
           error: _error,
           promise,
-        } = get('/fake/fail/get', {});
+        } = get(
+          '/fake/fail/get/:id',
+          () => ({
+            id: 1,
+          }),
+        );
 
         error = _error;
 
