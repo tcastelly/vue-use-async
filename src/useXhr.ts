@@ -240,7 +240,6 @@ export default function (args?: UseXhr) {
     watch(
       () => getParams.value,
       () => {
-        console.log(exec.value);
         if (exec.value) {
           reload();
         }
