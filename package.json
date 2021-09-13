@@ -21,7 +21,7 @@
     "lint:fix": "npm run tsc:check-types && eslint --fix --ext .js,.ts src tests",
     "precommit": "lint-staged",
     "prepublishOnly": "npm run lint && npm run test && npm run build",
-    "test": "jest tests/** --no-cache --runInBand",
+    "test": "jest tests/** --no-cache",
     "tsc:check-types": "tsc --noemit",
     "tsc:export-types": "tsc --outDir types"
   },

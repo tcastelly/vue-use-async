@@ -17,6 +17,9 @@ export default class Deferred<T> {
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
-    });
+    });/* .catch((e) => {
+      // fix unhandled-rejections
+      console.warn(e);
+    }) */
   }
 }
