@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import Xhr from '@/Xhr';
 import type { XhrGet } from '@/index';
 import mockXhr from './mockXhr';
@@ -23,7 +26,7 @@ describe('Given Xhr and MockXhr', () => {
         attr2: 'ok',
       }));
 
-      mockXhr
+      mockXhr()
         .get({ url: '/fake/get?attr=%22ok%22&attr2=%22ok%22' })
         .resolve('get-ok');
 
@@ -38,7 +41,7 @@ describe('Given Xhr and MockXhr', () => {
   describe('WHEN send POST query', () => {
     let query: Promise<any>;
     beforeAll(() => {
-      mockXhr
+      mockXhr()
         .post({ url: '/fake/post' })
         .resolve('post-ok');
 
@@ -55,7 +58,7 @@ describe('Given Xhr and MockXhr', () => {
   describe('WHEN send put query', () => {
     let query: Promise<any>;
     beforeAll(() => {
-      mockXhr
+      mockXhr()
         .put({ url: '/fake/put' })
         .resolve('put-ok');
 
@@ -67,7 +70,7 @@ describe('Given Xhr and MockXhr', () => {
   describe('WHEN send DELETE query', () => {
     let query: Promise<any>;
     beforeAll(() => {
-      mockXhr
+      mockXhr()
         .delete({ url: '/fake/delete' })
         .resolve('delete-ok');
 
@@ -82,7 +85,7 @@ describe('Given Xhr and MockXhr', () => {
   describe('WHEN send ABORT query', () => {
     let query: XhrGet<any>;
     beforeAll(() => {
-      mockXhr
+      mockXhr()
         .get({
           url: '/fake/abort',
           params: {

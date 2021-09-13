@@ -11,7 +11,7 @@ export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, durati
   const { id, xhr } = params || {};
   let duration: number = typeof params.duration !== 'string' ? (params.duration || 200) : 200;
   let _d;
-  let timer: NodeJS.Timer;
+  let timer: number;
 
   // By default 1h of cache
   if (params.duration === 'max') {
@@ -26,7 +26,7 @@ export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, durati
       Logger.log(`[Log] add cache: ${id}`);
 
       clearTimeout(timer);
-      timer = setTimeout(() => {
+      timer = window.setTimeout(() => {
         _cache.delete(id);
         Logger.log(`[Log] delete cache: ${id}`);
         clearTimeout(timer);

@@ -1,20 +1,20 @@
+/**
+ * @jest-environment jsdom
+ */
 import {
   computed, ComputedRef, nextTick, Ref, ref, watch,
 } from 'vue';
 import Xhr from '@/Xhr';
 import useXhr from '@/useXhr';
-import type { Func } from '@/index';
+import type { Func, Obj } from '@/index';
 import mockXhr from './mockXhr';
 
 describe('GIVEN `useAsync`', () => {
-  const token = ref<string>('FAKE_TOKEN');
+  const token = ref('FAKE_TOKEN');
 
   describe('WHEN run the function to resolve', () => {
-    let get: ReturnType<typeof useXhr>['get'];
-    beforeAll(() => {
-      ({ get } = useXhr({ legacy: true, token }));
-    });
     it('THEN `get` should be a function', () => {
+      const { get } = useXhr({ legacy: true, token });
       expect(typeof get).toBe('function');
     });
 
@@ -27,10 +27,13 @@ describe('GIVEN `useAsync`', () => {
       const params = ref({ ok: 1, undefinedParam: undefined });
 
       afterAll(() => {
-        mocked.restore();
+        // maybe already restored
+        mocked.restore?.();
       });
-      beforeAll(async (done) => {
-        mocked = mockXhr.get({
+      beforeAll((done) => {
+        const { get } = useXhr({ legacy: true, token });
+
+        mocked = mockXhr().get({
           url: '/fake/get/1',
         });
         mocked.resolve('get-ok');
@@ -96,24 +99,23 @@ describe('GIVEN `useAsync`', () => {
   });
 
   describe('WHEN run the function to reject the query', () => {
-    let get: Func;
-
-    beforeAll(() => {
-      ({ get } = useXhr({ legacy: true, token }));
-    });
     it('THEN `get` should be a function', () => {
+      const { get } = useXhr({ legacy: true, token });
       expect(typeof get).toBe('function');
     });
 
     describe('WHEN execute `get` Xhr', () => {
+      const { get } = useXhr({ legacy: true, token });
+
       let mocked: any;
-      let error: Ref<undefined | null | Error>;
+      let error: Ref<Error | Obj | null>;
 
       afterAll(() => {
-        mocked.restore();
+        // maybe already restored
+        mocked.restore?.();
       });
       beforeAll(async () => {
-        mocked = mockXhr.get({ url: '/fake/fail/get/1' });
+        mocked = mockXhr().get({ url: '/fake/fail/get/1' });
         mocked.reject('ko');
 
         const {

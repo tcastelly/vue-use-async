@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import cache, { cacheSize, clearCache } from '@/cache';
 import { XhrGet } from '@/index';
 

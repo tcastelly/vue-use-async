@@ -8,7 +8,7 @@ describe('GIVEN, `useAsync', () => {
         resolve('ok');
       });
     });
-    let data:Ref<undefined | null | string>;
+    let data: Ref<undefined | null | string>;
     let promise;
 
     beforeAll(async () => {
@@ -22,25 +22,12 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN reject `useAsync`', () => {
-    const func = () => new Promise((resolve, reject) => {
-      setTimeout(() => {
-        reject(Error('ko'));
-      });
-    });
+    const rejectFunc = () => Promise.reject(Error('ko'));
 
-    let error: Ref<null | Error>;
-    let promise;
-    beforeAll(async () => {
-      ({ error, promise } = useAsync(func));
-      try {
-        await promise.value;
-      } catch (e) {
-        //
-      }
-    });
-
-    it('THEN `data` should be resolved', () => {
-      expect(error.value?.message).toBe('ko');
+    it('promise should be rejected', () => {
+      const f = () => useAsync(rejectFunc);
+      const res = f();
+      return expect(res.promise.value).rejects.toThrow('ko');
     });
   });
 
@@ -62,6 +49,7 @@ describe('GIVEN, `useAsync', () => {
       expect(data.value).toBe('ok msg');
     });
   });
+
   describe('WHEN change params', () => {
     const func = (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {

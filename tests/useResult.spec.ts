@@ -1,5 +1,5 @@
-import useResult from '@/useResult';
 import { ref } from 'vue';
+import useResult from '@/useResult';
 
 describe('GIVEN useResult', () => {
   describe('WHEN input is undefined', () => {

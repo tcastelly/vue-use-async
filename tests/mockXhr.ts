@@ -130,23 +130,25 @@ class MockXhr {
   }
 }
 
-export default {
-  get(condition: Condition) {
-    return new MockXhr().get(condition);
-  },
-  post(condition: Condition) {
-    return new MockXhr().post(condition);
-  },
-  delete(condition: Condition) {
-    return new MockXhr().delete(condition);
-  },
-  put(condition: Condition) {
-    return new MockXhr().put(condition);
-  },
-  sendForm(condition: Condition) {
-    return new MockXhr().sendForm(condition);
-  },
-  restore() {
-    MockXhr.restore();
-  },
-};
+export default function () {
+  return {
+    get(condition: Condition) {
+      return new MockXhr().get(condition);
+    },
+    post(condition: Condition) {
+      return new MockXhr().post(condition);
+    },
+    delete(condition: Condition) {
+      return new MockXhr().delete(condition);
+    },
+    put(condition: Condition) {
+      return new MockXhr().put(condition);
+    },
+    sendForm(condition: Condition) {
+      return new MockXhr().sendForm(condition);
+    },
+    restore() {
+      MockXhr.restore();
+    },
+  };
+}

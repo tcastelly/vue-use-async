@@ -2,7 +2,6 @@ import {
   computed, ComputedRef, Ref, ref, unref, watch,
 } from 'vue';
 import type { Obj, UnwrappedPromiseType } from './index';
-import Deferred from './Deferred';
 
 type OnErrorCb = (e: null | Error, params: any) => any;
 
@@ -25,20 +24,20 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   params?: Params<Z, A>,
   enabled: Ref<boolean> | (() => boolean) = ref(true),
 ): {
+  isPending: Ref<undefined | boolean>,
+  data: Ref<undefined | null | UnwrappedPromiseType<typeof func>>;
+  error: Ref<null | Error>,
+  reload: () => any,
   onError: (cb: OnErrorCb) => any,
   onStart: (cb: OnStartCb) => any,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
-  isPending: Ref<undefined | boolean>,
-  error: Ref<null | Error>,
-  data: Ref<undefined | null | UnwrappedPromiseType<typeof func>>;
-  reload: () => any,
-  promise: ComputedRef<ReturnType<typeof func>>,
+  promise: ComputedRef<null | ReturnType<typeof func>>,
 } {
   const isPending = ref<undefined | boolean>();
 
   const data = ref<T>() as Ref<T>;
 
-  const error = ref<null | Error>(null);
+  const error: Ref<null | Error> = ref(null);
 
   const onErrorList: Array<OnErrorCb> = [];
 
@@ -47,7 +46,7 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   const onEndList: Array<OnEndCb<T>> = [];
 
   // for legacy use case
-  const d = ref<Deferred<T>>(new Deferred());
+  const d = ref<null | Promise<T>>(null);
 
   const wrapParams = computed(() => {
     if (typeof params === 'function') {
@@ -67,8 +66,6 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   const _reload = (_params: Z | [...A]) => {
     onStartList.forEach((cb) => cb(wrapParams.value));
 
-    d.value = new Deferred();
-
     isPending.value = true;
     error.value = null;
 
@@ -79,27 +76,29 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
     const funcRest = func as ((...args: A) => Promise<T>);
 
     // it's possible to pass multiple args by using an array as params
-    const p = Array.isArray(_params)
+    d.value = Array.isArray(_params)
       ? funcRest(..._params)
       : funcDefault(_params);
 
-    p.then((res) => {
-      data.value = res;
-      d.value.resolve(res);
-
-      onEndList.forEach((cb) => cb(res, wrapParams.value));
-    }, (_error) => {
+    d.value.catch((_error) => {
       error.value = _error || null;
 
       onErrorList.forEach((cb) => cb(error.value, wrapParams.value));
 
-      d.value.reject(_error);
       error.value = _error;
     });
 
-    p.finally(() => {
+    d.value.then((res) => {
+      data.value = res;
+
+      onEndList.forEach((cb) => cb(res, wrapParams.value));
+    });
+
+    d.value.finally(() => {
       isPending.value = false;
     });
+
+    return d.value;
   };
 
   // reload if the query has been enabled
@@ -122,8 +121,8 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
       if (
         !isPending.value
         && ((_enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
-        // fix if there is no change. Just undefined as value
-        || (v === undefined && oldV === undefined))
+          // fix if there is no change. Just undefined as value
+          || (v === undefined && oldV === undefined))
       ) {
         _reload(v);
       }
@@ -141,6 +140,6 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
     onError: (cb) => onErrorList.push(cb),
     onStart: (cb) => onStartList.push(cb),
     onEnd: (cb) => onEndList.push(cb),
-    promise: computed(() => d.value.promise),
+    promise: computed(() => d.value),
   };
 }
