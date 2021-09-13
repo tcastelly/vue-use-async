@@ -1,5 +1,12 @@
 import {
-  computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, unref, watch,
+  computed,
+  ComputedRef,
+  isRef,
+  onBeforeUnmount,
+  ref,
+  Ref,
+  unref,
+  watch,
 } from 'vue';
 import type {
   $GetConfigArgs,
@@ -128,7 +135,7 @@ export default function (args?: UseXhr) {
 
       const unwrapParametersObj = unref(parametersObj);
 
-      let _url;
+      let _url: $GetConfigArgs['url'];
 
       if (typeof unwrapParametersObj === 'string') {
         _url = unwrapParametersObj;
