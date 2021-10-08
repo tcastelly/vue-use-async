@@ -1,11 +1,14 @@
 import {
-  computed, ComputedRef, ref, Ref,
+  computed,
+  ComputedRef,
+  ref,
+  Ref,
 } from 'vue';
 import type { Obj, UnwrappedPromiseType } from './index';
 
 type TypeAllowed = undefined | boolean | null | string | number | Obj
 
-type OnErrorCb = (e: null | Error) => unknown;
+type OnErrorCb<Z, A extends TypeAllowed[]> = (e: null | Error, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
 type OnEndCb<T, Z, A extends TypeAllowed[]> = (res: T, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
@@ -13,7 +16,7 @@ export default function useMutation<T, Z, A extends TypeAllowed[]>(
   func: (arg: Z, ...args: A) => Promise<T>,
 ): {
   mutate: (param: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>,
-  onError: (cb: OnErrorCb) => unknown,
+  onError: (cb: OnErrorCb<Z, A>) => unknown,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown,
   isPending: Ref<boolean>,
   error: Ref<null | Error>,
@@ -26,7 +29,7 @@ export default function useMutation<T, Z, A extends TypeAllowed[]>(
 
   const error = ref<null | Error>() as Ref<null | Error>;
 
-  const onErrorList: OnErrorCb[] = [];
+  const onErrorList: OnErrorCb<Z, A>[] = [];
 
   const onEndList: OnEndCb<T, Z, A>[] = [];
 
@@ -51,7 +54,11 @@ export default function useMutation<T, Z, A extends TypeAllowed[]>(
     }, (_error) => {
       error.value = _error || null;
 
-      onErrorList.forEach((cb) => cb(error.value));
+      onErrorList.forEach((cb) => cb(
+        error.value,
+        // @ts-ignore - how test `Z extends []`?
+        params.length ? [param, ...params] : param,
+      ));
 
       error.value = _error;
     });
