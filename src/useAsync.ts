@@ -55,6 +55,8 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
     return unref(params);
   });
 
+  const lastUnwrapParams = ref();
+
   const _enabled = computed(() => {
     if (typeof enabled === 'function') {
       return enabled();
@@ -109,7 +111,8 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
       if (!isPending.value && v) {
         _reload(wrapParams.value);
       }
-    }, {
+    },
+    {
       // avoid simultaneously query
       immediate: false,
     },
@@ -117,16 +120,22 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
 
   watch(
     () => wrapParams.value,
-    (v, oldV) => {
+    (v) => {
+      const vStr = JSON.stringify(v);
       if (
         !isPending.value
-        && ((_enabled.value && JSON.stringify(v) !== JSON.stringify(oldV))
+        && (
           // fix if there is no change. Just undefined as value
-          || (v === undefined && oldV === undefined))
+          (v === undefined && lastUnwrapParams.value === undefined)
+
+          || (_enabled.value && vStr !== JSON.stringify(lastUnwrapParams.value))
+        )
       ) {
         _reload(v);
       }
-    }, {
+      lastUnwrapParams.value = vStr === undefined ? undefined : JSON.parse(vStr);
+    },
+    {
       immediate: _enabled.value,
       deep: true,
     },

@@ -24,7 +24,8 @@ export default function (isPending: Ref<undefined | boolean>, duration = 400) {
       } else {
         isPendingSpinner.value = isPending.value === true;
       }
-    }, {
+    },
+    {
       immediate: true,
     },
   );

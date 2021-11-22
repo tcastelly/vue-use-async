@@ -15,18 +15,23 @@ export default class Xhr<T> {
     return result;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   onError: (e: ProgressEvent) => void = () => {
   };
 
+  // eslint-disable-next-line class-methods-use-this
   onStart: (e: ProgressEvent) => void = () => {
   };
 
+  // eslint-disable-next-line class-methods-use-this
   onAbort: (e: ProgressEvent) => void = () => {
   };
 
+  // eslint-disable-next-line class-methods-use-this
   onProgress: (e: ProgressEvent) => void = () => {
   };
 
+  // eslint-disable-next-line class-methods-use-this
   onEnd: (result: any | null, e: ProgressEvent) => void = () => {
   };
 

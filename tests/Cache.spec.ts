@@ -37,7 +37,9 @@ describe('Given Cache', () => {
       let xhr: () => XhrGet<any>;
       beforeAll(() => {
         // @ts-ignore - fake xhr
-        xhr = () => new Promise((resolve) => resolve('ok'));
+        xhr = () => new Promise((resolve) => {
+          resolve('ok');
+        });
         cache({
           id: '/fake-canceled/',
           xhr,

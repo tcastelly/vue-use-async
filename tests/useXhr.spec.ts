@@ -85,7 +85,8 @@ describe('GIVEN `useAsync`', () => {
               if (isPending.value === true) {
                 done();
               }
-            }, {
+            },
+            {
               immediate: true,
             },
           );

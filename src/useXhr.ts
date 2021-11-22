@@ -255,7 +255,8 @@ export default function (args?: UseXhr) {
         if (exec.value) {
           reload();
         }
-      }, {
+      },
+      {
         immediate: exec.value,
       },
     );
@@ -269,7 +270,8 @@ export default function (args?: UseXhr) {
           // we don't want to abort the previous query
           reload();
         }
-      }, {
+      },
+      {
         // avoid simultaneously query
         immediate: false,
       },
