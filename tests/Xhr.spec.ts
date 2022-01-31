@@ -55,6 +55,21 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-ok'));
   });
+  describe('WHEN send POST query with array as parameter', () => {
+    let query: Promise<any>;
+    beforeAll(() => {
+      mockXhr()
+        .post({ url: '/fake/post' })
+        .resolve('post-users-ok');
+
+      query = new Xhr().post({
+        url: '/fake/post',
+        params: ['thomas'],
+      });
+    });
+
+    it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-users-ok'));
+  });
   describe('WHEN send put query', () => {
     let query: Promise<any>;
     beforeAll(() => {

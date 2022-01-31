@@ -260,7 +260,14 @@ export default class Xhr<T> {
    * @return {{url: *, params}}
    * @private
    */
-  static _injectParamsInUrl(url: string, params: Obj = {}): { url: string, params: Obj } {
+  static _injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string, params: Obj } {
+    if (Array.isArray(params)) {
+      return {
+        url,
+        params,
+      };
+    }
+
     //
     // replace path params
 
