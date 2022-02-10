@@ -6,10 +6,10 @@ import {
 } from 'vue';
 import Xhr from '@/Xhr';
 import useXhr from '@/useXhr';
-import type { Func, Obj } from '@/index';
+import type { Func } from '@/index';
 import mockXhr from './mockXhr';
 
-describe('GIVEN `useAsync`', () => {
+describe('GIVEN `useXhr`', () => {
   const token = ref('FAKE_TOKEN');
 
   describe('WHEN run the function to resolve', () => {
@@ -109,36 +109,29 @@ describe('GIVEN `useAsync`', () => {
       const { get } = useXhr({ legacy: true, token });
 
       let mocked: any;
-      let error: Ref<Error | Obj | null>;
 
       afterAll(() => {
         // maybe already restored
         mocked.restore?.();
       });
-      beforeAll(async () => {
+      beforeAll(() => {
         mocked = mockXhr().get({ url: '/fake/fail/get/1' });
         mocked.reject('ko');
-
-        const {
-          error: _error,
-          promise,
-        } = get(
-          '/fake/fail/get/:id',
-          () => ({
-            id: 1,
-          }),
-        );
-
-        error = _error;
-
-        try {
-          await promise.value;
-        } catch (e) {
-          //
-        }
       });
-      it('THEN error should be retrieved with good value', async () => {
-        expect(error.value).toBe('ko');
+      // eslint-disable-next-line consistent-return
+      it('THEN error should be retrieved with good value', () => {
+        const fetch = async (): Promise<unknown> => new Promise((resolve, reject) => {
+          const { promise } = get(
+            '/fake/fail/get/:id',
+            () => ({
+              id: 1,
+            }),
+          );
+          promise.value.catch((e) => {
+            reject(Error(e));
+          });
+        });
+        return expect(fetch).rejects.toThrow('ko');
       });
     });
   });

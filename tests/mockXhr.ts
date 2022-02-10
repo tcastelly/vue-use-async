@@ -99,12 +99,11 @@ class MockXhr {
         this.method = method;
       } else {
         // @ts-ignore
-        // eslint-disable-next-line prefer-rest-params
-        open.apply(this, arguments);
+        open.apply(this, arguments); // eslint-disable-line prefer-rest-params
       }
     };
 
-    // @ts-ignore - implement fake send
+    // @ts-ignore
     XMLHttpRequest.prototype.send = (params: any, xhr: XMLHttpRequest | null) => {
       Logger.info('[Log] Fake xhr sent');
       if (Xhr.stringifyUrl(condition.url || '', condition.params) && this.method === condition.method) {
@@ -112,8 +111,7 @@ class MockXhr {
         this.pending.resolve(xhr);
       } else {
         // @ts-ignore
-        // eslint-disable-next-line prefer-rest-params
-        send.apply(this, arguments);
+        send.apply(this, arguments); // eslint-disable-line prefer-rest-params
       }
     };
 

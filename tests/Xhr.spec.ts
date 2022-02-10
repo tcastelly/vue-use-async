@@ -108,11 +108,15 @@ describe('Given Xhr and MockXhr', () => {
           },
         })
         .abort();
-
-      query = new Xhr().get({ url: '/fake/abort', params: { user: 'Thomas' } });
-      query.abortXhr();
     });
 
-    it('THEN fake should be catch', () => expect(query).rejects.toHaveProperty('error'));
+    it('THEN fake should be catch', () => {
+      const fetch = () => {
+        query = new Xhr().get({ url: '/fake/abort', params: { user: 'Thomas' } });
+        query.abortXhr();
+        return query;
+      };
+      expect(fetch).rejects.toThrow();
+    });
   });
 });

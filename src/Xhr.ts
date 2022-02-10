@@ -150,7 +150,7 @@ export default class Xhr<T> {
     this._send();
 
     // add to the promise, way to cancel xhr query
-    const _d: Partial<XhrGet<T>> = this._deferred.promise;
+    const _d = this._deferred.promise as Partial<XhrGet<T>>;
     _d.abortXhr = this.abort.bind(this);
 
     return _d as XhrGet<T>;
@@ -170,8 +170,8 @@ export default class Xhr<T> {
   abort(): Promise<T> {
     // don t abort twice
     if (!this._isXhrResolved || this._isXhrRejected) {
-      // @ts-ignore - preserve context for tests
-      this._oXHR.abort(null, this);
+      // @ts-ignore
+      this._oXHR.abort(null, this); // preserve context for tests
       this._isXhrRejected = true;
       this._deferred.reject({
         error: `Xhr aborted: ${this.url}`,
@@ -345,8 +345,8 @@ export default class Xhr<T> {
       this._oXHR.setRequestHeader('Authorization', `Bearer ${this.token}`);
     }
 
-    // @ts-ignore - preserve context for tests
-    this._oXHR.send(params, this);
+    // @ts-ignore
+    this._oXHR.send(params, this); // preserve context for tests
   }
 
   /**
