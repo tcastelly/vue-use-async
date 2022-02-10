@@ -13,7 +13,7 @@ export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, durati
   let _d;
   let timer: number;
 
-  // By default 1h of cache
+  // By default, 1h of cache
   if (params.duration === 'max') {
     duration = 60 * 60 * 1000;
   }
@@ -50,6 +50,10 @@ export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, durati
 
 export function cacheSize() {
   return _cache.size;
+}
+
+export function cacheIds() {
+  return Array.from(_cache.keys());
 }
 
 export function clearCache(id?: string) {

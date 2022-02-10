@@ -5,6 +5,7 @@ import {
   computed, ComputedRef, nextTick, Ref, ref, watch,
 } from 'vue';
 import Xhr from '@/Xhr';
+import { cacheIds } from '@/cache';
 import useXhr from '@/useXhr';
 import type { Func } from '@/index';
 import mockXhr from './mockXhr';
@@ -30,6 +31,7 @@ describe('GIVEN `useXhr`', () => {
         // maybe already restored
         mocked.restore?.();
       });
+
       beforeAll((done) => {
         const { get } = useXhr({ legacy: true, token });
 
@@ -47,6 +49,7 @@ describe('GIVEN `useXhr`', () => {
           url: () => '/fake/get/:ok',
           params,
           enabled: computed(() => !!params.value.ok),
+          cacheDuration: 'max',
         });
 
         nextTick(() => {
@@ -71,6 +74,9 @@ describe('GIVEN `useXhr`', () => {
         expect(xhr.token).toBe('FAKE_TOKEN');
         expect(mocked.context.header[1][0]).toBe('Authorization');
         expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
+      });
+      it('AND cache should be set', () => {
+        expect(cacheIds().indexOf('/fake/get/1') > -1).toBe(true);
       });
 
       describe('WHEN execute `reload`', () => {
@@ -114,10 +120,12 @@ describe('GIVEN `useXhr`', () => {
         // maybe already restored
         mocked.restore?.();
       });
+
       beforeAll(() => {
         mocked = mockXhr().get({ url: '/fake/fail/get/1' });
         mocked.reject('ko');
       });
+
       // eslint-disable-next-line consistent-return
       it('THEN error should be retrieved with good value', () => {
         const fetch = async (): Promise<unknown> => new Promise((resolve, reject) => {
