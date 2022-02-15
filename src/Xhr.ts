@@ -268,26 +268,43 @@ export default class Xhr<T> {
       };
     }
 
+    const paramsKeys = Object.keys(params);
+
+    // query params already set in the URL
+    const existingParams: { [id: string]: any } = {};
+
+    let decodedUrl = decodeURIComponent(url);
+
+    // extract existing query params
+    const paramPos = decodedUrl.indexOf('?');
+    if (paramPos > -1) {
+      decodedUrl.split('?')[1].split('&').reduce((acc, v) => {
+        const [k, _v] = v.split('=');
+        const [, __v] = _v.match(/^(?:"?([^"]+)"?)$/) || [];
+        const vNbr = Number(__v);
+        acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
+
+        return acc;
+      }, existingParams);
+      decodedUrl = decodedUrl.substring(0, paramPos);
+    }
+
     //
     // replace path params
-
-    // TODO - `getOwnPropertyNames` used to keep compatibility with VueJS 2 and ES6 Proxy
-    // can be replaced by Object.keys with VueJS 3
-    const unbindParams = Object.getOwnPropertyNames(params)
-      .filter((attr) => !attr.match(/__[a-zA-Z0-9_]+__/gi)) // can be removed for VueJS 3
+    const unbindParams = paramsKeys
       .reduce((acc, v) => {
         acc[v] = params[v];
         return acc;
-      }, {} as { [id: string]: any });
+      }, existingParams);
 
     // escape hash character
-    url = url.replace(/#/, '%23');
+    decodedUrl = decodedUrl.replace(/#/, '%23');
 
-    (url.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
+    (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
       placeholder = placeholder.substr(1, placeholder.length);
       if (unbindParams[placeholder] !== undefined) {
         // stringify null
-        url = url.replace(
+        decodedUrl = decodedUrl.replace(
           `:${placeholder}`,
           (unbindParams[placeholder] === null || unbindParams[placeholder] === '') ? 'null' : unbindParams[placeholder],
         );
@@ -298,7 +315,7 @@ export default class Xhr<T> {
     });
 
     return {
-      url,
+      url: decodedUrl,
       params: unbindParams,
     };
   }

@@ -36,7 +36,9 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('get-ok'));
+    it('THEN fake should be catch', () => {
+      expect(query).resolves.toEqual('get-ok');
+    });
   });
   describe('WHEN send POST query', () => {
     let query: Promise<any>;
@@ -117,6 +119,36 @@ describe('Given Xhr and MockXhr', () => {
         return query;
       };
       expect(fetch).rejects.toThrow();
+    });
+  });
+
+  describe('WHEN stringify URL', () => {
+    const url = '/api-js/shipping/browses/loc/L/10?entId=3';
+    let res: string;
+
+    beforeAll(() => {
+      res = Xhr.stringifyUrl(url, {
+        pstrAiSts: 'A',
+      });
+    });
+
+    it('THEN the url should be stringified', () => {
+      expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22');
+    });
+  });
+
+  describe('WHEN stringify URL with existing query params', () => {
+    const url = '/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts="I"';
+    let res: string;
+
+    beforeAll(() => {
+      res = Xhr.stringifyUrl(url, {
+        pstrAiSts: 'A',
+      });
+    });
+
+    it('THEN the url should be stringified', () => {
+      expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22');
     });
   });
 });
