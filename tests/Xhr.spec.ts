@@ -138,7 +138,7 @@ describe('Given Xhr and MockXhr', () => {
   });
 
   describe('WHEN stringify URL with existing query params', () => {
-    const url = '/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts="I"';
+    const url = '/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts="I"&useIt=true';
     let res: string;
 
     beforeAll(() => {
@@ -148,7 +148,7 @@ describe('Given Xhr and MockXhr', () => {
     });
 
     it('THEN the url should be stringified', () => {
-      expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22');
+      expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22&useIt=true');
     });
   });
 });

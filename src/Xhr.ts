@@ -277,12 +277,19 @@ export default class Xhr<T> {
 
     // extract existing query params
     const paramPos = decodedUrl.indexOf('?');
+    const trueStr = true.toString();
+    const falseStr = false.toString();
     if (paramPos > -1) {
       decodedUrl.split('?')[1].split('&').reduce((acc, v) => {
         const [k, _v] = v.split('=');
         const [, __v] = _v.match(/^(?:"?([^"]+)"?)$/) || [];
-        const vNbr = Number(__v);
-        acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
+
+        if (__v === trueStr || __v === falseStr) {
+          acc[k] = __v === trueStr;
+        } else {
+          const vNbr = Number(__v);
+          acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
+        }
 
         return acc;
       }, existingParams);
@@ -301,7 +308,7 @@ export default class Xhr<T> {
     decodedUrl = decodedUrl.replace(/#/, '%23');
 
     (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
-      placeholder = placeholder.substr(1, placeholder.length);
+      placeholder = placeholder.substring(1);
       if (unbindParams[placeholder] !== undefined) {
         // stringify null
         decodedUrl = decodedUrl.replace(
