@@ -183,21 +183,17 @@ export default class Xhr<T> {
   }
 
   static stringifyUrl(url: string, params: Obj = {}): string {
-    const paramsInjected = Xhr._injectParamsInUrl(url, params);
-    ({
-      url,
-      params,
-    } = paramsInjected);
+    ({ url, params } = Xhr._injectParamsInUrl(url, params));
 
     let separator = url.indexOf('?') > -1 ? '&' : '?';
     let queryParams = '';
 
     // Stringify get parameters
-    Object.keys(params)
+    Object.getOwnPropertyNames(params)
       // remove undefined param
       .filter((paramKey) => params[paramKey] !== undefined)
       .forEach((paramKey) => {
-        queryParams += `${separator + paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
+        queryParams += `${separator}${paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
         separator = '&';
       });
 
@@ -291,7 +287,7 @@ export default class Xhr<T> {
       decodedUrl = decodedUrl.substring(0, paramPos);
     }
 
-    const mergedParams = Object.keys(params)
+    const mergedParams = Object.getOwnPropertyNames(params)
       .reduce((acc, v) => {
         acc[v] = params[v];
         return acc;
@@ -326,6 +322,7 @@ export default class Xhr<T> {
 
     // restore updated get params
     const getParamsKeys = Object.keys(queryParams);
+
     if (getParamsKeys.length) {
       let separator = '?';
       getParamsKeys.forEach((k) => {
