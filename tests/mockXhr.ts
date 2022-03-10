@@ -95,7 +95,8 @@ class MockXhr {
   _mockXMLHttpRequest(this: MockXhr, condition: Condition) {
     XMLHttpRequest.prototype.open = (method, url) => {
       Logger.info('[Log] Fake xhr open');
-      if (Xhr.stringifyUrl(condition.url || '', condition.params) === url && condition.method === method) {
+      const _url = condition.method === 'GET' ? Xhr.stringifyUrl(condition.url || '', condition.params) : condition.url;
+      if (url === _url && condition.method === method) {
         this.method = method;
       } else {
         // @ts-ignore

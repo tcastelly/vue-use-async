@@ -42,15 +42,17 @@ describe('Given Xhr and MockXhr', () => {
   });
   describe('WHEN send POST query', () => {
     let query: Promise<any>;
+    const params = { user: 'thomas ' };
     beforeAll(() => {
       mockXhr()
-        .post({ url: '/fake/post' })
+        .post({ url: '/fake/post?entId=4', params })
         .resolve('post-ok');
 
       query = new Xhr().post({
-        url: '/fake/post',
+        url: '/fake/post?entId=3',
         params: {
-          user: 'thomas',
+          ...params,
+          entId: 4, // override `entId` query param
         },
       });
     });

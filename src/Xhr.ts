@@ -254,11 +254,7 @@ export default class Xhr<T> {
   }
 
   /**
-   * @param {String} url, url with path params will be replaced by params values
-   * @param {Object} params
-   *
-   * @return {{url: *, params}}
-   * @private
+   * url with path params will be replaced by params values
    */
   static _injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string, params: Obj } {
     if (Array.isArray(params)) {
@@ -268,13 +264,12 @@ export default class Xhr<T> {
       };
     }
 
-    const paramsKeys = Object.keys(params);
-
     // query params already set in the URL
-    const existingParams: { [id: string]: any } = {};
+    const queryParams: { [id: string]: any } = {};
 
     let decodedUrl = decodeURIComponent(url);
 
+    //
     // extract existing query params
     const paramPos = decodedUrl.indexOf('?');
     const trueStr = true.toString();
@@ -292,38 +287,62 @@ export default class Xhr<T> {
         }
 
         return acc;
-      }, existingParams);
+      }, queryParams);
       decodedUrl = decodedUrl.substring(0, paramPos);
     }
 
-    //
-    // replace path params
-    const unbindParams = paramsKeys
+    const mergedParams = Object.keys(params)
       .reduce((acc, v) => {
         acc[v] = params[v];
         return acc;
-      }, existingParams);
+      }, { ...queryParams });
 
     // escape hash character
     decodedUrl = decodedUrl.replace(/#/, '%23');
 
+    //
+    // replace path params
     (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
       placeholder = placeholder.substring(1);
-      if (unbindParams[placeholder] !== undefined) {
+      if (mergedParams[placeholder] !== undefined) {
         // stringify null
         decodedUrl = decodedUrl.replace(
           `:${placeholder}`,
-          (unbindParams[placeholder] === null || unbindParams[placeholder] === '') ? 'null' : unbindParams[placeholder],
+          (mergedParams[placeholder] === null || mergedParams[placeholder] === '') ? 'null' : mergedParams[placeholder],
         );
 
         // remove duplicated parameters
-        delete unbindParams[placeholder];
+        delete mergedParams[placeholder];
       }
     });
 
+    // params can override query params
+    Object.keys(mergedParams).forEach((k) => {
+      if (queryParams[k] !== undefined) {
+        queryParams[k] = mergedParams[k];
+        delete mergedParams[k];
+      }
+    });
+
+    // restore updated get params
+    const getParamsKeys = Object.keys(queryParams);
+    if (getParamsKeys.length) {
+      let separator = '?';
+      getParamsKeys.forEach((k) => {
+        if (queryParams[k] === true || queryParams[k] === false) {
+          decodedUrl += `${separator}${k}=${queryParams[k]}`;
+        } else {
+          const vNbr = Number(queryParams[k]);
+          const v = Number.isNaN(vNbr) ? encodeURIComponent(`"${queryParams[k]}"`) : vNbr;
+          decodedUrl += `${separator}${k}=${v}`;
+        }
+        separator = '&';
+      });
+    }
+
     return {
       url: decodedUrl,
-      params: unbindParams,
+      params: mergedParams,
     };
   }
 
@@ -410,10 +429,10 @@ export default class Xhr<T> {
     this._isXhrResolved = false;
     this._isXhrRejected = false;
 
-    const injectedParams = Xhr._injectParamsInUrl(this.url, this.params);
+    const { url, params: _p } = Xhr._injectParamsInUrl(this.url, this.params);
 
-    this.url = injectedParams.url;
-    this.params = injectedParams.params;
+    this.url = url;
+    this.params = _p;
 
     this._onEnd = (e: ProgressEvent) => {
       const result: any = Xhr.parseResult(this._oXHR);
