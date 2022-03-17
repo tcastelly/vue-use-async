@@ -5,7 +5,7 @@
 const fs = require('fs');
 
 const del = (dir) => new Promise((resolve) => {
-  fs.rmdir(dir, { recursive: true }, (err) => {
+  fs.rm(dir, { recursive: true }, (err) => {
     if (err) {
       throw err;
     }
