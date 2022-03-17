@@ -328,6 +328,8 @@ export default class Xhr<T> {
       getParamsKeys.forEach((k) => {
         if (queryParams[k] === true || queryParams[k] === false) {
           decodedUrl += `${separator}${k}=${queryParams[k]}`;
+        } else if (queryParams[k] === null) {
+          decodedUrl += `${separator}${k}=${queryParams[k]}`;
         } else {
           const vNbr = Number(queryParams[k]);
           const v = Number.isNaN(vNbr) ? encodeURIComponent(`"${queryParams[k]}"`) : vNbr;

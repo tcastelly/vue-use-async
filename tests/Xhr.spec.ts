@@ -140,17 +140,18 @@ describe('Given Xhr and MockXhr', () => {
   });
 
   describe('WHEN stringify URL with existing query params', () => {
-    const url = '/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts="I"&useIt=true';
+    const url = '/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts="I"&useIt=true&nullAttr=false';
     let res: string;
 
     beforeAll(() => {
       res = Xhr.stringifyUrl(url, {
         pstrAiSts: 'A',
+        nullAttr: null,
       });
     });
 
     it('THEN the url should be stringified', () => {
-      expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22&useIt=true');
+      expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22&useIt=true&nullAttr=null');
     });
   });
 });
