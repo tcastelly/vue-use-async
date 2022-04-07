@@ -17,7 +17,7 @@ type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
   Z |
   [...A]
 
-type TypeAllowed = undefined | null | string | number | Obj
+type TypeAllowed = undefined | null | string | number | boolean | Obj
 
 export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),

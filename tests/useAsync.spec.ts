@@ -184,9 +184,9 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect multiple params', () => {
-    const func = (arg1: string, arg2: string) => new Promise<string>((resolve) => {
+    const func = (arg1: string, arg2: number, arg3: boolean) => new Promise<string>((resolve) => {
       setTimeout(() => {
-        resolve(`ok ${arg1} ${arg2}`);
+        resolve(`ok ${arg1} ${arg2} ${arg3}`);
       }, 200);
     });
 
@@ -195,13 +195,13 @@ describe('GIVEN, `useAsync', () => {
     beforeAll(async () => {
       ({ data, promise } = useAsync(
         func,
-        () => ['msg', 'msg2'],
+        () => ['msg', 42, true],
       ));
       await promise.value;
     });
 
     it('THEN `data` should be resolved', () => {
-      expect(data.value).toBe('ok msg msg2');
+      expect(data.value).toBe('ok msg 42 true');
     });
   });
 });
