@@ -13,7 +13,7 @@ module.exports = {
     filename: 'index.js',
   },
   externals: {
-    'vue': 'vue',
+    vue: 'vue',
     Vue: 'vue',
   },
   resolve: {
