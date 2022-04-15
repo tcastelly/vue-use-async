@@ -5,14 +5,11 @@ module.exports = {
   target: 'web',
   context: __dirname,
   entry: ['./src/index.ts'],
-  experiments: {
-    outputModule: true,
-  },
   // un-comment to generate source-map in the build
   // devtool: 'eval-source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'module',
+    libraryTarget: 'umd',
     filename: 'index.js',
   },
   externals: {
