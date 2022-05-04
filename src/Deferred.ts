@@ -5,6 +5,8 @@ export default class Deferred<T> {
 
   promise: Promise<T>;
 
+  done = false;
+
   constructor() {
     this.resolve = () => {
       throw Error('Can t resolve');
@@ -21,5 +23,9 @@ export default class Deferred<T> {
       // fix unhandled-rejections
       console.warn(e);
     }) */
+
+    this.promise.finally(() => {
+      this.done = true;
+    });
   }
 }
