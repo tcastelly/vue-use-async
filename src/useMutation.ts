@@ -36,7 +36,7 @@ export default function useMutation<T, Z, A extends TypeAllowed[]>(
   // for legacy use case (Vue xhr Plugin)
   const d = ref<null | Promise<T>>(null);
 
-  const mutate = (param: Z, ...params: A) => {
+  const mutate = (param?: Z, ...params: A) => {
     isPending.value = true;
     error.value = null;
 
