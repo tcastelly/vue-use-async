@@ -21,6 +21,7 @@ export default class Deferred<T> {
       this.reject = reject;
     });/* .catch((e) => {
       // fix unhandled-rejections
+      // but success is called ...
       console.warn(e);
     }) */
 
