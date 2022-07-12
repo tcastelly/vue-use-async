@@ -63,14 +63,11 @@ export default class Xhr<T> {
   // @ts-ignore - declared in _constructor
   _oXHR: XMLHttpRequest;
 
-  // @ts-ignore - declared in _constructor
-  _onEnd: (e: ProgressEvent) => void;
+  // eslint-disable-next-line class-methods-use-this
+  _onEnd: (e: ProgressEvent) => void = () => {};
 
-  _onError(e: ProgressEvent): void {
-    this.onError(e);
-
-    this._deferred.reject(e);
-  }
+  // eslint-disable-next-line class-methods-use-this
+  _onError: (e: ProgressEvent) => void = () => {};
 
   // @ts-ignore - declared in _constructor
   _deferred: Deferred<T>;
@@ -105,12 +102,12 @@ export default class Xhr<T> {
   removeEvents() {
     const removeEvents = () => {
       this._oXHR.removeEventListener('load', this._onEnd, false);
-      this._oXHR.removeEventListener('error', this.onError, false);
+      this._oXHR.removeEventListener('error', this._onError, false);
+      this._oXHR.removeEventListener('timeout', this._onError, false);
       this._oXHR.removeEventListener('loadstart', this.onStart, false);
       this._oXHR.removeEventListener('abort', this.onAbort, false);
       this._oXHR.upload.removeEventListener('progress', this.onProgress, false);
       this._oXHR.removeEventListener('progress', this.onProgress, false);
-      this._oXHR.removeEventListener('timeout', this.onError, false);
     };
 
     // remove listener only when the query is ended
@@ -359,12 +356,12 @@ export default class Xhr<T> {
     this._eventReady = true;
 
     xhr.addEventListener('load', this._onEnd, false);
-    xhr.addEventListener('error', this.onError, false);
+    xhr.addEventListener('error', this._onError, false);
+    xhr.addEventListener('timeout', this._onError, false);
     xhr.addEventListener('loadstart', this.onStart, false);
     xhr.addEventListener('abort', this.onAbort, false);
     xhr.upload.addEventListener('progress', this.onProgress, false);
     xhr.addEventListener('progress', this.onProgress, false);
-    xhr.addEventListener('timeout', this.onError, false);
   }
 
   /**
@@ -432,6 +429,13 @@ export default class Xhr<T> {
 
     this.url = url;
     this.params = _p;
+
+    this._onError = (e: ProgressEvent<EventTarget>) => {
+      this.onError(e);
+      this.removeEvents();
+
+      this._deferred.reject(e);
+    };
 
     this._onEnd = (e: ProgressEvent) => {
       const result: any = Xhr.parseResult(this._oXHR);

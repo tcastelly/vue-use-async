@@ -110,7 +110,6 @@ export default function (args?: UseXhr) {
   ): GetReturn<T> {
     const xhr: Xhr<T> = new Xhr<T>();
 
-    // Global cb for VueJS 2 Plugin Compatibility
     const _onError = (onError || _blank as unknown as OnErrorCb<T>).bind(context);
     const _onStart = (onStart || _blank as unknown as OnStartCb<T>).bind(context);
     const _onEnd = (onEnd || _blank as unknown as OnEndCb<T>).bind(context);
