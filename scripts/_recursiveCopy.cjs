@@ -5,7 +5,7 @@ const {
   copyFile,
 } = require('fs');
 const { join } = require('path');
-const mkdirIfNotExist = require('./_mkdirIfNotExist');
+const mkdirIfNotExist = require('./_mkdirIfNotExist.cjs');
 
 const copyFileAsync = promisify(copyFile);
 

@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from 'vue';
-import cache, { cacheSize, clearCache, cacheIds } from './cache';
+import cache, { cacheIds, cacheSize, clearCache } from './cache';
 import Deferred from './Deferred';
 import useAsync from './useAsync';
 import useMutation from './useMutation';

@@ -4,13 +4,16 @@ const path = require('path');
 module.exports = {
   target: 'web',
   context: __dirname,
-  entry: ['./src/index.ts'],
+  entry: {
+    index: './src/index.ts',
+    tests: './tests/index.ts',
+  },
   // un-comment to generate source-map in the build
   // devtool: 'eval-source-map',
   output: {
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    filename: 'index.js',
+    filename: '[name].js',
   },
   externals: {
     vue: 'vue',

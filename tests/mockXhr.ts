@@ -129,7 +129,7 @@ class MockXhr {
   }
 }
 
-export default function () {
+export default function mockXhr() {
   return {
     get(condition: Condition) {
       return new MockXhr().get(condition);
