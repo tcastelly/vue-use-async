@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "1.4.6",
+  "version": "1.4.8",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",
@@ -10,7 +10,6 @@
   "author": "Thomas CASTELLY",
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "prepare": "husky install",
     "beforebuild": "node ./scripts/beforeBuild.cjs && npm run tsc:export-types",
