@@ -1,13 +1,18 @@
 import {
-  computed, ComputedRef, Ref, ref, unref, watch,
+  computed,
+  ComputedRef,
+  Ref,
+  ref,
+  unref,
+  watch,
 } from 'vue';
 import type { Obj, UnwrappedPromiseType } from './index';
 
-type OnErrorCb = (e: null | Error, params: any) => any;
+type OnErrorCb<T> = (e: null | Error, params: T) => unknown;
 
-type OnStartCb = (params: any) => any;
+type OnStartCb<T> = (params: T) => unknown;
 
-type OnEndCb<T> = (res: T, params: any) => any;
+type OnEndCb<T, Z> = (res: T, params: Z) => unknown;
 
 // params: ComputedRef<A> | Ref<A> | (() => A) | A = {} as A,
 
@@ -27,10 +32,10 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   isPending: Ref<undefined | boolean>,
   data: Ref<undefined | null | UnwrappedPromiseType<typeof func>>;
   error: Ref<null | Error>,
-  reload: () => any,
-  onError: (cb: OnErrorCb) => any,
-  onStart: (cb: OnStartCb) => any,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>>) => any,
+  reload: () => unknown,
+  onError: (cb: OnErrorCb<Params<Z, A>>) => unknown,
+  onStart: (cb: OnStartCb<Params<Z, A>>) => unknown,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Params<Z, A>>) => unknown,
   promise: ComputedRef<null | ReturnType<typeof func>>,
 } {
   const isPending = ref<undefined | boolean>();
@@ -39,11 +44,11 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
 
   const error: Ref<null | Error> = ref(null);
 
-  const onErrorList: Array<OnErrorCb> = [];
+  const onErrorList: Array<OnErrorCb<Params<Z, A>>> = [];
 
-  const onStartList: Array<OnStartCb> = [];
+  const onStartList: Array<OnStartCb<Params<Z, A>>> = [];
 
-  const onEndList: Array<OnEndCb<T>> = [];
+  const onEndList: Array<OnEndCb<T, Params<Z, A>>> = [];
 
   // for legacy use case
   const d = ref<null | Promise<T>>(null);
