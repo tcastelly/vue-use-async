@@ -25,7 +25,7 @@ describe('GIVEN `useXhr`', () => {
       let reload: Func;
       let isPending: ComputedRef<undefined | null | boolean>;
       let xhr: Xhr<any>;
-      const params = ref({ ok: 1, undefinedParam: undefined });
+      const params = ref({ ok: 1, undefinedParam: undefined, otherParam: true });
 
       afterAll(() => {
         // maybe already restored
@@ -36,7 +36,7 @@ describe('GIVEN `useXhr`', () => {
         const { get } = useXhr({ legacy: true, token });
 
         mocked = mockXhr().get({
-          url: '/fake/get/1',
+          url: '/fake/get/1?otherParam=true',
         });
         mocked.resolve('get-ok');
 
@@ -66,13 +66,23 @@ describe('GIVEN `useXhr`', () => {
       it('THEN query should be retrieved with good value', () => {
         expect(data.value).toBe('get-ok');
       });
+
+      it('AND url should have params', () => {
+        expect(xhr.url).toBe('/fake/get/1');
+      });
+
       it('AND token should be in the `xhr` instance', () => {
         expect(xhr.token).toBe('FAKE_TOKEN');
         expect(mocked.context.header[1][0]).toBe('Authorization');
         expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
       });
+
       it('AND cache should be set', () => {
-        expect(cacheIds().indexOf('/fake/get/1') > -1).toBe(true);
+        expect(cacheIds().indexOf('/fake/get/1?otherParam=true') > -1).toBe(true);
+      });
+
+      it('AND params should be split in and params', () => {
+        expect(JSON.stringify(xhr.params)).toContain(JSON.stringify({ otherParam: true }));
       });
 
       describe('WHEN execute `reload`', () => {
@@ -151,6 +161,68 @@ describe('GIVEN `useXhr`', () => {
         expect(xhr.token).toBe('FAKE_TOKEN');
         expect(mocked.context.header[1][0]).toBe('Authorization');
         expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
+      });
+
+      it('AND params should be extracted', () => {
+        expect(JSON.stringify(xhr.params)).toContain(JSON.stringify(params.value));
+      });
+    });
+  });
+
+  describe('WHEN run the function to resolve a delete', () => {
+    it('THEN `post` should be a function', () => {
+      const { post } = useXhr({ legacy: true, token });
+      expect(typeof post).toBe('function');
+    });
+
+    describe('WHEN execute `post`', () => {
+      let mocked: any;
+      let data: Ref<undefined | null | string>;
+      let xhr: Xhr<any>;
+      const params = [1, 2, 3];
+
+      afterAll(() => {
+        // maybe already restored
+        mocked.restore?.();
+      });
+      beforeAll((done) => {
+        const { delete: _delete } = useXhr({ legacy: true, token });
+
+        mocked = mockXhr().delete({
+          url: '/fake/delete/1',
+        });
+        mocked.resolve('delete-ok');
+
+        const {
+          data: _data,
+          xhr: _xhr,
+        } = _delete<'delete-ok'>({
+          url: '/fake/delete/1',
+          params,
+        });
+
+        xhr = _xhr;
+
+        data = _data;
+
+        watch(
+          () => _data.value,
+          () => done(),
+        );
+      });
+
+      it('THEN query should be retrieved with good value', () => {
+        expect(data.value).toBe('delete-ok');
+      });
+
+      it('AND token should be in the `xhr` instance', () => {
+        expect(xhr.token).toBe('FAKE_TOKEN');
+        expect(mocked.context.header[1][0]).toBe('Authorization');
+        expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
+      });
+
+      it('AND params should be extracted', () => {
+        expect(JSON.stringify(xhr.params)).toContain(JSON.stringify(params));
       });
     });
   });

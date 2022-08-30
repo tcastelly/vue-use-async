@@ -28,6 +28,7 @@ describe('GIVEN, `useAsync', () => {
     it.skip('promise should be rejected', () => {
       const f = () => useAsync(rejectFunc);
       const res = f();
+
       return expect(res.promise.value).rejects.toThrow('ko');
     });
   });

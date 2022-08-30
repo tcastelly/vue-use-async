@@ -64,10 +64,12 @@ export default class Xhr<T> {
   _oXHR: XMLHttpRequest;
 
   // eslint-disable-next-line class-methods-use-this
-  _onEnd: (e: ProgressEvent) => void = () => {};
+  _onEnd: (e: ProgressEvent) => void = () => {
+  };
 
   // eslint-disable-next-line class-methods-use-this
-  _onError: (e: ProgressEvent) => void = () => {};
+  _onError: (e: ProgressEvent) => void = () => {
+  };
 
   // @ts-ignore - declared in _constructor
   _deferred: Deferred<T>;
@@ -185,14 +187,16 @@ export default class Xhr<T> {
     let separator = url.indexOf('?') > -1 ? '&' : '?';
     let queryParams = '';
 
-    // Stringify get parameters
-    Object.getOwnPropertyNames(params)
-      // remove undefined param
-      .filter((paramKey) => params[paramKey] !== undefined)
-      .forEach((paramKey) => {
-        queryParams += `${separator}${paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
-        separator = '&';
-      });
+    if (params && !Array.isArray(params) && typeof params === 'object') {
+      // Stringify get parameters
+      Object.getOwnPropertyNames(params)
+        // remove undefined param
+        .filter((paramKey) => params[paramKey] !== undefined)
+        .forEach((paramKey) => {
+          queryParams += `${separator}${paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
+          separator = '&';
+        });
+    }
 
     // remove unresolved query parameters (:value)
     url = url.replace(/\/:[^/]*/gi, '');

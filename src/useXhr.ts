@@ -291,11 +291,6 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
         p = (p as () => ZZ)();
       }
 
-      _postArgs.params = {
-        ...p as ZZ,
-        ...(isRef(params) ? (params.value || {}) : params),
-      };
-
       _postArgs.url = unref(unwrapParametersObj.url);
 
       return _postArgs;
@@ -303,7 +298,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
 
     const xhr = new Xhr<TT>();
 
-    const p = (unref(updateArgs.value.params) || {}) as object;
+    const p = unref(updateArgs.value.params) || {};
 
     let xhrFunc: typeof xhr.post;
 
