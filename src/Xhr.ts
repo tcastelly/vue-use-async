@@ -256,7 +256,8 @@ export default class Xhr<T> {
    * url with path params will be replaced by params values
    */
   static _injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string, params: Obj } {
-    if (Array.isArray(params)) {
+    // don't try to inject params if there is nothing to inject
+    if (Array.isArray(params) || Object.keys(params).length === 0) {
       return {
         url,
         params,
@@ -307,7 +308,9 @@ export default class Xhr<T> {
         // stringify null
         decodedUrl = decodedUrl.replace(
           `:${placeholder}`,
-          (mergedParams[placeholder] === null || mergedParams[placeholder] === '') ? 'null' : mergedParams[placeholder],
+          encodeURIComponent(JSON.stringify(
+            (mergedParams[placeholder] === null || mergedParams[placeholder] === '') ? 'null' : mergedParams[placeholder],
+          )),
         );
 
         // remove duplicated parameters
