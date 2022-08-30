@@ -9,6 +9,7 @@ describe('Given Xhr and MockXhr', () => {
   it('THEN constructor should not be null', () => {
     expect(Xhr.new()).not.toBe(null);
   });
+
   describe('WHEN send GET query', () => {
     let query: Promise<any>;
     afterAll(() => {
@@ -40,6 +41,7 @@ describe('Given Xhr and MockXhr', () => {
       expect(query).resolves.toEqual('get-ok');
     });
   });
+
   describe('WHEN send POST query', () => {
     let query: Promise<any>;
     const params = { user: 'thomas ' };
@@ -59,6 +61,7 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-ok'));
   });
+
   describe('WHEN send POST query with array as parameter', () => {
     let query: Promise<any>;
     beforeAll(() => {
@@ -74,6 +77,7 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-users-ok'));
   });
+
   describe('WHEN send put query', () => {
     let query: Promise<any>;
     beforeAll(() => {
@@ -86,6 +90,7 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('put-ok'));
   });
+
   describe('WHEN send DELETE query', () => {
     let query: Promise<any>;
     beforeAll(() => {
@@ -101,6 +106,7 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('delete-ok'));
   });
+
   describe('WHEN send ABORT query', () => {
     let query: XhrGet<any>;
     beforeAll(() => {
@@ -152,6 +158,19 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN the url should be stringified', () => {
       expect(res).toBe('/api-js/shipping/browses/loc/L/10?entId=3&pstrAiSts=%22A%22&useIt=true&nullAttr=null');
+    });
+  });
+
+  describe('WHEN stringify URL with array as param', () => {
+    const url = '/api-js';
+    let res: string;
+
+    beforeAll(() => {
+      res = Xhr.stringifyUrl(url, [1, 2, 3]);
+    });
+
+    it('THEN the array should be serialized', () => {
+      expect(res).toBe('/api-js?%5B1%2C2%2C3%5D');
     });
   });
 });

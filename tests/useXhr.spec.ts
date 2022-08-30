@@ -189,7 +189,7 @@ describe('GIVEN `useXhr`', () => {
         const { delete: _delete } = useXhr({ legacy: true, token });
 
         mocked = mockXhr().delete({
-          url: '/fake/delete/1',
+          url: '/fake/delete/1?%5B1%2C2%2C3%5D',
         });
         mocked.resolve('delete-ok');
 

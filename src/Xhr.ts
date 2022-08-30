@@ -196,6 +196,8 @@ export default class Xhr<T> {
           queryParams += `${separator}${paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
           separator = '&';
         });
+    } else if (params) {
+      queryParams = separator + encodeURIComponent(JSON.stringify(params));
     }
 
     // remove unresolved query parameters (:value)
@@ -273,7 +275,7 @@ export default class Xhr<T> {
     const falseStr = false.toString();
     if (paramPos > -1) {
       decodedUrl.split('?')[1].split('&').reduce((acc, v) => {
-        const [k, _v] = v.split('=');
+        const [k, _v = ''] = v.split('=');
         const [, __v] = _v.match(/^(?:"?([^"]+)"?)$/) || [];
 
         if (__v === trueStr || __v === falseStr) {
