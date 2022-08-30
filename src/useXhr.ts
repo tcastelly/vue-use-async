@@ -1,19 +1,14 @@
 import {
-  computed,
-  ComputedRef,
-  isRef,
-  onBeforeUnmount,
-  ref,
-  Ref,
-  unref,
-  watch,
+  computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, unref, watch,
 } from 'vue';
 import type {
   $GetConfigArgs,
+  $UpdateConfigArgs,
   CacheDuration,
   GetConfig,
   GetReturn,
   Obj,
+  TypeAllowed,
   XhrConfig,
   XhrGet,
 } from './index';
@@ -25,45 +20,42 @@ type Enabled = undefined | null | (() => boolean) | Ref<boolean> | ComputedRef<b
 
 type Token = Ref<string | null> | ComputedRef<string | null> | string | null
 
-type OnErrorCb<T> = (e: Error, xhr: Xhr<T>) => any
+type OnErrorCb<T> = (e: Error, xhr: Xhr<T>) => unknown
 
-type OnStartCb<T> = (params: any, xhr: Xhr<T>) => any;
+type OnStartCb<T, Z> = (params: Z, xhr: Xhr<T>) => unknown
 
-type OnEndCb<T> = (res: T, params: any, xhr: Xhr<T>) => any
+type OnEndCb<T, Z> = (res: T, params: Z, xhr: Xhr<T>) => unknown
 
 // override url to have string used by Xhr
-type $$GetConfigArg = Omit<$GetConfigArgs, 'url'> & Partial<{
-  url: undefined | string,
-}>
+type $$GetConfigArg<T> = Omit<$GetConfigArgs<T>, 'url'> & {
+  url?: string,
+}
+
+type Params<Z> = (() => Z) |
+  ComputedRef<Z> |
+  Ref<Z> |
+  Z
 
 // used as default `onError`
 const _blank = () => {
 };
 
-declare type UseXhr<T = any> = {
+declare type UseXhr<T, Z extends TypeAllowed> = Partial<{
   // global callback for VueJS 2 plugin compatibility
-  onError?: OnErrorCb<T>,
-  onStart?: OnStartCb<T>,
-  onEnd?: OnEndCb<T>,
-  onProgress?: (e: ProgressEvent) => any,
-  onAbort?: (e: ProgressEvent) => any,
+  onError: OnErrorCb<T>,
+  onStart: OnStartCb<T, Params<Z>>,
+  onEnd: OnEndCb<T, Params<Z>>,
+  onProgress: (e: ProgressEvent) => any,
+  onAbort: (e: ProgressEvent) => any,
   //
-  context?: any;
-  legacy?: boolean;
-  token?: Token;
-};
+  context: any;
+  legacy: boolean;
+  token: Token;
+}>;
 
-const getTokenValue: (token: Token) => string | null = (token) => {
-  if (isRef(token)) {
-    return token.value;
-  }
+const getTokenValue = (token: undefined | Token): undefined | null | string => unref<undefined | string | null>(token);
 
-  const tokenStr: any = token;
-
-  return tokenStr;
-};
-
-export default function (args?: UseXhr) {
+export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
   const {
     onError,
     onStart,
@@ -83,40 +75,25 @@ export default function (args?: UseXhr) {
     token: null,
   });
 
-  const mergeParamsWithToken = (params: Obj | Ref<Obj>) => {
-    const _token = getTokenValue(token);
-    if (!_token) {
-      return params;
-    }
-
-    if (isRef(params)) {
-      params.value.token = _token;
-    } else {
-      params.token = _token;
-    }
-
-    return params;
-  };
-
   const xhrList = ref<Array<Xhr<any>>>([]);
 
   /**
    * For GET it's possible to add cache
    */
-  function get<T = any>(
-    parametersObj: GetConfig,
-    params?: Ref<Obj> | Obj,
+  function get<TT = T, ZZ = Z>(
+    parametersObj: GetConfig<ZZ>,
+    params?: Params<ZZ>,
     enabled?: Enabled,
-  ): GetReturn<T> {
-    const xhr: Xhr<T> = new Xhr<T>();
+  ): GetReturn<TT> {
+    const xhr: Xhr<TT> = new Xhr<TT>();
 
-    const _onError = (onError || _blank as unknown as OnErrorCb<T>).bind(context);
-    const _onStart = (onStart || _blank as unknown as OnStartCb<T>).bind(context);
-    const _onEnd = (onEnd || _blank as unknown as OnEndCb<T>).bind(context);
+    const _onError = (onError || _blank).bind(context);
+    const _onStart = (onStart || _blank).bind(context);
+    const _onEnd = (onEnd || _blank).bind(context);
 
-    const onErrorList: OnErrorCb<T>[] = [_onError];
-    const onStartList: OnStartCb<T>[] = [_onStart];
-    const onEndList: OnEndCb<T>[] = [_onEnd];
+    const onErrorList: OnErrorCb<TT>[] = [_onError as unknown as OnErrorCb<TT>];
+    const onStartList: OnStartCb<TT, ZZ>[] = [_onStart as unknown as OnStartCb<TT, ZZ>];
+    const onEndList: OnEndCb<TT, ZZ>[] = [_onEnd as unknown as OnEndCb<TT, ZZ>];
 
     const error = ref<null | Error | Obj>(null);
 
@@ -124,26 +101,26 @@ export default function (args?: UseXhr) {
 
     const isPending = ref<undefined | boolean>();
 
-    const data = ref<T>() as Ref<T>;
+    const data = ref() as Ref<TT>;
 
     let url: undefined | string = '';
     let duration: undefined | CacheDuration = 0;
 
     const getParams = computed(() => {
-      const _getParams: $$GetConfigArg = {};
+      const _getParams: $$GetConfigArg<ZZ> = {};
 
       const unwrapParametersObj = unref(parametersObj);
 
-      let _url: $GetConfigArgs['url'];
+      let _url: $GetConfigArgs<ZZ>['url'];
 
       if (typeof unwrapParametersObj === 'string') {
         _url = unwrapParametersObj;
       } else {
-        _url = unwrapParametersObj.url;
+        _url = unref(unwrapParametersObj.url);
 
         // use params from second args of get function
         if (!params) {
-          params = unwrapParametersObj.params || {};
+          params = (unwrapParametersObj.params || {}) as Params<ZZ>;
         }
 
         duration = unwrapParametersObj.cacheDuration;
@@ -156,7 +133,7 @@ export default function (args?: UseXhr) {
           _getParams.enabled = enabled;
         }
 
-        _getParams.params = params;
+        _getParams.params = unref<ZZ>(params as ZZ);
         _getParams.cacheDuration = duration;
       }
 
@@ -164,15 +141,14 @@ export default function (args?: UseXhr) {
         _getParams.token = getTokenValue(token);
       }
 
-      let p = unref(_getParams.params || params || {});
-
+      // merge params
+      let p = unref(_getParams.params || params || {} as Params<ZZ>);
       if (typeof p === 'function') {
-        p = p();
+        p = (p as () => ZZ)();
       }
 
-      // merge params
       _getParams.params = {
-        ...p,
+        ...p as ZZ,
         ...(isRef(params) ? (params.value || {}) : params),
       };
 
@@ -196,14 +172,14 @@ export default function (args?: UseXhr) {
 
     let lastCacheId: null | string;
 
-    const xhrPromise = ref<XhrGet<T>>();
+    const xhrPromise = ref<XhrGet<TT>>();
 
     const reload = () => {
       if (isPending.value) {
         xhr.abort();
       }
 
-      const xhrParams = typeof getParams.value.params === 'object' ? getParams.value.params : {};
+      const xhrParams = typeof getParams.value.params === 'object' ? getParams.value.params : {} as ZZ;
 
       onStartList.forEach((cb) => cb(xhrParams, xhr));
 
@@ -216,13 +192,13 @@ export default function (args?: UseXhr) {
 
       lastCacheId = decodeURIComponent(Xhr.stringifyUrl(
         String(url),
-        xhrParams,
+        xhrParams as object,
       ));
 
       // Preserve function extended in promise (abort)
-      xhrPromise.value = cache<T>({
+      xhrPromise.value = cache<TT>({
         id: lastCacheId,
-        xhr: xhr.get.bind(xhr, getParams.value),
+        xhr: xhr.get.bind(xhr, getParams.value as object),
         duration,
       });
 
@@ -293,41 +269,75 @@ export default function (args?: UseXhr) {
     };
   }
 
-  const post = <T = any>(xhrConfig?: XhrConfig, params: Obj | Ref<Obj> = {}) => {
-    const xhr = new Xhr<T>();
+  const update = <TT = T, ZZ = Z>(method: 'post' | 'delete' | 'put', xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => {
+    const updateArgs = computed(() => {
+      const _postArgs: $UpdateConfigArgs<ZZ> = {};
+
+      const unwrapParametersObj = unref(xhrConfig || {} as XhrConfig);
+
+      // use params from second args of post function
+      if (!params) {
+        params = (unwrapParametersObj.params || {}) as Params<ZZ>;
+      }
+      _postArgs.params = unref<ZZ>(params as ZZ);
+
+      if (token) {
+        _postArgs.token = getTokenValue(token);
+      }
+
+      // merge params
+      let p = unref(_postArgs.params || params || {} as Params<ZZ>);
+      if (typeof p === 'function') {
+        p = (p as () => ZZ)();
+      }
+
+      _postArgs.params = {
+        ...p as ZZ,
+        ...(isRef(params) ? (params.value || {}) : params),
+      };
+
+      _postArgs.url = unref(unwrapParametersObj.url);
+
+      return _postArgs;
+    });
+
+    const xhr = new Xhr<TT>();
+
+    const p = (unref(updateArgs.value.params) || {}) as object;
+
+    let xhrFunc: typeof xhr.post;
+
+    switch (method) {
+      case 'post':
+        xhrFunc = xhr.post.bind(xhr);
+        break;
+      case 'put':
+        xhrFunc = xhr.put.bind(xhr);
+        break;
+      case 'delete':
+        xhrFunc = xhr.delete.bind(xhr);
+        break;
+      default:
+        xhrFunc = xhr.post.bind(xhr);
+        break;
+    }
 
     return {
       ...useAsync(
-        () => xhr.post(xhrConfig || {}),
-        mergeParamsWithToken(params),
+        () => xhrFunc({
+          ...updateArgs.value,
+          params: p,
+        }),
       ),
       xhr,
     };
   };
 
-  const put = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => {
-    const xhr = new Xhr<T>();
+  const post = <TT = T, ZZ = Z>(xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => update<TT, ZZ>('post', xhrConfig, params);
 
-    return {
-      ...useAsync(
-        () => xhr.put(xhrConfig || {}),
-        mergeParamsWithToken(params || {}),
-      ),
-      xhr,
-    };
-  };
+  const put = <TT = T, ZZ = Z>(xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => update<TT, ZZ>('put', xhrConfig, params);
 
-  const _delete = <T = any>(xhrConfig?: XhrConfig, params?: Obj | Ref<Obj>) => {
-    const xhr = new Xhr<T>();
-
-    return {
-      ...useAsync(
-        () => xhr.delete(xhrConfig || {}),
-        mergeParamsWithToken(params || {}),
-      ),
-      xhr,
-    };
-  };
+  const _delete = <TT = T, ZZ = Z>(xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => update<TT, ZZ>('delete', xhrConfig, params);
 
   if (!legacy) {
     onBeforeUnmount(() => {

@@ -50,19 +50,27 @@ export type XhrConfig = Partial<{
   responseType?: 'arraybuffer' | 'blob',
 }>
 
-export type $GetConfigArgs = (Omit<XhrConfig, 'url'> & Partial<{
+type GetConfigArgsWithoutParams = Omit<XhrConfig, 'params'>;
+
+export type $UpdateConfigArgs<T = object> = (GetConfigArgsWithoutParams & Partial<{
+  params: T,
+}>);
+
+export type $GetConfigArgs<T = object> = (Omit<GetConfigArgsWithoutParams, 'url'> & Partial<{
   cacheDuration: CacheDuration;
 
-  url: string | ((params: Obj) => string) | ComputedRef<string>,
+  url: string | ((params?: T) => string) | ComputedRef<string>,
 
-  params: Obj | ComputedRef<Obj>,
+  params: T,
 
   enabled: undefined | null | (() => boolean) | boolean | ComputedRef<boolean> | Ref<boolean>,
 }>);
 
-export type $GetConfig = string | $GetConfigArgs;
+export type $GetConfig<T> = string | $GetConfigArgs<T>;
 
-export type GetConfig = $GetConfig | Ref<$GetConfig>
+export type GetConfig<T> = $GetConfig<T> | Ref<$GetConfig<T>>
+
+export type TypeAllowed = undefined | null | string | number | boolean | Obj
 
 export type GetReturn<T> = {
   isPending: ComputedRef<undefined | boolean>,

@@ -12,7 +12,7 @@ type OnErrorCb<Z, A extends TypeAllowed[]> = (e: null | Error, params: A extends
 
 type OnEndCb<T, Z, A extends TypeAllowed[]> = (res: T, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
-export default function useMutation<T, Z, A extends TypeAllowed[]>(
+export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   func: (arg: Z, ...args: A) => Promise<T>,
 ): {
   mutate: (param?: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>,

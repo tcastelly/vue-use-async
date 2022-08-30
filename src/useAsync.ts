@@ -6,7 +6,7 @@ import {
   unref,
   watch,
 } from 'vue';
-import type { Obj, UnwrappedPromiseType } from './index';
+import type { TypeAllowed, UnwrappedPromiseType } from './index';
 
 type OnErrorCb<T> = (e: null | Error, params: T) => unknown;
 
@@ -21,8 +21,6 @@ type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
   Ref<Z | [...A]> |
   Z |
   [...A]
-
-type TypeAllowed = undefined | null | string | number | boolean | Obj
 
 export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),

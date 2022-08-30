@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import {
-  computed, ComputedRef, nextTick, Ref, ref, watch,
+  computed, ComputedRef, Ref, ref, watch,
 } from 'vue';
 import Xhr from '@/Xhr';
 import { cacheIds } from '@/cache';
@@ -13,7 +13,7 @@ import mockXhr from './mockXhr';
 describe('GIVEN `useXhr`', () => {
   const token = ref('FAKE_TOKEN');
 
-  describe('WHEN run the function to resolve', () => {
+  describe('WHEN run the function to resolve get', () => {
     it('THEN `get` should be a function', () => {
       const { get } = useXhr({ legacy: true, token });
       expect(typeof get).toBe('function');
@@ -45,15 +45,11 @@ describe('GIVEN `useXhr`', () => {
           reload: _reload,
           isPending: _isPending,
           xhr: _xhr,
-        } = get<any>({
+        } = get<'get-ok'>({
           url: () => '/fake/get/:ok',
           params,
           enabled: computed(() => !!params.value.ok),
           cacheDuration: 'max',
-        });
-
-        nextTick(() => {
-          params.value.ok = 1;
         });
 
         xhr = _xhr;
@@ -101,6 +97,60 @@ describe('GIVEN `useXhr`', () => {
         it('THEN `isPending` should be toggle to true', () => {
           expect(_isPending).toBe(true);
         });
+      });
+    });
+  });
+
+  describe('WHEN run the function to resolve a post', () => {
+    it('THEN `post` should be a function', () => {
+      const { post } = useXhr({ legacy: true, token });
+      expect(typeof post).toBe('function');
+    });
+
+    describe('WHEN execute `post`', () => {
+      let mocked: any;
+      let data: Ref<undefined | null | string>;
+      let xhr: Xhr<any>;
+      const params = ref({ ok: 1, undefinedParam: undefined });
+
+      afterAll(() => {
+        // maybe already restored
+        mocked.restore?.();
+      });
+      beforeAll((done) => {
+        const { post } = useXhr({ legacy: true, token });
+
+        mocked = mockXhr().post({
+          url: '/fake/post/1',
+        });
+        mocked.resolve('post-ok');
+
+        const {
+          data: _data,
+          xhr: _xhr,
+        } = post<'post-ok'>({
+          url: '/fake/post/1',
+          params,
+        });
+
+        xhr = _xhr;
+
+        data = _data;
+
+        watch(
+          () => _data.value,
+          () => done(),
+        );
+      });
+
+      it('THEN query should be retrieved with good value', () => {
+        expect(data.value).toBe('post-ok');
+      });
+
+      it('AND token should be in the `xhr` instance', () => {
+        expect(xhr.token).toBe('FAKE_TOKEN');
+        expect(mocked.context.header[1][0]).toBe('Authorization');
+        expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
       });
     });
   });
