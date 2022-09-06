@@ -252,6 +252,31 @@ export default class Xhr<T> {
     return this._deferred.promise;
   }
 
+  // if type of value to be injected as path param is:
+  // - boolean
+  // - string
+  // - number
+  // just stringify, else encode it
+  static _stringifyForPathParam(decodedUrl: string, attrName: string, obj: any) {
+    let value = obj[attrName] === null || obj[attrName] === '' ? 'null' : obj[attrName];
+    switch (typeof obj[attrName]) {
+      case 'boolean':
+      case 'string':
+      case 'bigint':
+      case 'number':
+        value = String(value);
+        break;
+      default:
+        value = encodeURIComponent(JSON.stringify(value));
+        break;
+    }
+
+    return decodedUrl.replace(
+      `:${attrName}`,
+      value,
+    );
+  }
+
   /**
    * url with path params will be replaced by params values
    */
@@ -306,12 +331,7 @@ export default class Xhr<T> {
       placeholder = placeholder.substring(1);
       if (mergedParams[placeholder] !== undefined) {
         // stringify null
-        decodedUrl = decodedUrl.replace(
-          `:${placeholder}`,
-          encodeURIComponent(JSON.stringify(
-            (mergedParams[placeholder] === null || mergedParams[placeholder] === '') ? 'null' : mergedParams[placeholder],
-          )),
-        );
+        decodedUrl = Xhr._stringifyForPathParam(decodedUrl, placeholder, mergedParams);
 
         // remove duplicated parameters
         delete mergedParams[placeholder];

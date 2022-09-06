@@ -122,17 +122,19 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => expect(query).resolves.toEqual('delete-ok'));
   });
+
   describe('WHEN send DELETE query with query params injected as path params', () => {
     let query: Promise<any>;
     beforeAll(() => {
       mockXhr()
-        .delete({ url: '/fake/delete/%5B1%2C2%2C3%5D' })
+        .delete({ url: '/fake/delete/toto/%5B1%2C2%2C3%5D' })
         .resolve('delete-ok');
 
       query = new Xhr().delete({
-        url: '/fake/delete/:pnumIds',
+        url: '/fake/delete/:str/:pnumIds',
         params: {
           pnumIds: [1, 2, 3],
+          str: 'toto',
         },
       });
     });
