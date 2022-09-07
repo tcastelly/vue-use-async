@@ -258,7 +258,7 @@ export default class Xhr<T> {
   // - number
   // just stringify, else encode it
   static _stringifyForPathParam(decodedUrl: string, attrName: string, obj: any) {
-    let value = obj[attrName] === null || obj[attrName] === '' ? 'null' : obj[attrName];
+    let value = obj[attrName];
     switch (typeof obj[attrName]) {
       case 'boolean':
       case 'string':
@@ -267,7 +267,7 @@ export default class Xhr<T> {
         value = String(value);
         break;
       default:
-        value = encodeURIComponent(JSON.stringify(value));
+        value = value === null ? 'null' : encodeURIComponent(JSON.stringify(value));
         break;
     }
 
@@ -330,7 +330,6 @@ export default class Xhr<T> {
     (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
       placeholder = placeholder.substring(1);
       if (mergedParams[placeholder] !== undefined) {
-        // stringify null
         decodedUrl = Xhr._stringifyForPathParam(decodedUrl, placeholder, mergedParams);
 
         // remove duplicated parameters

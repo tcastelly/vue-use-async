@@ -127,14 +127,15 @@ describe('Given Xhr and MockXhr', () => {
     let query: Promise<any>;
     beforeAll(() => {
       mockXhr()
-        .delete({ url: '/fake/delete/toto/%5B1%2C2%2C3%5D' })
+        .delete({ url: '/fake/delete/toto/null/%5B1%2C2%2C3%5D' })
         .resolve('delete-ok');
 
       query = new Xhr().delete({
-        url: '/fake/delete/:str/:pnumIds',
+        url: '/fake/delete/:str/:nothing/:pnumIds',
         params: {
           pnumIds: [1, 2, 3],
           str: 'toto',
+          nothing: null,
         },
       });
     });
