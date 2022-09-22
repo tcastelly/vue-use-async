@@ -175,6 +175,10 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
     const xhrPromise = ref<XhrGet<TT>>();
 
     const reload = () => {
+      if (!exec.value) {
+        return;
+      }
+
       if (isPending.value) {
         xhr.abort();
       }
