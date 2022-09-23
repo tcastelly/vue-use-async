@@ -77,6 +77,8 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
 
   const xhrList = ref<Array<Xhr<any>>>([]);
 
+  const unwatch: Array<() => unknown> = [];
+
   /**
    * For GET it's possible to add cache
    */
@@ -158,24 +160,27 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       return _getParams;
     });
 
-    let exec: Ref<boolean>;
-    const _exec: Enabled = getParams.value.enabled !== undefined ? getParams.value.enabled : enabled;
-    if (_exec === undefined) {
-      exec = ref(true);
-    } else if (isRef(_exec)) {
-      exec = _exec;
-    } else if (typeof _exec === 'function') {
-      exec = ref(_exec());
-    } else {
-      exec = ref(_exec === true);
-    }
+    const isEnabled = () => {
+      const _exec: Enabled = getParams.value.enabled !== undefined ? getParams.value.enabled : enabled;
+
+      if (_exec === undefined) {
+        return true;
+      }
+      if (isRef(_exec)) {
+        return unref(_exec);
+      }
+      if (typeof _exec === 'function') {
+        return _exec();
+      }
+      return _exec === true;
+    };
 
     let lastCacheId: null | string;
 
     const xhrPromise = ref<XhrGet<TT>>();
 
     const reload = () => {
-      if (!exec.value) {
+      if (!isEnabled()) {
         return;
       }
 
@@ -228,33 +233,13 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
     };
 
     // reload if parameters changed
-    watch(
+    unwatch.push(watch(
       () => getParams.value,
-      () => {
-        if (exec.value) {
-          reload();
-        }
-      },
+      reload,
       {
-        immediate: exec.value,
+        immediate: isEnabled(),
       },
-    );
-
-    // reload if the query has been enabled
-    watch(
-      () => exec.value,
-      (v) => {
-        // we don't want to execute twice if params changed AND exec changed
-        if (!isPending.value && v) {
-          // we don't want to abort the previous query
-          reload();
-        }
-      },
-      {
-        // avoid simultaneously query
-        immediate: false,
-      },
-    );
+    ));
 
     return {
       isPending: computed(() => isPending.value),
@@ -345,6 +330,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
           xhr.abort();
         }
       });
+      unwatch.forEach((f) => f());
     });
   }
 
