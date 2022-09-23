@@ -238,6 +238,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       reload,
       {
         immediate: isEnabled(),
+        deep: true,
       },
     ));
 
