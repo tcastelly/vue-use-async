@@ -174,7 +174,7 @@ export default class Xhr<T> {
       this._isXhrRejected = true;
       this._deferred.reject({
         message: `Xhr aborted: ${this.url}`,
-        code: 'HTTP-ABORTED',
+        name: 'HTTP-ABORTED',
       });
     }
 
