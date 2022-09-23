@@ -122,6 +122,15 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   );
 
   watch(
+    () => error.value,
+    (err) => {
+      if (err) {
+        throw err;
+      }
+    },
+  );
+
+  watch(
     () => wrapParams.value,
     (v) => {
       const vStr = JSON.stringify(v);

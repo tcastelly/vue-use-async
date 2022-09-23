@@ -219,12 +219,15 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
         }
       };
 
-      xhrPromise.value.then((_data) => {
-        data.value = _data;
-      }, (err) => {
+      xhrPromise.value.catch((err) => {
         onErrorList.forEach((cb) => cb(err, xhr));
         error.value = err;
       });
+
+      xhrPromise.value.then((_data) => {
+        data.value = _data;
+      });
+
       xhrPromise.value.finally(() => {
         removeHttpXhrList();
         isPending.value = false;
@@ -239,6 +242,15 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       {
         immediate: isEnabled(),
         deep: true,
+      },
+    ));
+
+    unwatch.push(watch(
+      () => error.value,
+      (err) => {
+        if (err) {
+          throw err;
+        }
       },
     ));
 

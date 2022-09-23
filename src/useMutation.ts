@@ -44,14 +44,7 @@ export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllo
     const funcRes = func as (...args: TypeAllowed[]) => Promise<T>;
     d.value = funcRes(...[param, ...params]);
 
-    d.value.then((res) => {
-      data.value = res;
-      onEndList.forEach((cb: OnEndCb<T, Z, A>) => cb(
-        data.value,
-        // @ts-ignore - how test `Z extends []`?
-        params.length ? [param, ...params] : param,
-      ));
-    }, (_error) => {
+    d.value.catch((_error) => {
       error.value = _error || null;
 
       onErrorList.forEach((cb) => cb(
@@ -61,6 +54,15 @@ export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllo
       ));
 
       error.value = _error;
+    });
+
+    d.value.then((res) => {
+      data.value = res;
+      onEndList.forEach((cb: OnEndCb<T, Z, A>) => cb(
+        data.value,
+        // @ts-ignore - how test `Z extends []`?
+        params.length ? [param, ...params] : param,
+      ));
     });
 
     d.value.finally(() => {
