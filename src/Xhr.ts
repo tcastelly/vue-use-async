@@ -173,7 +173,7 @@ export default class Xhr<T> {
       this._oXHR.abort(null, this); // preserve context for tests
       this._isXhrRejected = true;
       this._deferred.reject({
-        error: `Xhr aborted: ${this.url}`,
+        message: `Xhr aborted: ${this.url}`,
         code: 'HTTP-ABORTED',
       });
     }
