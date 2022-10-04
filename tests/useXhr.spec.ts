@@ -5,7 +5,7 @@ import {
   computed, ComputedRef, Ref, ref, watch,
 } from 'vue';
 import Xhr from '@/Xhr';
-import { cacheIds } from '@/cache';
+import { cacheIds, clearCache } from '@/cache';
 import useXhr from '@/useXhr';
 import type { Func } from '@/index';
 import mockXhr from './mockXhr';
@@ -88,6 +88,7 @@ describe('GIVEN `useXhr`', () => {
       describe('WHEN execute `reload`', () => {
         let _isPending: undefined | null | boolean;
         beforeAll((done) => {
+          clearCache('/fake/get/1?otherParam=true');
           reload();
 
           watch(

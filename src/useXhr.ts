@@ -13,7 +13,7 @@ import type {
   XhrGet,
 } from './index';
 import Xhr from './Xhr';
-import cache, { clearCache } from './cache';
+import cache from './cache';
 import useAsync from './useAsync';
 
 type Enabled = undefined | null | (() => boolean) | Ref<boolean> | ComputedRef<boolean> | boolean;
@@ -175,8 +175,6 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       return _exec === true;
     };
 
-    let lastCacheId: null | string;
-
     const xhrPromise = ref<XhrGet<TT>>();
 
     const reload = () => {
@@ -195,11 +193,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       isPending.value = true;
       error.value = null;
 
-      if (lastCacheId) {
-        clearCache(lastCacheId);
-      }
-
-      lastCacheId = decodeURIComponent(Xhr.stringifyUrl(
+      const lastCacheId = decodeURIComponent(Xhr.stringifyUrl(
         String(url),
         xhrParams as object,
       ));
