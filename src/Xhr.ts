@@ -15,6 +15,39 @@ export default class Xhr<T> {
     return result;
   }
 
+  static extractQueryParams(url: string) {
+    // query params already set in the URL
+    const queryParams: Obj = {};
+
+    const hashPos = url.search(/#/);
+    if (hashPos > -1) {
+      url = url.substring(0, hashPos);
+    }
+
+    //
+    // extract existing query params
+    const paramPos = url.indexOf('?');
+    const trueStr = true.toString();
+    const falseStr = false.toString();
+    if (paramPos > -1) {
+      url.split('?')[1].split('&').reduce((acc, v) => {
+        const [k, _v = ''] = v.split('=');
+        const [, __v] = _v.match(/^(?:"?([^"]+)"?)$/) || [];
+
+        if (__v === trueStr || __v === falseStr) {
+          acc[k] = __v === trueStr;
+        } else {
+          const vNbr = Number(__v);
+          acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
+        }
+
+        return acc;
+      }, queryParams);
+    }
+
+    return queryParams;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   onError: (e: ProgressEvent) => void = () => {
   };
@@ -289,31 +322,14 @@ export default class Xhr<T> {
       };
     }
 
-    // query params already set in the URL
-    const queryParams: { [id: string]: any } = {};
-
     let decodedUrl = decodeURIComponent(url);
 
-    //
-    // extract existing query params
-    const paramPos = decodedUrl.indexOf('?');
-    const trueStr = true.toString();
-    const falseStr = false.toString();
-    if (paramPos > -1) {
-      decodedUrl.split('?')[1].split('&').reduce((acc, v) => {
-        const [k, _v = ''] = v.split('=');
-        const [, __v] = _v.match(/^(?:"?([^"]+)"?)$/) || [];
+    // query params already set in the URL
+    const queryParams = Xhr.extractQueryParams(decodedUrl);
 
-        if (__v === trueStr || __v === falseStr) {
-          acc[k] = __v === trueStr;
-        } else {
-          const vNbr = Number(__v);
-          acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
-        }
-
-        return acc;
-      }, queryParams);
-      decodedUrl = decodedUrl.substring(0, paramPos);
+    const extraPos = decodedUrl.search(/\?|#/);
+    if (extraPos > -1) {
+      decodedUrl = decodedUrl.substring(0, extraPos);
     }
 
     const mergedParams = Object.getOwnPropertyNames(params)
@@ -321,9 +337,6 @@ export default class Xhr<T> {
         acc[v] = params[v];
         return acc;
       }, { ...queryParams });
-
-    // escape hash character
-    decodedUrl = decodedUrl.replace(/#/, '%23');
 
     //
     // replace path params

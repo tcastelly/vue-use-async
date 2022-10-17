@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import Xhr from '@/Xhr';
-import type { XhrGet } from '@/index';
+import type { Obj, XhrGet } from '@/index';
 import mockXhr from './mockXhr';
 
 describe('Given Xhr and MockXhr', () => {
@@ -207,6 +207,23 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN the array should be serialized', () => {
       expect(res).toBe('/api-js?%5B1%2C2%2C3%5D');
+    });
+  });
+
+  describe('WHEN extract query params from url', () => {
+    const url = '/pl/relet/1270/summary-compare/1266/:pnumId?pnumPrd=2015&pnumEntId&something=else#divId';
+
+    let extractedQueryParams: Obj;
+
+    beforeAll(() => {
+      extractedQueryParams = Xhr.extractQueryParams(url);
+    });
+
+    it('THEN params should be extracted', () => {
+      expect(extractedQueryParams).toBeTruthy();
+      expect(extractedQueryParams.pnumPrd).toBe(2015);
+      expect(extractedQueryParams.pnumEntId).toBe(undefined);
+      expect(extractedQueryParams.something).toBe('else');
     });
   });
 });
