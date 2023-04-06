@@ -210,6 +210,21 @@ describe('Given Xhr and MockXhr', () => {
     });
   });
 
+  describe('WHEN stringify URL with array as query param', () => {
+    const url = '/api-js';
+    let res: string;
+
+    beforeAll(() => {
+      res = Xhr.stringifyUrl(url, {
+        ids: [2],
+      });
+    });
+
+    it('THEN the array should be serialized', () => {
+      expect(res).toBe('/api-js?ids=%5B2%5D');
+    });
+  });
+
   describe('WHEN extract query params from url', () => {
     const url = '/pl/relet/1270/summary-compare/1266/:pnumId?pnumPrd=2015&pnumEntId&something=else#divId';
 
