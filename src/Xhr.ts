@@ -215,7 +215,7 @@ export default class Xhr<T> {
   }
 
   static stringifyUrl(url: string, params: Obj = {}): string {
-    ({ url, params } = Xhr._injectParamsInUrl(url, params));
+    ({ url, params } = Xhr.injectParamsInUrl(url, params));
 
     let separator = url.indexOf('?') > -1 ? '&' : '?';
     let queryParams = '';
@@ -313,7 +313,7 @@ export default class Xhr<T> {
   /**
    * url with path params will be replaced by params values
    */
-  static _injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string, params: Obj } {
+  static injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string, params: Obj } {
     // don't try to inject params if there is nothing to inject
     if (Array.isArray(params) || Object.keys(params).length === 0) {
       return {
@@ -466,7 +466,7 @@ export default class Xhr<T> {
     this._isXhrResolved = false;
     this._isXhrRejected = false;
 
-    const { url, params: _p } = Xhr._injectParamsInUrl(this.url, this.params);
+    const { url, params: _p } = Xhr.injectParamsInUrl(this.url, this.params);
 
     this.url = url;
     this.params = _p;
