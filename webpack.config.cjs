@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 
 module.exports = {
@@ -6,13 +5,16 @@ module.exports = {
   context: __dirname,
   entry: {
     index: './src/index.ts',
-    tests: './tests/index.ts',
   },
   // un-comment to generate source-map in the build
   // devtool: 'eval-source-map',
+  experiments: {
+    outputModule: true,
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'umd',
+    module: true,
+    libraryTarget: 'module',
     filename: '[name].js',
   },
   externals: {

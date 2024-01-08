@@ -1,7 +1,6 @@
+import type { ComputedRef, Ref } from 'vue';
 import {
   computed,
-  ComputedRef,
-  Ref,
   ref,
   unref,
   watch,
@@ -22,7 +21,7 @@ type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
   Z |
   [...A]
 
-export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
+const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
   params?: Params<Z, A>,
   enabled: Ref<boolean> | (() => boolean) = ref(true),
@@ -35,10 +34,10 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
   onStart: (cb: OnStartCb<Params<Z, A>>) => unknown,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Params<Z, A>>) => unknown,
   promise: ComputedRef<null | ReturnType<typeof func>>,
-} {
+} => {
   const isPending = ref<undefined | boolean>();
 
-  const data = ref<T>() as Ref<T>;
+  const data = ref<T>();
 
   const error: Ref<null | Error> = ref(null);
 
@@ -106,6 +105,22 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
     return d.value;
   };
 
+  const reload = () => _reload(wrapParams.value);
+
+  const onError = (cb: OnErrorCb<Params<Z, A>>) => {
+    onErrorList.push(cb);
+  };
+
+  const onStart = (cb: OnStartCb<Params<Z, A>>) => {
+    onStartList.push(cb);
+  };
+
+  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Params<Z, A>>) => {
+    onEndList.push(cb);
+  };
+
+  const promise = computed(() => d.value);
+
   // reload if the query has been enabled
   watch(
     () => _enabled.value,
@@ -157,10 +172,12 @@ export default function useAsync<T, Z extends TypeAllowed, A extends TypeAllowed
     isPending,
     data,
     error,
-    reload: () => _reload(wrapParams.value),
-    onError: (cb) => onErrorList.push(cb),
-    onStart: (cb) => onStartList.push(cb),
-    onEnd: (cb) => onEndList.push(cb),
-    promise: computed(() => d.value),
+    reload,
+    onError,
+    onStart,
+    onEnd,
+    promise,
   };
-}
+};
+
+export default useAsync;

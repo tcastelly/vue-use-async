@@ -4,9 +4,10 @@
     "skipLibCheck": true,
     "declaration": true,
     "outDir": "./dist",
-    "target": "es6",
-    "module": "CommonJS",
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
     "baseUrl": ".",
+    "module": "ESNext",
     "paths": {
       "@/*": [
         "src/*"
