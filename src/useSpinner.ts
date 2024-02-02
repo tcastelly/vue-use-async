@@ -1,34 +1,44 @@
 import {
-  watch,
-  computed,
-  ref,
-  Ref,
+  computed, onBeforeUnmount, Ref, ref, watch,
 } from 'vue';
 
-export default function (isPending: Ref<undefined | boolean>, duration = 400) {
-  const isPendingSpinner = ref<boolean>(false);
+export default function (isPending: Ref<undefined | boolean>, minDuration = 400) {
+  const isPendingSpinner = ref(false);
 
   let timeoutId: ReturnType<typeof setTimeout>;
 
+  let lastDuration = 0;
+
   watch(
     () => isPending.value,
-    () => {
+    (v) => {
+      if (v) {
+        lastDuration = Date.now();
+        isPendingSpinner.value = v;
+      }
+
       // wait before stop spinner
-      if (isPendingSpinner.value && !isPending.value) {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
+      if (v === false && lastDuration > 0) {
+        const diff = Date.now() - lastDuration;
+        clearTimeout(timeoutId);
+
+        if (diff > minDuration) {
+          isPendingSpinner.value = v;
+        } else {
+          timeoutId = setTimeout(() => {
+            isPendingSpinner.value = v;
+          }, minDuration - diff);
         }
-        timeoutId = setTimeout(() => {
-          isPendingSpinner.value = isPending.value === true;
-        }, duration);
-      } else {
-        isPendingSpinner.value = isPending.value === true;
       }
     },
     {
       immediate: true,
     },
   );
+
+  onBeforeUnmount(() => {
+    clearTimeout(timeoutId);
+  });
 
   return computed(() => isPendingSpinner.value);
 }
