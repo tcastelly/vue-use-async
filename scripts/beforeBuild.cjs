@@ -5,12 +5,23 @@
 const fs = require('fs');
 
 const del = (dir) => new Promise((resolve) => {
-  fs.rm(dir, { recursive: true }, (err) => {
+  fs.rm(dir, { recursive: true, force: true }, (err) => {
     if (err) {
       throw err;
     }
 
-    resolve(`${dir} is deleted!`);
+    resolve(`${dir} has been deleted!`);
+  });
+});
+
+
+const mkdir = (dir) => new Promise((resolve) => {
+  fs.mkdir(dir, (err) => {
+    if (err) {
+      throw err;
+    }
+
+    resolve(`${dir} has been created!`);
   });
 });
 
@@ -19,6 +30,8 @@ const main = async () => {
     del('./dist'),
     del('./types'),
   ]);
+
+  await mkdir('./dist');
 
   console.log(r, r1);
 };
