@@ -1,0 +1,35 @@
+name: Publish to NPM
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: detect package.version changes
+        uses: MontyD/package-json-updated-action@master
+        id: version-updated
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        if: steps.version-updated.outputs.has-updated
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        if: steps.version-updated.outputs.has-updated
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies and build 🔧
+        if: steps.version-updated.outputs.has-updated
+        run: npm ci && npm run build
+
+      - name: Publish package on NPM 📦
+        if: steps.version-updated.outputs.has-updated
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
