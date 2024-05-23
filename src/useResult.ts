@@ -20,7 +20,7 @@ export default function <T, Z extends T, U = Res<T, Z>>(
     map = (a: any) => a;
   }
 
-  if (defaultRes) {
+  if (defaultRes !== undefined) {
     _res.value = map(defaultRes as Res<T, Z>);
   }
 
@@ -28,7 +28,7 @@ export default function <T, Z extends T, U = Res<T, Z>>(
     if (res) {
       const unWrapRes = unref<any>(res);
 
-      if (unWrapRes) {
+      if (unWrapRes !== undefined) {
         _res.value = map?.(unWrapRes);
       }
     }
