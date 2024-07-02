@@ -68,6 +68,10 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
 
   // generate new xhr/promise
   const _reload = (_params: Z | [...A]) => {
+    if (!_enabled.value) {
+      return null;
+    }
+
     onStartList.forEach((cb) => cb(wrapParams.value));
 
     isPending.value = true;
