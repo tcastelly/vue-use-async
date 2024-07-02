@@ -22,14 +22,20 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN reject `useAsync`', () => {
-    const rejectFunc = () => Promise.reject(Error('ko'));
+    let err: Error;
 
-    // TODO - maybe fix un handled promise can fix this issue
-    it.skip('promise should be rejected', () => {
+    beforeAll(async () => new Promise((resolve) => {
+      const rejectFunc = () => Promise.reject(Error('ko')).catch((e) => {
+        err = e;
+        resolve(e);
+      });
+
       const f = () => useAsync(rejectFunc);
-      const res = f();
+      f();
+    }));
 
-      return expect(res.promise.value).rejects.toThrow('ko');
+    it('promise should be rejected', () => {
+      expect(err.message).toBe('ko');
     });
   });
 
