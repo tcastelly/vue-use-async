@@ -1,6 +1,7 @@
 import {
   computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, unref, watch,
 } from 'vue';
+import uuid from '@/_base/uuid';
 import type {
   $GetConfigArgs,
   $UpdateConfigArgs,
@@ -15,6 +16,7 @@ import type {
 import Xhr from './Xhr';
 import cache from './cache';
 import useAsync from './useAsync';
+import { Result } from './useResult';
 
 type Enabled = undefined | null | (() => boolean) | Ref<boolean> | ComputedRef<boolean> | boolean;
 
@@ -249,8 +251,22 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
     ));
 
     return {
+      // set variable in ro
       isPending: computed(() => isPending.value),
-      data,
+
+      // set variable in ro only for TS
+      data: computed({
+        get: () => data.value,
+        set: (v: typeof data.value | Result<typeof data.value>) => {
+          if (v instanceof Result && v.uuid === uuid) {
+            data.value = v.value;
+          } else {
+            console.warn('"useXhr" Update a readonly field is not allowed');
+            data.value = v as typeof data.value;
+          }
+        },
+      }) as ComputedRef,
+
       onError: (cb) => onErrorList.push(cb),
       onStart: (cb) => onStartList.push(cb),
       onEnd: (cb) => onEndList.push(cb),

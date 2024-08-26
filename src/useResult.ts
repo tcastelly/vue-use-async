@@ -1,13 +1,26 @@
 import {
-  Ref,
   ref,
   unref,
+  watch,
   watchEffect,
 } from 'vue';
+import type { Ref } from 'vue';
+import uuid from '@/_base/uuid';
 
 type NonNullable<T> = Exclude<T, null | undefined>;
 
 type Res<T, Z extends T> = NonNullable<Z extends never[] ? T : Z>;
+
+export class Result<T> {
+  constructor(v: T) {
+    this.uuid = uuid;
+    this.value = v;
+  }
+
+  value: T;
+
+  uuid: string;
+}
 
 export default function <T, Z extends T, U = Res<T, Z>>(
   res: Ref<T>,
@@ -33,6 +46,20 @@ export default function <T, Z extends T, U = Res<T, Z>>(
       }
     }
   });
+
+  watch(
+    () => _res.value,
+    (v) => {
+      if (res.value === undefined) {
+        return;
+      }
+
+      if (v !== res.value) {
+        // @ts-ignore
+        res.value = new Result(v);
+      }
+    },
+  );
 
   return _res;
 }

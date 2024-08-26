@@ -74,7 +74,7 @@ export type TypeAllowed = undefined | null | string | number | boolean | Obj
 
 export type GetReturn<T> = {
   isPending: ComputedRef<undefined | boolean>,
-  data: Ref<T>,
+  data: ComputedRef<T>,
   error: Ref<null | Error | Obj>,
   abort: () => void,
   promise: ComputedRef<Promise<T>>,

@@ -5,6 +5,8 @@ import {
   unref,
   watch,
 } from 'vue';
+import { Result } from '@/useResult';
+import uuid from '@/_base/uuid';
 import type { TypeAllowed, UnwrappedPromiseType } from './index';
 
 type OnErrorCb<T> = (e: null | Error, params: T) => unknown;
@@ -174,7 +176,20 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
 
   return {
     isPending,
-    data,
+
+    // set variable in ro only for TS
+    data: computed({
+      get: () => data.value,
+      set: (v: typeof data.value | Result<typeof data.value>) => {
+        if (v instanceof Result && v.uuid === uuid) {
+          data.value = v.value;
+        } else {
+          console.warn('"useAsync" Update a readonly field is not allowed');
+          data.value = v as typeof data.value;
+        }
+      },
+    }) as ComputedRef,
+
     error,
     reload,
     onError,
