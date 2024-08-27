@@ -1,10 +1,10 @@
+import type { Ref } from 'vue';
 import {
   ref,
   unref,
   watch,
   watchEffect,
 } from 'vue';
-import type { Ref } from 'vue';
 import uuid from '@/_base/uuid';
 
 type NonNullable<T> = Exclude<T, null | undefined>;
@@ -37,15 +37,11 @@ export default function <T, Z extends T, U = Res<T, Z>>(
     _res.value = map(defaultRes as Res<T, Z>);
   }
 
-  // prevent infinite loop because of _res/res changes
-  let disableWatch = false;
-
-  watchEffect(() => {
+  watchEffect(async () => {
     if (res) {
       const unWrapRes = unref<any>(res);
 
       if (unWrapRes !== undefined) {
-        disableWatch = true;
         _res.value = map?.(unWrapRes);
       }
     }
@@ -54,17 +50,14 @@ export default function <T, Z extends T, U = Res<T, Z>>(
   watch(
     () => _res.value,
     (v) => {
-      if (v === undefined || res.value === undefined) {
+      if (v === undefined || res.value === undefined || v === _res.value) {
         return;
       }
 
-      if (disableWatch) {
-        disableWatch = false;
-        return;
+      if (JSON.stringify(v) !== JSON.stringify(_res.value)) {
+        // @ts-ignore
+        res.value = new Result(v);
       }
-
-      // @ts-ignore
-      res.value = new Result(v);
     },
   );
 
