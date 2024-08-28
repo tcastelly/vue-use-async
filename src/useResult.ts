@@ -1,10 +1,4 @@
-import type { Ref } from 'vue';
-import {
-  ref,
-  unref,
-  watch,
-  watchEffect,
-} from 'vue';
+import { computed, Ref, watch } from 'vue';
 import uuid from '@/_base/uuid';
 
 type NonNullable<T> = Exclude<T, null | undefined>;
@@ -23,43 +17,33 @@ export class Result<T> {
 }
 
 export default function <T, Z extends T, U = Res<T, Z>>(
-  res: Ref<T>,
+  input: Ref<T>,
   defaultRes: NonNullable<Z>,
-  map?: (r: Res<T, Z>) => NonNullable<U>,
+  map: (r: Res<T, Z>) => NonNullable<U> = (a: any) => a,
 ): Ref<U> {
-  const _res = ref<any>(defaultRes);
-
-  if (!map) {
-    map = (a: any) => a;
-  }
-
-  if (defaultRes !== undefined) {
-    _res.value = map(defaultRes as Res<T, Z>);
-  }
-
-  watchEffect(async () => {
-    if (res) {
-      const unWrapRes = unref<any>(res);
-
-      if (unWrapRes !== undefined) {
-        _res.value = map?.(unWrapRes);
-      }
-    }
-  });
-
+  // map has to be applied only if async data changed
   watch(
-    () => _res.value,
+    () => input.value,
     (v) => {
-      if (v === undefined || res.value === undefined || v === _res.value) {
-        return;
-      }
-
-      if (JSON.stringify(v) !== JSON.stringify(_res.value)) {
-        // @ts-ignore
-        res.value = new Result(v);
+      if (v !== undefined && !(v instanceof Result)) {
+        input.value = new Result(map?.(v as Res<T, Z>)) as typeof input.value;
       }
     },
   );
 
-  return _res;
+  return computed<any>({
+    get: () => {
+      let v;
+      if (input.value instanceof Result) {
+        v = input.value.value;
+      } else {
+        v = input.value;
+      }
+
+      return v === undefined ? defaultRes : v;
+    },
+    set: (v: typeof input.value) => {
+      input.value = new Result(v) as typeof input.value;
+    },
+  });
 }

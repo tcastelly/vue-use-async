@@ -1,5 +1,11 @@
+import type { ComputedRef, Ref } from 'vue';
 import {
-  computed, ComputedRef, isRef, onBeforeUnmount, ref, Ref, unref, watch,
+  computed,
+  isRef,
+  onBeforeUnmount,
+  ref,
+  unref,
+  watch,
 } from 'vue';
 import uuid from '@/_base/uuid';
 import type {
@@ -105,7 +111,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
 
     const isPending = ref<undefined | boolean>();
 
-    const data = ref() as Ref<TT>;
+    const data = ref<TT>();
 
     let url: undefined | string = '';
     let duration: undefined | CacheDuration = 0;
@@ -227,7 +233,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       xhrPromise.value.finally(() => {
         removeHttpXhrList();
         isPending.value = false;
-        onEndList.forEach((cb) => cb(data.value, xhrParams, xhr));
+        onEndList.forEach((cb) => cb(data.value as TT, xhrParams, xhr));
       });
     };
 
@@ -258,8 +264,9 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       data: computed({
         get: () => data.value,
         set: (v: typeof data.value | Result<typeof data.value>) => {
+          // variable updated by `useResult`
           if (v instanceof Result && v.uuid === uuid) {
-            data.value = v.value;
+            data.value = v as typeof data.value;
           } else {
             console.warn('"useXhr" Update a readonly field is not allowed');
             data.value = v as typeof data.value;
@@ -271,11 +278,8 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       onStart: (cb) => onStartList.push(cb),
       onEnd: (cb) => onEndList.push(cb),
       error,
-      abort() {
-        return xhrPromise.value?.abortXhr();
-      },
-      promise: computed(() => xhrPromise.value || new Promise(() => {
-      })),
+      abort: () => xhrPromise.value?.abortXhr(),
+      promise: computed(() => xhrPromise.value || new Promise(() => {})),
       reload,
       xhr,
     };

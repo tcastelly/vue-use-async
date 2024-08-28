@@ -29,7 +29,7 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   enabled: Ref<boolean> | (() => boolean) = ref(true),
 ): {
   isPending: Ref<undefined | boolean>,
-  data: Ref<undefined | null | UnwrappedPromiseType<typeof func>>;
+  data: ComputedRef<undefined | null | UnwrappedPromiseType<typeof func>>;
   error: Ref<null | Error>,
   reload: () => unknown,
   onError: (cb: OnErrorCb<Params<Z, A>>) => unknown,
@@ -181,8 +181,9 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
     data: computed({
       get: () => data.value,
       set: (v: typeof data.value | Result<typeof data.value>) => {
+        // variable updated by `useResult`
         if (v instanceof Result && v.uuid === uuid) {
-          data.value = v.value;
+          data.value = v as typeof data.value;
         } else {
           console.warn('"useAsync" Update a readonly field is not allowed');
           data.value = v as typeof data.value;
