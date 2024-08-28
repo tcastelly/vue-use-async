@@ -21,7 +21,14 @@ export default function <T, Z extends T, U = Res<T, Z>>(
   defaultRes: NonNullable<Z>,
   map: (r: Res<T, Z>) => NonNullable<U> = (a: any) => a,
 ): Ref<U> {
-  // map has to be applied only if async data changed
+  const defaultValue = input.value === undefined ? defaultRes : input.value;
+
+  // the initial value comes async
+  input.value = defaultValue === undefined
+    ? defaultValue
+    : new Result(map?.(defaultValue as Res<T, Z>)) as typeof input.value;
+
+  // map has to be applied ONLY if async data changed
   watch(
     () => input.value,
     (v) => {
