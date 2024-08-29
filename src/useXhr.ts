@@ -44,11 +44,17 @@ type $$GetConfigArg<T> = Omit<$GetConfigArgs<T>, 'url'> & {
 const _blank = () => {
 };
 
-declare type UseXhr<T, Z extends TypeAllowed, A extends TypeAllowed[]> = Partial<{
+declare type UseXhr<
+  T,
+  Z extends TypeAllowed,
+  A extends TypeAllowed[],
+  F extends ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
+  P extends RequiredParams<Parameters<F>[0], A>
+> = Partial<{
   // global callback for VueJS 2 plugin compatibility
-  onError: OnErrorCb<T>,
-  onStart: OnStartCb<T, RequiredParams<Z, A>>,
-  onEnd: OnEndCb<T, RequiredParams<Z, A>>,
+  onError: (cb: OnErrorCb<P>) => unknown,
+  onStart: OnStartCb<T, P>,
+  onEnd: OnEndCb<T, P>,
   onProgress: (e: ProgressEvent) => any,
   onAbort: (e: ProgressEvent) => any,
   //
@@ -59,7 +65,13 @@ declare type UseXhr<T, Z extends TypeAllowed, A extends TypeAllowed[]> = Partial
 
 const getTokenValue = (token: undefined | Token): undefined | null | string => unref<undefined | string | null>(token);
 
-export default function <T, Z extends TypeAllowed, A extends TypeAllowed[]>(args?: UseXhr<T, Z, A>) {
+export default function <
+  T,
+  Z extends TypeAllowed,
+  A extends TypeAllowed[],
+  F extends ((..._args: A) => Promise<T>) | ((_args: Z) => Promise<T>),
+  P extends RequiredParams<Parameters<F>[0], A>
+>(args?: UseXhr<T, Z, A, F, P>) {
   const {
     onError,
     onStart,
@@ -86,7 +98,11 @@ export default function <T, Z extends TypeAllowed, A extends TypeAllowed[]>(args
   /**
    * For GET it's possible to add cache
    */
-  function get<TT = T, ZZ extends TypeAllowed = Z, AA extends TypeAllowed[] = A>(
+  function get<
+    TT = T,
+    ZZ extends TypeAllowed = Z,
+    AA extends TypeAllowed[] = A,
+  >(
     parametersObj: GetConfig<ZZ>,
     params?: RequiredParams<ZZ, AA>,
     enabled?: Enabled,
@@ -148,14 +164,14 @@ export default function <T, Z extends TypeAllowed, A extends TypeAllowed[]>(args
       }
 
       // merge params
-      let p = unref(_getParams.params || params || {});
+      let p: object = unref((_getParams.params || params || {}) as object);
       if (typeof p === 'function') {
-        p = (p as () => ZZ)() as RequiredParams<ZZ, AA>;
+        p = (p as () => object)();
       }
 
       _getParams.params = ({
         ...p,
-        ...(isRef(params) ? (params.value || {}) : params),
+        ...((isRef(params) ? (params.value || {}) : params) as object),
       }) as ZZ;
 
       url = typeof _url === 'function' ? _url(_getParams.params) : unref(_url);
@@ -275,7 +291,8 @@ export default function <T, Z extends TypeAllowed, A extends TypeAllowed[]>(args
       onEnd: (cb) => onEndList.push(cb),
       error,
       abort: () => xhrPromise.value?.abortXhr(),
-      promise: computed(() => xhrPromise.value || new Promise(() => {})),
+      promise: computed(() => xhrPromise.value || new Promise(() => {
+      })),
       reload,
       xhr,
     };

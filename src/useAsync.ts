@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from 'vue';
+import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
   computed,
   ref,
@@ -13,46 +13,53 @@ import type {
   RequiredParams,
 } from './index';
 
-type OnErrorCb<T> = (e: null | Error, params: T) => unknown;
+type OnErrorCb<T> = (e: null | Error, params: T) => void;
 
-type OnStartCb<T> = (params: T) => unknown;
+type OnStartCb<T> = (params: T) => void;
 
-type OnEndCb<T, Z> = (res: T, params: Z) => unknown;
+type OnEndCb<T, Z> = (res: T, params: Z) => void;
 
-const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
-  func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-  params?: RequiredParams<Z, A>,
-  enabled: Ref<boolean> | (() => boolean) = ref(true),
-): {
+const useAsync = <T,
+  Z extends TypeAllowed,
+  A extends TypeAllowed[],
+  F extends ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
+  P extends RequiredParams<Parameters<F>[0], A>,
+>(
+    func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
+    params?: P,
+    enabled: Ref<boolean> | (() => boolean) = ref(true),
+  ): {
   isPending: Ref<undefined | boolean>,
-  data: ComputedRef<undefined | null | UnwrappedPromiseType<typeof func>>;
+  data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
   error: Ref<null | Error>,
-  reload: () => unknown,
-  onError: (cb: OnErrorCb<RequiredParams<Z, A>>) => unknown,
-  onStart: (cb: OnStartCb<RequiredParams<Z, A>>) => unknown,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, RequiredParams<Z, A>>) => unknown,
-  promise: ComputedRef<null | ReturnType<typeof func>>,
+  reload: () => void,
+  onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void,
+  onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
+  promise: ComputedRef<null | Promise<T>>,
 } => {
+  type PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
+
   const isPending = ref<undefined | boolean>();
 
   const data = ref<T>();
 
   const error: Ref<null | Error> = ref(null);
 
-  const onErrorList: Array<OnErrorCb<RequiredParams<Z, A>>> = [];
+  const onErrorList: OnErrorCb<PP>[] = [];
 
-  const onStartList: Array<OnStartCb<RequiredParams<Z, A>>> = [];
+  const onStartList: OnStartCb<PP>[] = [];
 
-  const onEndList: Array<OnEndCb<T, RequiredParams<Z, A>>> = [];
+  const onEndList: OnEndCb<UnwrappedPromiseType<F>, PP>[] = [];
 
   // for legacy use case
   const d = ref<null | Promise<T>>(null);
 
   const wrapParams = computed(() => {
     if (typeof params === 'function') {
-      return params() as RequiredParams<Z, A>;
+      return params();
     }
-    return unref(params) as RequiredParams<Z, A>;
+    return unref(params);
   });
 
   const lastUnwrapParams = ref();
@@ -97,7 +104,7 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
     d.value.then((res) => {
       data.value = res;
 
-      onEndList.forEach((cb) => cb(res, wrapParams.value));
+      onEndList.forEach((cb) => cb(res as UnwrappedPromiseType<F>, wrapParams.value));
     });
 
     d.value.finally(() => {
@@ -109,15 +116,15 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
 
   const reload = () => _reload(wrapParams.value);
 
-  const onError = (cb: OnErrorCb<RequiredParams<Z, A>>) => {
+  const onError = (cb: OnErrorCb<PP>) => {
     onErrorList.push(cb);
   };
 
-  const onStart = (cb: OnStartCb<RequiredParams<Z, A>>) => {
+  const onStart = (cb: OnStartCb<PP>) => {
     onStartList.push(cb);
   };
 
-  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<typeof func>, RequiredParams<Z, A>>) => {
+  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<F>, PP>) => {
     onEndList.push(cb);
   };
 

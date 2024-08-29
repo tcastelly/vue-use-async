@@ -78,7 +78,7 @@ type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
   Z |
   [...A]
 
-export type RequiredParams<Z extends TypeAllowed, A extends TypeAllowed[]> = Params<Required<Z>, Required<A>>;
+export type RequiredParams<Z extends TypeAllowed, A extends TypeAllowed[]> = Params<Z, A>;
 
 export type GetReturn<T> = {
   isPending: ComputedRef<undefined | boolean>,
