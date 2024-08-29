@@ -185,7 +185,6 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
         if (v instanceof Result && v.uuid === uuid) {
           data.value = v as typeof data.value;
         } else {
-          console.log(data.value);
           console.warn('"useAsync" update a readonly field is not allowed');
           data.value = v as typeof data.value;
         }
