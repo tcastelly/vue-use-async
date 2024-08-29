@@ -72,6 +72,14 @@ export type GetConfig<T> = $GetConfig<T> | Ref<$GetConfig<T>>
 
 export type TypeAllowed = undefined | null | string | number | boolean | Obj
 
+type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
+  ComputedRef<Z | [...A]> |
+  Ref<Z | [...A]> |
+  Z |
+  [...A]
+
+export type RequiredParams<Z extends TypeAllowed, A extends TypeAllowed[]> = Params<Required<Z>, Required<A>>;
+
 export type GetReturn<T> = {
   isPending: ComputedRef<undefined | boolean>,
   data: ComputedRef<T>,

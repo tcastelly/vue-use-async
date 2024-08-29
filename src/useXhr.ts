@@ -15,6 +15,7 @@ import type {
   GetConfig,
   GetReturn,
   Obj,
+  RequiredParams,
   TypeAllowed,
   XhrConfig,
   XhrGet,
@@ -39,20 +40,15 @@ type $$GetConfigArg<T> = Omit<$GetConfigArgs<T>, 'url'> & {
   url?: string,
 }
 
-type Params<Z> = (() => Z) |
-  ComputedRef<Z> |
-  Ref<Z> |
-  Z
-
 // used as default `onError`
 const _blank = () => {
 };
 
-declare type UseXhr<T, Z extends TypeAllowed> = Partial<{
+declare type UseXhr<T, Z extends TypeAllowed, A extends TypeAllowed[]> = Partial<{
   // global callback for VueJS 2 plugin compatibility
   onError: OnErrorCb<T>,
-  onStart: OnStartCb<T, Params<Z>>,
-  onEnd: OnEndCb<T, Params<Z>>,
+  onStart: OnStartCb<T, RequiredParams<Z, A>>,
+  onEnd: OnEndCb<T, RequiredParams<Z, A>>,
   onProgress: (e: ProgressEvent) => any,
   onAbort: (e: ProgressEvent) => any,
   //
@@ -63,7 +59,7 @@ declare type UseXhr<T, Z extends TypeAllowed> = Partial<{
 
 const getTokenValue = (token: undefined | Token): undefined | null | string => unref<undefined | string | null>(token);
 
-export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
+export default function <T, Z extends TypeAllowed, A extends TypeAllowed[]>(args?: UseXhr<T, Z, A>) {
   const {
     onError,
     onStart,
@@ -90,9 +86,9 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
   /**
    * For GET it's possible to add cache
    */
-  function get<TT = T, ZZ = Z>(
+  function get<TT = T, ZZ extends TypeAllowed = Z, AA extends TypeAllowed[] = A>(
     parametersObj: GetConfig<ZZ>,
-    params?: Params<ZZ>,
+    params?: RequiredParams<ZZ, AA>,
     enabled?: Enabled,
   ): GetReturn<TT> {
     const xhr: Xhr<TT> = new Xhr<TT>();
@@ -130,7 +126,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
 
         // use params from second args of get function
         if (!params) {
-          params = (unwrapParametersObj.params || {}) as Params<ZZ>;
+          params = (unwrapParametersObj.params || {}) as RequiredParams<ZZ, AA>;
         }
 
         duration = unwrapParametersObj.cacheDuration;
@@ -152,15 +148,15 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
       }
 
       // merge params
-      let p = unref(_getParams.params || params || {} as Params<ZZ>);
+      let p = unref(_getParams.params || params || {});
       if (typeof p === 'function') {
-        p = (p as () => ZZ)();
+        p = (p as () => ZZ)() as RequiredParams<ZZ, AA>;
       }
 
-      _getParams.params = {
-        ...p as ZZ,
+      _getParams.params = ({
+        ...p,
         ...(isRef(params) ? (params.value || {}) : params),
-      };
+      }) as ZZ;
 
       url = typeof _url === 'function' ? _url(_getParams.params) : unref(_url);
       _getParams.url = url;
@@ -285,7 +281,11 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
     };
   }
 
-  const update = <TT = T, ZZ = Z>(method: 'post' | 'delete' | 'put', xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => {
+  const update = <TT = T, ZZ extends TypeAllowed = Z, AA extends TypeAllowed[] = A>(
+    method: 'post' | 'delete' | 'put',
+    xhrConfig?: $UpdateConfigArgs,
+    params?: RequiredParams<ZZ, AA>,
+  ) => {
     const updateArgs = computed(() => {
       const _postArgs: $UpdateConfigArgs<ZZ> = {};
 
@@ -293,18 +293,12 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
 
       // use params from second args of post function
       if (!params) {
-        params = (unwrapParametersObj.params || {}) as Params<ZZ>;
+        params = (unwrapParametersObj.params || {}) as RequiredParams<ZZ, AA>;
       }
       _postArgs.params = unref<ZZ>(params as ZZ);
 
       if (token) {
         _postArgs.token = getTokenValue(token);
-      }
-
-      // merge params
-      let p = unref(_postArgs.params || params || {} as Params<ZZ>);
-      if (typeof p === 'function') {
-        p = (p as () => ZZ)();
       }
 
       _postArgs.url = unref(unwrapParametersObj.url);
@@ -344,11 +338,20 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
     };
   };
 
-  const post = <TT = T, ZZ = Z>(xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => update<TT, ZZ>('post', xhrConfig, params);
+  const post = <TT = T, ZZ extends TypeAllowed = Z, AA extends TypeAllowed[] = A>(
+    xhrConfig?: $UpdateConfigArgs,
+    params?: RequiredParams<ZZ, AA>,
+  ) => update<TT, ZZ, AA>('post', xhrConfig, params);
 
-  const put = <TT = T, ZZ = Z>(xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => update<TT, ZZ>('put', xhrConfig, params);
+  const put = <TT = T, ZZ extends TypeAllowed = Z, AA extends TypeAllowed[] = A>(
+    xhrConfig?: $UpdateConfigArgs,
+    params?: RequiredParams<ZZ, AA>,
+  ) => update<TT, ZZ, AA>('put', xhrConfig, params);
 
-  const _delete = <TT = T, ZZ = Z>(xhrConfig?: $UpdateConfigArgs, params?: Params<ZZ>) => update<TT, ZZ>('delete', xhrConfig, params);
+  const _delete = <TT = T, ZZ extends TypeAllowed = Z, AA extends TypeAllowed[] = A>(
+    xhrConfig?: $UpdateConfigArgs,
+    params?: RequiredParams<ZZ, AA>,
+  ) => update<TT, ZZ, AA>('delete', xhrConfig, params);
 
   if (!legacy) {
     onBeforeUnmount(() => {

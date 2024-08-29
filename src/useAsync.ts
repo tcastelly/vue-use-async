@@ -7,7 +7,11 @@ import {
 } from 'vue';
 import { Result } from '@/useResult';
 import uuid from '@/_base/uuid';
-import type { TypeAllowed, UnwrappedPromiseType } from './index';
+import type {
+  TypeAllowed,
+  UnwrappedPromiseType,
+  RequiredParams,
+} from './index';
 
 type OnErrorCb<T> = (e: null | Error, params: T) => unknown;
 
@@ -15,26 +19,18 @@ type OnStartCb<T> = (params: T) => unknown;
 
 type OnEndCb<T, Z> = (res: T, params: Z) => unknown;
 
-// params: ComputedRef<A> | Ref<A> | (() => A) | A = {} as A,
-
-type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
-  ComputedRef<Z | [...A]> |
-  Ref<Z | [...A]> |
-  Z |
-  [...A]
-
 const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-  params?: Params<Z, A>,
+  params?: RequiredParams<Z, A>,
   enabled: Ref<boolean> | (() => boolean) = ref(true),
 ): {
   isPending: Ref<undefined | boolean>,
   data: ComputedRef<undefined | null | UnwrappedPromiseType<typeof func>>;
   error: Ref<null | Error>,
   reload: () => unknown,
-  onError: (cb: OnErrorCb<Params<Z, A>>) => unknown,
-  onStart: (cb: OnStartCb<Params<Z, A>>) => unknown,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Params<Z, A>>) => unknown,
+  onError: (cb: OnErrorCb<RequiredParams<Z, A>>) => unknown,
+  onStart: (cb: OnStartCb<RequiredParams<Z, A>>) => unknown,
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, RequiredParams<Z, A>>) => unknown,
   promise: ComputedRef<null | ReturnType<typeof func>>,
 } => {
   const isPending = ref<undefined | boolean>();
@@ -43,20 +39,20 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
 
   const error: Ref<null | Error> = ref(null);
 
-  const onErrorList: Array<OnErrorCb<Params<Z, A>>> = [];
+  const onErrorList: Array<OnErrorCb<RequiredParams<Z, A>>> = [];
 
-  const onStartList: Array<OnStartCb<Params<Z, A>>> = [];
+  const onStartList: Array<OnStartCb<RequiredParams<Z, A>>> = [];
 
-  const onEndList: Array<OnEndCb<T, Params<Z, A>>> = [];
+  const onEndList: Array<OnEndCb<T, RequiredParams<Z, A>>> = [];
 
   // for legacy use case
   const d = ref<null | Promise<T>>(null);
 
   const wrapParams = computed(() => {
     if (typeof params === 'function') {
-      return params();
+      return params() as RequiredParams<Z, A>;
     }
-    return unref(params);
+    return unref(params) as RequiredParams<Z, A>;
   });
 
   const lastUnwrapParams = ref();
@@ -69,7 +65,7 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   });
 
   // generate new xhr/promise
-  const _reload = (_params: Z | [...A]) => {
+  const _reload = (_params: RequiredParams<Z, A>) => {
     if (!_enabled.value) {
       return null;
     }
@@ -80,7 +76,7 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
     error.value = null;
 
     // possible to call with rest params
-    const funcDefault = func as ((args: Z) => Promise<T>);
+    const funcDefault = func as ((args: RequiredParams<Z, A>) => Promise<T>);
 
     // call with only one param
     const funcRest = func as ((...args: A) => Promise<T>);
@@ -113,15 +109,15 @@ const useAsync = <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
 
   const reload = () => _reload(wrapParams.value);
 
-  const onError = (cb: OnErrorCb<Params<Z, A>>) => {
+  const onError = (cb: OnErrorCb<RequiredParams<Z, A>>) => {
     onErrorList.push(cb);
   };
 
-  const onStart = (cb: OnStartCb<Params<Z, A>>) => {
+  const onStart = (cb: OnStartCb<RequiredParams<Z, A>>) => {
     onStartList.push(cb);
   };
 
-  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Params<Z, A>>) => {
+  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<typeof func>, RequiredParams<Z, A>>) => {
     onEndList.push(cb);
   };
 
