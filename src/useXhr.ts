@@ -268,7 +268,7 @@ export default function <T, Z extends TypeAllowed>(args?: UseXhr<T, Z>) {
           if (v instanceof Result && v.uuid === uuid) {
             data.value = v as typeof data.value;
           } else {
-            console.warn('"useXhr" Update a readonly field is not allowed');
+            console.warn('"useXhr" update a readonly field is not allowed');
             data.value = v as typeof data.value;
           }
         },
