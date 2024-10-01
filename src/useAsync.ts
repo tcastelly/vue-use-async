@@ -77,6 +77,11 @@ const useAsync = <T,
       return null;
     }
 
+    if (isPending.value) {
+      // @ts-ignore - the `abortXhr` can came from useXhr
+      d.value?.abortXhr?.();
+    }
+
     onStartList.forEach((cb) => cb(wrapParams.value));
 
     isPending.value = true;
@@ -158,14 +163,9 @@ const useAsync = <T,
     () => wrapParams.value,
     (v) => {
       const vStr = JSON.stringify(v);
-      if (
-        !isPending.value
-        && (
-          // fix if there is no change. Just undefined as value
-          (v === undefined && lastUnwrapParams.value === undefined)
-
+      // fix if there is no change. Just undefined as value
+      if ((v === undefined && lastUnwrapParams.value === undefined)
           || (_enabled.value && vStr !== JSON.stringify(lastUnwrapParams.value))
-        )
       ) {
         _reload(v);
       }
