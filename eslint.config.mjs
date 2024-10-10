@@ -17,6 +17,11 @@ const compat = new FlatCompat({
 export default [
   ...compat.config({
     extends: ['airbnb-base'],
+    rules: {
+      // fix airbnb conflicts
+      'import/extensions': 'off',
+      'import/no-unresolved': 'off',
+    },
   }),
   {
     files: ['**/*.+(ts|tsx|mts|cts|js|mjs|cjs|jsx)'],
@@ -43,10 +48,6 @@ export default [
       '@typescript-eslint/no-explicit-any': 0,
       '@typescript-eslint/no-empty-function': 0,
       '@typescript-eslint/ban-ts-comment': 0,
-
-      // fix airbnb conflicts
-      'import/extensions': 'off',
-      'import/no-unresolved': 'off',
 
       'no-useless-constructor': 'off',
       '@typescript-eslint/no-useless-constructor': 'error',
