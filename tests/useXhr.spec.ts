@@ -249,7 +249,6 @@ describe('GIVEN `useXhr`', () => {
         mocked.reject('ko');
       });
 
-      // eslint-disable-next-line consistent-return
       it('THEN error should be retrieved with good value', () => {
         const fetch = async (): Promise<unknown> => new Promise((resolve, reject) => {
           const { promise } = get(
