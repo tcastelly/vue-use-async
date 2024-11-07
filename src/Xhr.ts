@@ -443,7 +443,10 @@ export default class Xhr<T> {
       this.onProgress = (paramsObj.onProgress || this.onProgress).bind(this);
       this.onStart = (paramsObj.onStart || this.onStart).bind(this);
       this.onAbort = (paramsObj.onAbort || this.onAbort).bind(this);
+
+      // @ts-ignore - allow currentTarget as XMLHttpTarget
       this.onEnd = (paramsObj.onEnd || this.onEnd).bind(this);
+
       this.onError = (paramsObj.onError || this.onError).bind(this);
       this.token = paramsObj.token || this.token;
     } else if (paramsObj && typeof paramsObj === 'string') {

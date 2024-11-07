@@ -35,7 +35,9 @@ export type XhrConfig = Partial<{
 
   onStart?: (e: ProgressEvent) => void;
 
-  onEnd?: (e: ProgressEvent) => void;
+  onEnd?: (result: unknown, e: ProgressEvent & {
+    currentTarget: XMLHttpRequest,
+  }) => void;
 
   onProgress?: (e: ProgressEvent) => void;
 
