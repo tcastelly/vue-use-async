@@ -478,13 +478,20 @@ export default class Xhr<T> {
       this._deferred.reject(e);
     };
 
-    this._onEnd = (e: ProgressEvent) => {
+    this._onEnd = async (e: ProgressEvent) => {
       const result: any = Xhr.parseResult(this._oXHR);
 
       if (this._oXHR.status >= 400) {
+        let errorMsg = await this._oXHR.response.text();
+        try {
+          errorMsg = JSON.parse(errorMsg);
+        } catch (_e) {
+          //
+        }
+
         this._isXhrRejected = true;
-        this._onError(result);
-        return this._deferred.reject(result);
+        this._onError(errorMsg);
+        return this._deferred.reject(errorMsg);
       }
 
       this.onEnd(result, e);
