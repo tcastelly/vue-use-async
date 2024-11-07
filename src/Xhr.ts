@@ -485,7 +485,7 @@ export default class Xhr<T> {
       const result: any = Xhr.parseResult(this._oXHR);
 
       if (this._oXHR.status >= 400) {
-        let errorMsg = await this._oXHR.response.text();
+        let errorMsg = await this._oXHR.response.text?.() || this._oXHR.response;
         try {
           errorMsg = JSON.parse(errorMsg);
         } catch (_e) {
