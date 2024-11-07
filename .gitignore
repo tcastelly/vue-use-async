@@ -6,6 +6,8 @@ node_modules/
 # generat types
 types/
 
+.eslintcache
+
 .env
 
 !.gitkeep
