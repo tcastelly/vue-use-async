@@ -7,11 +7,7 @@ import {
 } from 'vue';
 import { Result } from '@/useResult';
 import uuid from '@/_base/uuid';
-import type {
-  TypeAllowed,
-  UnwrappedPromiseType,
-  RequiredParams,
-} from './index';
+import type { RequiredParams, TypeAllowed, UnwrappedPromiseType } from './index';
 
 type OnErrorCb<T> = (e: null | Error, params: T) => void;
 
@@ -100,10 +96,7 @@ const useAsync = <T,
 
     d.value.catch((_error) => {
       error.value = _error || null;
-
       onErrorList.forEach((cb) => cb(error.value, wrapParams.value));
-
-      error.value = _error;
     });
 
     d.value.then((res) => {
@@ -164,9 +157,12 @@ const useAsync = <T,
     (v) => {
       const vStr = JSON.stringify(v);
       // fix if there is no change. Just undefined as value
-      if ((v === undefined && lastUnwrapParams.value === undefined)
-          || (_enabled.value && vStr !== JSON.stringify(lastUnwrapParams.value))
-      ) {
+      if (!isPending.value
+        && (
+          (v === undefined && lastUnwrapParams.value === undefined)
+          || (_enabled.value && vStr !== JSON.stringify(lastUnwrapParams.value)
+          )
+        )) {
         _reload(v);
       }
       lastUnwrapParams.value = vStr === undefined ? undefined : JSON.parse(vStr);
