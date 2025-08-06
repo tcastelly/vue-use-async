@@ -1,10 +1,11 @@
 /**
  * @jest-environment jsdom
  */
+import type { ComputedRef, Ref } from 'vue';
 import {
-  computed, ComputedRef, Ref, ref, watch,
+  computed, ref, watch,
 } from 'vue';
-import Xhr from '@/Xhr';
+import type Xhr from '@/Xhr';
 import { cacheIds, clearCache } from '@/cache';
 import useXhr from '@/useXhr';
 import type { Func } from '@/index';
@@ -60,7 +61,9 @@ describe('GIVEN `useXhr`', () => {
 
         watch(
           () => _data.value,
-          () => done(),
+          () => {
+            done();
+          },
         );
       });
       it('THEN query should be retrieved with good value', () => {
@@ -78,7 +81,7 @@ describe('GIVEN `useXhr`', () => {
       });
 
       it('AND cache should be set', () => {
-        expect(cacheIds().indexOf('/fake/get/1?otherParam=true') > -1).toBe(true);
+        expect(cacheIds().includes('/fake/get/1?otherParam=true')).toBe(true);
       });
 
       it('AND params should be split in and params', () => {
@@ -150,7 +153,9 @@ describe('GIVEN `useXhr`', () => {
 
         watch(
           () => _data.value,
-          () => done(),
+          () => {
+            done();
+          },
         );
       });
 
@@ -208,7 +213,9 @@ describe('GIVEN `useXhr`', () => {
 
         watch(
           () => _data.value,
-          () => done(),
+          () => {
+            done();
+          },
         );
       });
 

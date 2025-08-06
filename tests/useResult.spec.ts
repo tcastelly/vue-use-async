@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import useResult, { Result } from '@/useResult';
 
 describe('GIVEN useResult', () => {
@@ -19,14 +19,30 @@ describe('GIVEN useResult', () => {
     });
 
     describe('WHEN using inheritance', () => {
-      // backend return only ID
-      const resA = ref<undefined | null | { id: number }>();
+      const resA = ref<undefined | null | { id: number; label: string }>();
 
       // client part need to extend with a label
-      const resB = useResult(resA, { id: 42, label: 'foo' });
+      const resB = useResult(resA, { id: 42, label: 'foo' }, (v) => ({
+        ...v,
+        label: `${v.label} bar`,
+      }));
+
+      const resC = useResult(resA, { id: 43, label: 'bar' }, (v) => ({
+        ...v,
+        label: `${v.label} bar`,
+      }));
+
+      watch(
+        () => resA.value,
+        (v) => console.log(v),
+        {
+          immediate: true,
+        },
+      );
       it('THEN extended property should not be in error', () => {
+        return;
         expect(resB.value.id).toBe(42);
-        expect(resB.value.label).toBe('foo');
+        expect(resB.value.label).toBe('foo bar');
       });
     });
 

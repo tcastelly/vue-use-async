@@ -1,9 +1,9 @@
-const { promisify } = require('util');
+const { promisify } = require('node:util');
 const {
   mkdir,
   access,
   constants,
-} = require('fs');
+} = require('node:fs');
 
 const mkdirAsync = promisify(mkdir);
 

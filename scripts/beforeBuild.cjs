@@ -1,8 +1,7 @@
 //
 // script launched before build only
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fs = require('fs');
+const fs = require('node:fs');
 
 const del = (dir) => new Promise((resolve) => {
   fs.rm(dir, { recursive: true, force: true }, (err) => {
@@ -13,7 +12,6 @@ const del = (dir) => new Promise((resolve) => {
     resolve(`${dir} has been deleted!`);
   });
 });
-
 
 const mkdir = (dir) => new Promise((resolve) => {
   fs.mkdir(dir, (err) => {

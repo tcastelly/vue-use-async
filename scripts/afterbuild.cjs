@@ -1,5 +1,5 @@
-const { join } = require('path');
-const { copyFile } = require('fs/promises');
+const { join } = require('node:path');
+const { copyFile } = require('node:fs/promises');
 const recursiveCopy = require('./_recursiveCopy.cjs');
 
 //

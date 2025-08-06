@@ -1,4 +1,5 @@
-import { computed, Ref, ref } from 'vue';
+import type { Ref } from 'vue';
+import { computed, ref } from 'vue';
 import useAsync from '@/useAsync';
 
 describe('GIVEN, `useAsync', () => {

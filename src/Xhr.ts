@@ -1,4 +1,4 @@
-import type { Obj, XhrConfig, XhrGet } from './index';
+import type { Obj, XhrConfig, XhrGet } from '.';
 import Deferred from './Deferred';
 
 export default class Xhr<T> {
@@ -6,7 +6,7 @@ export default class Xhr<T> {
     let result = xhr.response;
     try {
       const contentType = xhr.getResponseHeader('Content-Type');
-      if (contentType && contentType.toLowerCase().indexOf('json') > -1) {
+      if (contentType?.toLowerCase().includes('json')) {
         result = JSON.parse(xhr.response);
       }
     } catch (e) {
@@ -16,32 +16,35 @@ export default class Xhr<T> {
   }
 
   static extractQueryParams(url: string) {
+    let _url = url;
+
     // query params already set in the URL
     const queryParams: Obj = {};
 
-    const hashPos = url.search(/#/);
+    const hashPos = _url.search(/#/);
     if (hashPos > -1) {
-      url = url.substring(0, hashPos);
+      _url = _url.substring(0, hashPos);
     }
 
     //
     // extract existing query params
-    const paramPos = url.indexOf('?');
+    const paramPos = _url.indexOf('?');
     const trueStr = true.toString();
     const falseStr = false.toString();
     if (paramPos > -1) {
-      url.split('?')[1].split('&').reduce((acc, v) => {
+      _url.split('?')[1].split('&').reduce((acc, v) => {
+        const _acc = acc;
         const [k, _v = ''] = v.split('=');
-        const [, __v] = _v.match(/^(?:"?([^"]+)"?)$/) || [];
+        const [, __v] = (/^(?:"?([^"]+)"?)$/.exec(_v)) || [];
 
         if (__v === trueStr || __v === falseStr) {
-          acc[k] = __v === trueStr;
-        } else {
-          const vNbr = Number(__v);
-          acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
+          _acc[k] = __v === trueStr;
+          return _acc;
         }
 
-        return acc;
+        const vNbr = Number(__v);
+        _acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
+        return _acc;
       }, queryParams);
     }
 
@@ -64,8 +67,8 @@ export default class Xhr<T> {
   onProgress: (e: ProgressEvent) => void = () => {
   };
 
-  // eslint-disable-next-line class-methods-use-this
-  onEnd: (result: any | null, e: ProgressEvent) => void = () => {
+  // eslint-disable-next-line class-methods-use-this,
+  onEnd: (result: T | null, e: ProgressEvent) => void = () => {
   };
 
   static onBeforeSendList: Array<(params: Obj) => Obj> = [];
@@ -188,7 +191,7 @@ export default class Xhr<T> {
     return _d as XhrGet<T>;
   }
 
-  delete(paramsObj: XhrConfig): Promise<any> {
+  delete(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
     this._oXHR.open('DELETE', this._getUrl(this.params), true);
     this._send();
@@ -215,28 +218,31 @@ export default class Xhr<T> {
   }
 
   static stringifyUrl(url: string, params: Obj = {}): string {
-    ({ url, params } = Xhr.injectParamsInUrl(url, params));
+    let _url = url;
+    let _params = params;
 
-    let separator = url.indexOf('?') > -1 ? '&' : '?';
+    ({ url: _url, params: _params } = Xhr.injectParamsInUrl(_url, _params));
+
+    let separator = _url.includes('?') ? '&' : '?';
     let queryParams = '';
 
-    if (params && !Array.isArray(params) && typeof params === 'object') {
+    if (_params && !Array.isArray(_params) && typeof _params === 'object') {
       // Stringify get parameters
-      Object.getOwnPropertyNames(params)
+      Object.getOwnPropertyNames(_params)
         // remove undefined param
-        .filter((paramKey) => params[paramKey] !== undefined)
+        .filter((paramKey) => _params[paramKey] !== undefined)
         .forEach((paramKey) => {
-          queryParams += `${separator}${paramKey}=${encodeURIComponent(JSON.stringify(params[paramKey]))}`;
+          queryParams += `${separator}${paramKey}=${encodeURIComponent(JSON.stringify(_params[paramKey]))}`;
           separator = '&';
         });
-    } else if (params) {
-      queryParams = separator + encodeURIComponent(JSON.stringify(params));
+    } else if (_params) {
+      queryParams = separator + encodeURIComponent(JSON.stringify(_params));
     }
 
     // remove unresolved query parameters (:value)
-    url = url.replace(/\/:[^/]*/gi, '');
+    _url = _url.replace(/\/:[^/]*/gi, '');
 
-    return url + queryParams;
+    return _url + queryParams;
   }
 
   /**
@@ -313,7 +319,7 @@ export default class Xhr<T> {
   /**
    * url with path params will be replaced by params values
    */
-  static injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string, params: Obj } {
+  static injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string; params: Obj } {
     // don't try to inject params if there is nothing to inject
     if (Array.isArray(params) || Object.keys(params).length === 0) {
       return {
@@ -332,21 +338,21 @@ export default class Xhr<T> {
       decodedUrl = decodedUrl.substring(0, extraPos);
     }
 
-    const mergedParams = Object.getOwnPropertyNames(params)
-      .reduce((acc, v) => {
-        acc[v] = params[v];
-        return acc;
-      }, { ...queryParams });
+    const mergedParams = Object.getOwnPropertyNames(params).reduce((acc, v) => ({
+      ...acc,
+      [v]: params[v],
+    }), { ...queryParams });
 
     //
     // replace path params
     (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
-      placeholder = placeholder.substring(1);
-      if (mergedParams[placeholder] !== undefined) {
-        decodedUrl = Xhr._stringifyForPathParam(decodedUrl, placeholder, mergedParams);
+      let _placeholder = placeholder;
+      _placeholder = _placeholder.substring(1);
+      if (mergedParams[_placeholder] !== undefined) {
+        decodedUrl = Xhr._stringifyForPathParam(decodedUrl, _placeholder, mergedParams);
 
         // remove duplicated parameters
-        delete mergedParams[placeholder];
+        delete mergedParams[_placeholder];
       }
     });
 
@@ -474,7 +480,7 @@ export default class Xhr<T> {
     this.url = url;
     this.params = _p;
 
-    this._onError = (e: ProgressEvent<EventTarget>) => {
+    this._onError = (e: ProgressEvent) => {
       this.onError(e);
       this.removeEvents();
 

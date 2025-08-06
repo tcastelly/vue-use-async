@@ -1,13 +1,13 @@
 import Logger from './_base/Logger';
-import type { XhrGet } from './index';
+import type { XhrGet } from '.';
 
-const _cache: Map<string, XhrGet<any>> = new Map();
+const _cache = new Map<string, XhrGet<any>>();
 /**
  * @params {String} params.id
  * @params {Promise} params.xhr
  * @params {Number} params.duration, in ms
  */
-export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, duration?: number | 'max' | null }): XhrGet<T> {
+export default function<T> (params: { id: string; xhr?: () => XhrGet<T>; duration?: number | 'max' | null }): XhrGet<T> {
   const { id, xhr } = params || {};
   let duration: number = typeof params.duration !== 'string' ? (params.duration || 200) : 200;
   let _d;
@@ -35,7 +35,7 @@ export default function <T> (params: { id: string, xhr?: () => XhrGet<T>, durati
       return dto;
     }, () => {
       _cache.delete(id);
-      return Logger.log(`[Log] delete cache: ${id}`);
+      Logger.log(`[Log] delete cache: ${id}`);
     });
   } else if (id) {
     _d = _cache.get(id);

@@ -1,12 +1,14 @@
-import {
-  computed,
+import type {
   ComputedRef,
-  ref,
   Ref,
 } from 'vue';
-import type { Obj, UnwrappedPromiseType } from './index';
+import {
+  computed,
+  ref,
+} from 'vue';
+import type { Obj, UnwrappedPromiseType } from '.';
 
-type TypeAllowed = undefined | boolean | null | string | number | Obj
+type TypeAllowed = undefined | boolean | null | string | number | Obj;
 
 type OnErrorCb<Z, A extends TypeAllowed[]> = (e: null | Error, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
@@ -15,14 +17,14 @@ type OnEndCb<T, Z, A extends TypeAllowed[]> = (res: T, params: A extends [] ? Z 
 export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
   func: (arg: Z, ...args: A) => Promise<T>,
 ): {
-  mutate: (param?: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>,
-  onError: (cb: OnErrorCb<Z, A>) => unknown,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown,
-  isPending: Ref<boolean>,
-  error: Ref<null | Error>,
-  data: Ref<UnwrappedPromiseType<typeof func>>;
-  promise: ComputedRef<null | Promise<T>>,
-} {
+    mutate: (param?: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>;
+    onError: (cb: OnErrorCb<Z, A>) => unknown;
+    onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown;
+    isPending: Ref<boolean>;
+    error: Ref<null | Error>;
+    data: Ref<UnwrappedPromiseType<typeof func>>;
+    promise: ComputedRef<null | Promise<T>>;
+  } {
   const isPending = ref();
 
   const data = ref<T>() as Ref<T>;

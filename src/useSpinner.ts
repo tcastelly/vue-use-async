@@ -1,5 +1,6 @@
+import type { Ref } from 'vue';
 import {
-  computed, onBeforeUnmount, Ref, ref, watch,
+  computed, onBeforeUnmount, ref, watch,
 } from 'vue';
 
 export default function (isPending: Ref<undefined | boolean>, minDuration = 400) {

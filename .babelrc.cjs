@@ -12,9 +12,9 @@ module.exports = {
   plugins: [
     [require.resolve('@babel/plugin-proposal-class-properties')],
     [require.resolve('babel-plugin-module-resolver'), {
-      root: ["./src/"],
+      root: ['./src/'],
       alias: {
-        "@": "./src"
+        '@': './src',
       },
     }],
   ],

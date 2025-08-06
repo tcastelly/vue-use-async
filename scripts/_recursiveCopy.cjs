@@ -1,10 +1,10 @@
-const { promisify } = require('util');
+const { promisify } = require('node:util');
 const {
   readdir,
   stat,
   copyFile,
-} = require('fs');
-const { join } = require('path');
+} = require('node:fs');
+const { join } = require('node:path');
 const mkdirIfNotExist = require('./_mkdirIfNotExist.cjs');
 
 const copyFileAsync = promisify(copyFile);

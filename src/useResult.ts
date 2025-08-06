@@ -1,4 +1,5 @@
-import { computed, Ref, watch } from 'vue';
+import type { Ref } from 'vue';
+import { computed, watch } from 'vue';
 import uuid from '@/_base/uuid';
 
 type NonNullable<T> = Exclude<T, null | undefined>;
@@ -16,7 +17,7 @@ export class Result<T> {
   uuid: string;
 }
 
-export default function <T, Z extends T, U = Res<T, Z>>(
+export default function<T, Z extends T, U = Res<T, Z>>(
   input: Ref<T>,
   defaultRes: NonNullable<Z>,
   map: (r: Res<T, Z>) => NonNullable<U> = (a: any) => a,

@@ -19,7 +19,7 @@ import type {
   TypeAllowed,
   XhrConfig,
   XhrGet,
-} from './index';
+} from '.';
 import Xhr from './Xhr';
 import cache from './cache';
 import useAsync from './useAsync';
@@ -27,18 +27,18 @@ import { Result } from './useResult';
 
 type Enabled = undefined | null | (() => boolean) | Ref<boolean> | ComputedRef<boolean> | boolean;
 
-type Token = Ref<string | null> | ComputedRef<string | null> | string | null
+type Token = Ref<string | null> | ComputedRef<string | null> | string | null;
 
-type OnErrorCb<T> = (e: Error, xhr: Xhr<T>) => unknown
+type OnErrorCb<T> = (e: Error, xhr: Xhr<T>) => unknown;
 
-type OnStartCb<T, Z> = (params: Z, xhr: Xhr<T>) => unknown
+type OnStartCb<T, Z> = (params: Z, xhr: Xhr<T>) => unknown;
 
-type OnEndCb<T, Z> = (res: T, params: Z, xhr: Xhr<T>) => unknown
+type OnEndCb<T, Z> = (res: T, params: Z, xhr: Xhr<T>) => unknown;
 
 // override url to have string used by Xhr
 type $$GetConfigArg<T> = Omit<$GetConfigArgs<T>, 'url'> & {
-  url?: string,
-}
+  url?: string;
+};
 
 // used as default `onError`
 const _blank = () => {
@@ -49,28 +49,28 @@ declare type UseXhr<
   Z extends TypeAllowed,
   A extends TypeAllowed[],
   F extends ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-  P extends RequiredParams<Parameters<F>[0], A>
+  P extends RequiredParams<Parameters<F>[0], A>,
 > = Partial<{
   // global callback for VueJS 2 plugin compatibility
-  onError: (cb: OnErrorCb<P>) => unknown,
-  onStart: OnStartCb<T, P>,
-  onEnd: OnEndCb<T, P>,
-  onProgress: (e: ProgressEvent) => any,
-  onAbort: (e: ProgressEvent) => any,
+  onError: (cb: OnErrorCb<P>) => unknown;
+  onStart: OnStartCb<T, P>;
+  onEnd: OnEndCb<T, P>;
+  onProgress: (e: ProgressEvent) => unknown;
+  onAbort: (e: ProgressEvent) => unknown;
   //
-  context: any;
+  context: unknown;
   legacy: boolean;
   token: Token;
 }>;
 
 const getTokenValue = (token: undefined | Token): undefined | null | string => unref<undefined | string | null>(token);
 
-export default function <
+export default function<
   T,
   Z extends TypeAllowed,
   A extends TypeAllowed[],
   F extends ((..._args: A) => Promise<T>) | ((_args: Z) => Promise<T>),
-  P extends RequiredParams<Parameters<F>[0], A>
+  P extends RequiredParams<Parameters<F>[0], A>,
 >(args?: UseXhr<T, Z, A, F, P>) {
   const {
     onError,
@@ -93,7 +93,7 @@ export default function <
 
   const xhrList = ref<Array<Xhr<any>>>([]);
 
-  const unwatch: Array<() => unknown> = [];
+  const unwatch: Array<() => void> = [];
 
   /**
    * For GET it's possible to add cache
@@ -107,6 +107,7 @@ export default function <
     params?: RequiredParams<ZZ, AA>,
     enabled?: Enabled,
   ): GetReturn<TT> {
+    let _params = params;
     const xhr: Xhr<TT> = new Xhr<TT>();
 
     const _onError = (onError || _blank).bind(context);
@@ -141,8 +142,8 @@ export default function <
         _url = unref(unwrapParametersObj.url);
 
         // use params from second args of get function
-        if (!params) {
-          params = (unwrapParametersObj.params || {}) as RequiredParams<ZZ, AA>;
+        if (!_params) {
+          _params = (unwrapParametersObj.params || {}) as RequiredParams<ZZ, AA>;
         }
 
         duration = unwrapParametersObj.cacheDuration;
@@ -155,7 +156,7 @@ export default function <
           _getParams.enabled = enabled;
         }
 
-        _getParams.params = unref<ZZ>(params as ZZ);
+        _getParams.params = unref<ZZ>(_params as ZZ);
         _getParams.cacheDuration = duration;
       }
 
@@ -164,14 +165,14 @@ export default function <
       }
 
       // merge params
-      let p: object = unref((_getParams.params || params || {}) as object);
+      let p: object = unref((_getParams.params || _params || {}) as object);
       if (typeof p === 'function') {
         p = (p as () => object)();
       }
 
       _getParams.params = ({
         ...p,
-        ...((isRef(params) ? (params.value || {}) : params) as object),
+        ...((isRef(_params) ? (_params.value || {}) : _params) as object),
       }) as ZZ;
 
       url = typeof _url === 'function' ? _url(_getParams.params) : unref(_url);
@@ -263,7 +264,7 @@ export default function <
       () => error.value,
       (err) => {
         if (err) {
-          throw err;
+          throw err as Error;
         }
       },
     ));
@@ -303,16 +304,17 @@ export default function <
     xhrConfig?: $UpdateConfigArgs,
     params?: RequiredParams<ZZ, AA>,
   ) => {
+    let _params = params;
     const updateArgs = computed(() => {
       const _postArgs: $UpdateConfigArgs<ZZ> = {};
 
       const unwrapParametersObj = unref(xhrConfig || {} as XhrConfig);
 
       // use params from second args of post function
-      if (!params) {
-        params = (unwrapParametersObj.params || {}) as RequiredParams<ZZ, AA>;
+      if (!_params) {
+        _params = (unwrapParametersObj.params || {}) as RequiredParams<ZZ, AA>;
       }
-      _postArgs.params = unref<ZZ>(params as ZZ);
+      _postArgs.params = unref<ZZ>(_params as ZZ);
 
       if (token) {
         _postArgs.token = getTokenValue(token);

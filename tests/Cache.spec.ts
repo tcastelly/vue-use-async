@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import cache, { cacheSize, clearCache } from '@/cache';
-import { XhrGet } from '@/index';
+import type { XhrGet } from '@/index';
 
 describe('Given Cache', () => {
   it('THEN no cache should be available', () => {

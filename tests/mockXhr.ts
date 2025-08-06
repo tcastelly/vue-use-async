@@ -5,7 +5,7 @@ import Xhr from '../src/Xhr';
 type Condition = Partial<{
   method: string;
   url: string;
-  params: { [id: string]: any };
+  params: Record<string, any>;
   getAttribute: (arg0: string) => any;
 }>;
 

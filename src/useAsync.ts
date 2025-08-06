@@ -7,7 +7,7 @@ import {
 } from 'vue';
 import { Result } from '@/useResult';
 import uuid from '@/_base/uuid';
-import type { RequiredParams, TypeAllowed, UnwrappedPromiseType } from './index';
+import type { RequiredParams, TypeAllowed, UnwrappedPromiseType } from '.';
 
 type OnErrorCb<T> = (e: null | Error, params: T) => void;
 
@@ -25,15 +25,15 @@ const useAsync = <T,
     params?: P,
     enabled: Ref<boolean> | (() => boolean) = ref(true),
   ): {
-  isPending: Ref<undefined | boolean>,
-  data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
-  error: Ref<null | Error>,
-  reload: () => void,
-  onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void,
-  onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void,
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
-  promise: ComputedRef<null | Promise<T>>,
-} => {
+    isPending: Ref<undefined | boolean>;
+    data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
+    error: Ref<null | Error>;
+    reload: () => void;
+    onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
+    onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
+    onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
+    promise: ComputedRef<null | Promise<T>>;
+  } => {
   type PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
 
   const isPending = ref<undefined | boolean>();
