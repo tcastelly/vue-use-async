@@ -9,11 +9,11 @@ import { Result } from '@/useResult';
 import uuid from '@/_base/uuid';
 import type { RequiredParams, TypeAllowed, UnwrappedPromiseType } from '.';
 
-type OnErrorCb<T> = (e: null | Error, params: T) => void;
+type OnErrorCb<T> = (e: null | Error, params: T) => unknown;
 
-type OnStartCb<T> = (params: T) => void;
+type OnStartCb<T> = (params: T) => unknown;
 
-type OnEndCb<T, Z> = (res: T, params: Z) => void;
+type OnEndCb<T, Z> = (res: T, params: Z) => unknown;
 
 const useAsync = <T,
   Z extends TypeAllowed,
