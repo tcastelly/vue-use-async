@@ -28,7 +28,7 @@ const useAsync = <T,
     isPending: Ref<undefined | boolean>;
     data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
     error: Ref<null | Error>;
-    reload: () => void;
+    reload: () => null | Promise<T>;
     onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
     onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
     onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
