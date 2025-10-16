@@ -1,27 +1,21 @@
-import type {
-  ComputedRef,
-  Ref,
-} from 'vue';
-import {
-  computed,
-  ref,
-} from 'vue';
+import type { ComputedRef, Ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Obj, UnwrappedPromiseType } from '.';
 
 type TypeAllowed = undefined | boolean | null | string | number | Obj;
 
-type OnErrorCb<Z, A extends TypeAllowed[]> = (e: null | Error, params: A extends [] ? Z : [Z, ...A]) => unknown;
+type OnErrorCb<E = Error, Z = unknown, A extends TypeAllowed[] = any> = (e: null | E, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
 type OnEndCb<T, Z, A extends TypeAllowed[]> = (res: T, params: A extends [] ? Z : [Z, ...A]) => unknown;
 
-export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllowed[]>(
+export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllowed[], E = Error>(
   func: (arg: Z, ...args: A) => Promise<T>,
 ): {
     mutate: (param?: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>;
-    onError: (cb: OnErrorCb<Z, A>) => unknown;
+    onError: (cb: OnErrorCb<E, Z, A>) => unknown;
     onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown;
     isPending: Ref<boolean>;
-    error: Ref<null | Error>;
+    error: Ref<null | E>;
     data: Ref<UnwrappedPromiseType<typeof func>>;
     promise: ComputedRef<null | Promise<T>>;
   } {
@@ -29,9 +23,9 @@ export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllo
 
   const data = ref<T>() as Ref<T>;
 
-  const error = ref<null | Error>() as Ref<null | Error>;
+  const error = ref<null | E>() as Ref<null | E>;
 
-  const onErrorList: OnErrorCb<Z, A>[] = [];
+  const onErrorList: OnErrorCb<E, Z, A>[] = [];
 
   const onEndList: OnEndCb<T, Z, A>[] = [];
 
@@ -82,5 +76,14 @@ export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllo
     error,
     data,
     promise: computed(() => d.value),
+  };
+}
+
+export function useMutationWithError<E>() {
+  // Returns a function that accepts the actual async function
+  return function <T, Z extends TypeAllowed, A extends TypeAllowed[]>(
+    func: (arg: Z, ...args: A) => Promise<T>,
+  ) {
+    return useMutation<T, Z, A, E>(func);
   };
 }

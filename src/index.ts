@@ -2,7 +2,7 @@ import type { ComputedRef, Ref } from 'vue';
 import cache, { cacheIds, cacheSize, clearCache } from './cache';
 import Deferred from './Deferred';
 import useAsync from './useAsync';
-import useMutation from './useMutation';
+import useMutation, { useMutationWithError } from './useMutation';
 import useResult from './useResult';
 import useXhr from './useXhr';
 import Xhr from './Xhr';
@@ -103,6 +103,7 @@ export {
   Deferred,
   useAsync,
   useMutation,
+  useMutationWithError,
   useResult,
   useXhr,
   Xhr,

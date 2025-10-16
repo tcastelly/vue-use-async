@@ -1,4 +1,4 @@
-import useMutation from '@/useMutation';
+import useMutation, { useMutationWithError } from '@/useMutation';
 
 describe('GIVEN useMutation', () => {
   describe('WITH single param', () => {
@@ -66,6 +66,33 @@ describe('GIVEN useMutation', () => {
         expect(onEndParams.length).toBe(2);
         expect(onEndParams[0]).toBe('toto');
         expect(onEndParams[1]).toBe('tata');
+      });
+    });
+  });
+
+  describe('WITH error type', () => {
+    const func = (a: string) => new Promise<string>((resolve, reject) => {
+      // eslint-disable-next-line prefer-promise-reject-errors
+      reject({ message2: 'fakeError' });
+    });
+
+    const useMutation = useMutationWithError<{ message2: string }>();
+
+    const {
+      mutate,
+      error,
+    } = useMutation(func);
+
+    describe('WHEN mutate', () => {
+      beforeAll(async () => {
+        try {
+          await mutate('toto');
+        } catch (e) {
+          // expected error
+        }
+      });
+      it('THEN the error should have compiled type', () => {
+        expect(error.value?.message2).toBe('fakeError');
       });
     });
   });
