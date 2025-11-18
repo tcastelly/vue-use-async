@@ -14,7 +14,6 @@ const defaultConfig = [
     languageOptions: {
       parser,
       parserOptions: {
-        project: './tsconfig.json',
         tsconfigRootDir: path.resolve('.'),
         sourceType: 'module',
         ecmaVersion: 'latest',
