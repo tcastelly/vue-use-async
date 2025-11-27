@@ -1,12 +1,15 @@
 import type { Obj, XhrConfig, XhrGet } from '.';
 import Deferred from './Deferred';
 
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
 export default class Xhr<T> {
   static parseResult(xhr: XMLHttpRequest): Response {
     let result = xhr.response;
     try {
       const contentType = xhr.getResponseHeader('Content-Type');
-      if (contentType?.toLowerCase().includes('json')) {
+      if (contentType?.toLowerCase()
+        .includes('json')) {
         result = JSON.parse(xhr.response);
       }
     } catch (e) {
@@ -32,20 +35,21 @@ export default class Xhr<T> {
     const trueStr = true.toString();
     const falseStr = false.toString();
     if (paramPos > -1) {
-      _url.split('?')[1].split('&').reduce((acc, v) => {
-        const _acc = acc;
-        const [k, _v = ''] = v.split('=');
-        const [, __v] = (/^(?:"?([^"]+)"?)$/.exec(_v)) || [];
+      _url.split('?')[1].split('&')
+        .reduce((acc, v) => {
+          const _acc = acc;
+          const [k, _v = ''] = v.split('=');
+          const [, __v] = (/^(?:"?([^"]+)"?)$/.exec(_v)) || [];
 
-        if (__v === trueStr || __v === falseStr) {
-          _acc[k] = __v === trueStr;
+          if (__v === trueStr || __v === falseStr) {
+            _acc[k] = __v === trueStr;
+            return _acc;
+          }
+
+          const vNbr = Number(__v);
+          _acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
           return _acc;
-        }
-
-        const vNbr = Number(__v);
-        _acc[k] = __v === '' || Number.isNaN(vNbr) ? __v : vNbr;
-        return _acc;
-      }, queryParams);
+        }, queryParams);
     }
 
     return queryParams;
@@ -154,6 +158,15 @@ export default class Xhr<T> {
 
   post(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
+
+    const {
+      url,
+      params: _p,
+    } = Xhr.injectParamsInUrl(this.url, this.params);
+
+    this.url = url;
+    this.params = _p;
+
     this._oXHR.open('POST', this._getUrl(), true);
     this._send();
 
@@ -162,6 +175,15 @@ export default class Xhr<T> {
 
   put(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
+
+    const {
+      url,
+      params: _p,
+    } = Xhr.injectParamsInUrl(this.url, this.params);
+
+    this.url = url;
+    this.params = _p;
+
     this._oXHR.open('PUT', this._getUrl(), true);
     this._send();
 
@@ -176,6 +198,14 @@ export default class Xhr<T> {
    */
   get(paramsObj?: XhrConfig): XhrGet<T> {
     this._constructor(paramsObj || {});
+
+    const {
+      url,
+      params: _p,
+    } = Xhr.injectParamsInUrl(this.url, this.params);
+
+    this.url = url;
+    this.params = _p;
 
     this._oXHR.open(
       'GET',
@@ -193,6 +223,15 @@ export default class Xhr<T> {
 
   delete(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
+
+    const {
+      url,
+      params: _p,
+    } = Xhr.injectParamsInUrl(this.url, this.params);
+
+    this.url = url;
+    this.params = _p;
+
     this._oXHR.open('DELETE', this._getUrl(this.params), true);
     this._send();
 
@@ -221,7 +260,10 @@ export default class Xhr<T> {
     let _url = url;
     let _params = params;
 
-    ({ url: _url, params: _params } = Xhr.injectParamsInUrl(_url, _params));
+    ({
+      url: _url,
+      params: _params,
+    } = Xhr.injectParamsInUrl(_url, _params));
 
     let separator = _url.includes('?') ? '&' : '?';
     let queryParams = '';
@@ -252,21 +294,22 @@ export default class Xhr<T> {
     const formData = new FormData();
 
     let value;
-    Object.keys(data).forEach((key) => {
-      if (data[key] instanceof FileList) {
-        for (let i = 0; i < data[key].length; i += 1) {
-          formData.append(key, data[key][i]);
+    Object.keys(data)
+      .forEach((key) => {
+        if (data[key] instanceof FileList) {
+          for (let i = 0; i < data[key].length; i += 1) {
+            formData.append(key, data[key][i]);
+          }
+        } else if (data[key] instanceof File) {
+          formData.append(key, data[key]);
+        } else {
+          value = data[key];
+          if ((typeof value === 'object' || Array.isArray(value)) && value !== null) {
+            value = JSON.stringify(value);
+          }
+          formData.append(key, value);
         }
-      } else if (data[key] instanceof File) {
-        formData.append(key, data[key]);
-      } else {
-        value = data[key];
-        if ((typeof value === 'object' || Array.isArray(value)) && value !== null) {
-          value = JSON.stringify(value);
-        }
-        formData.append(key, value);
-      }
-    });
+      });
 
     return formData;
   }
@@ -319,7 +362,8 @@ export default class Xhr<T> {
   /**
    * url with path params will be replaced by params values
    */
-  static injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}): { url: string; params: Obj } {
+  static injectParamsInUrl(url: string, params: Obj | Array<unknown>, method?: Method): { url: string; params: Obj };
+  static injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}, method: Method = 'GET') {
     // don't try to inject params if there is nothing to inject
     if (Array.isArray(params) || Object.keys(params).length === 0) {
       return {
@@ -328,59 +372,66 @@ export default class Xhr<T> {
       };
     }
 
-    let decodedUrl = decodeURIComponent(url);
+    let mergedParams = params;
 
-    // query params already set in the URL
-    const queryParams = Xhr.extractQueryParams(decodedUrl);
+    let decodedUrl = url;
+    if (method === 'GET') {
+      decodedUrl = decodeURIComponent(url);
 
-    const extraPos = decodedUrl.search(/\?|#/);
-    if (extraPos > -1) {
-      decodedUrl = decodedUrl.substring(0, extraPos);
-    }
+      // query params already set in the URL
+      const queryParams = Xhr.extractQueryParams(decodedUrl);
 
-    const mergedParams = Object.getOwnPropertyNames(params).reduce((acc, v) => ({
-      ...acc,
-      [v]: params[v],
-    }), { ...queryParams });
-
-    //
-    // replace path params
-    (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
-      let _placeholder = placeholder;
-      _placeholder = _placeholder.substring(1);
-      if (mergedParams[_placeholder] !== undefined) {
-        decodedUrl = Xhr._stringifyForPathParam(decodedUrl, _placeholder, mergedParams);
-
-        // remove duplicated parameters
-        delete mergedParams[_placeholder];
+      const extraPos = decodedUrl.search(/\?|#/);
+      if (extraPos > -1) {
+        decodedUrl = decodedUrl.substring(0, extraPos);
       }
-    });
 
-    // params can override query params
-    Object.keys(mergedParams).forEach((k) => {
-      if (queryParams[k] !== undefined) {
-        queryParams[k] = mergedParams[k];
-        delete mergedParams[k];
-      }
-    });
+      mergedParams = Object.getOwnPropertyNames(params)
+        .reduce((acc, v) => ({
+          ...acc,
+          [v]: params[v],
+        }), { ...queryParams });
 
-    // restore updated get params
-    const getParamsKeys = Object.keys(queryParams);
+      //
+      // replace path params
+      (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
+        let _placeholder = placeholder;
+        _placeholder = _placeholder.substring(1);
+        if (mergedParams[_placeholder] !== undefined) {
+          decodedUrl = Xhr._stringifyForPathParam(decodedUrl, _placeholder, mergedParams);
 
-    if (getParamsKeys.length) {
-      let separator = '?';
-      getParamsKeys.forEach((k) => {
-        if (queryParams[k] === true || queryParams[k] === false) {
-          decodedUrl += `${separator}${k}=${queryParams[k]}`;
-        } else if (queryParams[k] === null) {
-          decodedUrl += `${separator}${k}=${queryParams[k]}`;
-        } else {
-          const vNbr = Number(queryParams[k]);
-          const v = Number.isNaN(vNbr) ? encodeURIComponent(`"${queryParams[k]}"`) : vNbr;
-          decodedUrl += `${separator}${k}=${v}`;
+          // remove duplicated parameters
+          delete mergedParams[_placeholder];
         }
-        separator = '&';
       });
+
+      // params can override query params
+      Object.keys(mergedParams)
+        .forEach((k) => {
+          if (queryParams[k] !== undefined) {
+            queryParams[k] = mergedParams[k];
+            delete mergedParams[k];
+          }
+        });
+
+      // restore updated get params
+      const getParamsKeys = Object.keys(queryParams);
+
+      if (getParamsKeys.length) {
+        let separator = '?';
+        getParamsKeys.forEach((k) => {
+          if (queryParams[k] === true || queryParams[k] === false) {
+            decodedUrl += `${separator}${k}=${queryParams[k]}`;
+          } else if (queryParams[k] === null) {
+            decodedUrl += `${separator}${k}=${queryParams[k]}`;
+          } else {
+            const vNbr = Number(queryParams[k]);
+            const v = Number.isNaN(vNbr) ? encodeURIComponent(`"${queryParams[k]}"`) : vNbr;
+            decodedUrl += `${separator}${k}=${v}`;
+          }
+          separator = '&';
+        });
+      }
     }
 
     return {
@@ -474,11 +525,6 @@ export default class Xhr<T> {
 
     this._isXhrResolved = false;
     this._isXhrRejected = false;
-
-    const { url, params: _p } = Xhr.injectParamsInUrl(this.url, this.params);
-
-    this.url = url;
-    this.params = _p;
 
     this._onError = (e: ProgressEvent) => {
       this.onError(e);

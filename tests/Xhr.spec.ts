@@ -47,7 +47,10 @@ describe('Given Xhr and MockXhr', () => {
     const params = { user: 'thomas ' };
     beforeAll(() => {
       mockXhr()
-        .post({ url: '/fake/post?entId=4', params })
+        .post({
+          url: '/fake/post?entId=4',
+          params,
+        })
         .resolve('post-ok');
 
       query = new Xhr().post({
@@ -158,7 +161,10 @@ describe('Given Xhr and MockXhr', () => {
 
     it('THEN fake should be catch', () => {
       const fetch = () => {
-        query = new Xhr().get({ url: '/fake/abort', params: { user: 'Thomas' } });
+        query = new Xhr().get({
+          url: '/fake/abort',
+          params: { user: 'Thomas' },
+        });
         query.abortXhr();
         return query;
       };
@@ -262,6 +268,42 @@ describe('Given Xhr and MockXhr', () => {
       const paramKeys = Object.keys(res.params);
       expect(paramKeys.length).toBe(1);
       expect(paramKeys[0]).toBe('other');
+    });
+  });
+
+  describe('WHEN try to override query parameters with GET', () => {
+    const params = {
+      foo: 'tata',
+      other: true,
+    };
+    const url = '/api?foo=toto';
+
+    let res: { url: string; params: Obj };
+    beforeAll(() => {
+      res = Xhr.injectParamsInUrl(url, params);
+    });
+
+    it('THEN url should contains "tata" param\'s value', () => {
+      expect(res.params.foo).not.toBeDefined();
+      expect(res.url).toBe('/api?foo=%22tata%22');
+    });
+  });
+
+  describe('WHEN try to override query parameters with POST', () => {
+    const params = {
+      foo: 'tata',
+      other: true,
+    };
+    const url = '/api?foo=toto';
+
+    let res: { url: string; params: Obj };
+    beforeAll(() => {
+      res = Xhr.injectParamsInUrl(url, params, 'POST');
+    });
+
+    it('THEN url should contains "toto" value', () => {
+      expect(res.params.foo).toBeDefined();
+      expect(res.url).toBe('/api?foo=toto');
     });
   });
 });
