@@ -248,7 +248,7 @@ describe('Given Xhr and MockXhr', () => {
     });
   });
 
-  describe('WHEN inject params in url', () => {
+  describe('WHEN inject params in url with GET', () => {
     const params = {
       foo: 'bar',
       other: true,
@@ -258,6 +258,29 @@ describe('Given Xhr and MockXhr', () => {
     let res: { url: string; params: Obj };
     beforeAll(() => {
       res = Xhr.injectParamsInUrl(url, params);
+    });
+
+    it('THEN url should contains "foo" param\'s value', () => {
+      expect(res.url).toBe('/api/bar');
+    });
+
+    it('AND "foo" attribute should be removed from params', () => {
+      const paramKeys = Object.keys(res.params);
+      expect(paramKeys.length).toBe(1);
+      expect(paramKeys[0]).toBe('other');
+    });
+  });
+
+  describe('WHEN inject params in url with POST', () => {
+    const params = {
+      foo: 'bar',
+      other: true,
+    };
+    const url = '/api/:foo';
+
+    let res: { url: string; params: Obj };
+    beforeAll(() => {
+      res = Xhr.injectParamsInUrl(url, params, 'POST');
     });
 
     it('THEN url should contains "foo" param\'s value', () => {
