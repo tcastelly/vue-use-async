@@ -373,8 +373,8 @@ export default class Xhr<T> {
     }
 
     let mergedParams = params;
-
     let decodedUrl = url;
+
     if (method === 'GET') {
       decodedUrl = decodeURIComponent(url);
 
@@ -391,19 +391,6 @@ export default class Xhr<T> {
           ...acc,
           [v]: params[v],
         }), { ...queryParams });
-
-      //
-      // replace path params
-      (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
-        let _placeholder = placeholder;
-        _placeholder = _placeholder.substring(1);
-        if (mergedParams[_placeholder] !== undefined) {
-          decodedUrl = Xhr._stringifyForPathParam(decodedUrl, _placeholder, mergedParams);
-
-          // remove duplicated parameters
-          delete mergedParams[_placeholder];
-        }
-      });
 
       // params can override query params
       Object.keys(mergedParams)
@@ -433,6 +420,19 @@ export default class Xhr<T> {
         });
       }
     }
+
+    //
+    // replace path params
+    (decodedUrl.match(/:[a-z0-9]+/gi) || []).forEach((placeholder) => {
+      let _placeholder = placeholder;
+      _placeholder = _placeholder.substring(1);
+      if (mergedParams[_placeholder] !== undefined) {
+        decodedUrl = Xhr._stringifyForPathParam(decodedUrl, _placeholder, mergedParams);
+
+        // remove duplicated parameters
+        delete mergedParams[_placeholder];
+      }
+    });
 
     return {
       url: decodedUrl,

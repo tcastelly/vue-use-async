@@ -294,6 +294,31 @@ describe('Given Xhr and MockXhr', () => {
     });
   });
 
+  describe('WHEN inject params in url with query params and POST', () => {
+    const params = {
+      foo: 'bar',
+      bar: false,
+      other: true,
+    };
+    const url = '/api/:foo?bar=true';
+
+    let res: { url: string; params: Obj };
+    beforeAll(() => {
+      res = Xhr.injectParamsInUrl(url, params, 'POST');
+    });
+
+    it('THEN url should contains "foo" param\'s value', () => {
+      expect(res.url).toBe('/api/bar?bar=true');
+    });
+
+    it('AND "foo" attribute should be removed from params', () => {
+      const paramKeys = Object.keys(res.params);
+      expect(paramKeys.length).toBe(2);
+      expect(res.params.bar).toBe(false);
+      expect(res.params.other).toBe(true);
+    });
+  });
+
   describe('WHEN try to override query parameters with GET', () => {
     const params = {
       foo: 'tata',
