@@ -33,9 +33,20 @@ jobs:
         if: steps.version-updated.outputs.has-updated
         run: npm ci && npm run build
 
+
       - name: Publish package on NPM 📦
         if: steps.version-updated.outputs.has-updated
         run: |
           npm install -g npm@latest
-          npm publish
- 
+          # Get version from package.json
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Package version: $VERSION"
+          
+          # Check if version contains a prerelease identifier
+          if [[ "$VERSION" == *"-"* ]]; then
+            echo "Prerelease detected, publishing with tag 'beta'"
+            npm publish --tag beta
+          else
+            echo "Stable release, publishing with default tag 'latest'"
+            npm publish
+          fi
