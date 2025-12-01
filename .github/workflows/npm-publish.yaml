@@ -36,5 +36,3 @@ jobs:
       - name: Publish package on NPM 📦
         if: steps.version-updated.outputs.has-updated
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
