@@ -21,19 +21,19 @@ const useAsync = <T,
   F extends ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
   P extends RequiredParams<Parameters<F>[0], A>,
 >(
-    func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-    params?: P,
-    enabled: Ref<boolean> | (() => boolean) = ref(true),
-  ): {
-    isPending: Ref<undefined | boolean>;
-    data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
-    error: Ref<null | Error>;
-    reload: () => null | Promise<T>;
-    onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
-    onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
-    onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
-    promise: ComputedRef<null | Promise<T>>;
-  } => {
+  func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
+  params?: P,
+  enabled: Ref<boolean> | (() => boolean) = ref(true),
+): {
+  isPending: Ref<undefined | boolean>;
+  data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
+  error: Ref<null | Error>;
+  reload: () => null | Promise<T>;
+  onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
+  onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
+  promise: ComputedRef<null | Promise<T>>;
+} => {
   type PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
 
   const isPending = ref<undefined | boolean>();

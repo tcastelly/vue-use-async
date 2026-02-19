@@ -12,9 +12,8 @@ export type Obj = Record<string, any>;
 
 export type Func = (...args: any[]) => any;
 
-export type UnwrappedPromiseType<T extends (...args: any) => any> =
-  T extends (...args: any) => Promise<infer U> ? U :
-    T extends (...args: any) => infer U ? U : any;
+export type UnwrappedPromiseType<T extends (...args: any) => any> = T extends (...args: any) => Promise<infer U> ? U
+  : T extends (...args: any) => infer U ? U : any;
 
 interface CancellablePromise<T> extends Promise<T> {
   abortXhr: () => void;
@@ -74,11 +73,11 @@ export type GetConfig<T> = $GetConfig<T> | Ref<$GetConfig<T>>;
 
 export type TypeAllowed = undefined | null | string | number | boolean | Obj;
 
-type Params<Z, A extends unknown[]> = (() => (Z | [...A])) |
-  ComputedRef<Z | [...A]> |
-  Ref<Z | [...A]> |
-  Z |
-  [...A];
+type Params<Z, A extends unknown[]> = (() => (Z | [...A]))
+  | ComputedRef<Z | [...A]>
+  | Ref<Z | [...A]>
+  | Z
+  | [...A];
 
 export type RequiredParams<Z extends TypeAllowed, A extends TypeAllowed[]> = Params<Z, A>;
 

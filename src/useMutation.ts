@@ -11,14 +11,14 @@ type OnEndCb<T, Z, A extends TypeAllowed[]> = (res: T, params: A extends [] ? Z 
 export default function useMutation<T, Z extends TypeAllowed, A extends TypeAllowed[], E = Error>(
   func: (arg: Z, ...args: A) => Promise<T>,
 ): {
-    mutate: (param?: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>;
-    onError: (cb: OnErrorCb<E, Z, A>) => unknown;
-    onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown;
-    isPending: Ref<boolean>;
-    error: Ref<null | E>;
-    data: Ref<UnwrappedPromiseType<typeof func>>;
-    promise: ComputedRef<null | Promise<T>>;
-  } {
+  mutate: (param?: Z, ...restParams: A) => Promise<UnwrappedPromiseType<typeof func>>;
+  onError: (cb: OnErrorCb<E, Z, A>) => unknown;
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<typeof func>, Z, A>) => unknown;
+  isPending: Ref<boolean>;
+  error: Ref<null | E>;
+  data: Ref<UnwrappedPromiseType<typeof func>>;
+  promise: ComputedRef<null | Promise<T>>;
+} {
   const isPending = ref();
 
   const data = ref<T>() as Ref<T>;
