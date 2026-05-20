@@ -6,13 +6,13 @@
     "outDir": "./dist",
     "target": "ESNext",
     "moduleResolution": "Bundler",
-    "baseUrl": ".",
     "module": "ESNext",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     },
+    "types": ["node"],
     "jsx": "preserve"
   },
   "exclude": ["node_modules"]

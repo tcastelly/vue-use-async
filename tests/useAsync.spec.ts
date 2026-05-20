@@ -1,5 +1,11 @@
 import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+} from '@jest/globals';
 import useAsync from '@/useAsync';
 
 describe('GIVEN, `useAsync', () => {

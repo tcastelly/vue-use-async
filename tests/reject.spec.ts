@@ -1,3 +1,9 @@
+import {
+  describe,
+  expect,
+  it,
+} from '@jest/globals';
+
 describe('WHEN reject a promise', () => {
   it('THEN the promise should be rejected with `octopus` error', () => {
     const fetch = (): Promise<unknown> => new Promise((resolve, reject) => {

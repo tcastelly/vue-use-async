@@ -1,6 +1,6 @@
 import path from 'node:path';
 import parser from '@typescript-eslint/parser';
-import { includeIgnoreFile } from '@eslint/compat';
+import { includeIgnoreFile } from '@eslint/config-helpers';
 import js from '@eslint/js';
 import { configs, plugins, rules } from 'eslint-config-airbnb-extended';
 import pluginNode from 'eslint-plugin-n';

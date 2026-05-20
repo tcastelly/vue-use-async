@@ -1,4 +1,10 @@
 import { ref } from 'vue';
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+} from '@jest/globals';
 import userSpinner from '@/useSpinner';
 
 describe('GIVEN `isPendingSpinner`', () => {

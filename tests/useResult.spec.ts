@@ -1,4 +1,10 @@
 import { ref, watch } from 'vue';
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+} from '@jest/globals';
 import useResult, { Result } from '@/useResult';
 
 describe('GIVEN useResult', () => {

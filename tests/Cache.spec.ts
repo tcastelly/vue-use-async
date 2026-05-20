@@ -2,6 +2,12 @@
  * @jest-environment jsdom
  */
 import cache, { cacheSize, clearCache } from '@/cache';
+import {
+  beforeAll,
+  describe,
+  expect,
+  it,
+} from '@jest/globals';
 import type { XhrGet } from '@/index';
 
 describe('Given Cache', () => {

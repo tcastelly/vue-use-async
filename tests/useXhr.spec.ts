@@ -2,11 +2,16 @@
  * @jest-environment jsdom
  */
 import type { ComputedRef, Ref } from 'vue';
-import {
-  computed, ref, watch,
-} from 'vue';
+import { computed, ref, watch } from 'vue';
 import type Xhr from '@/Xhr';
 import { cacheIds, clearCache } from '@/cache';
+import {
+  afterAll,
+  describe,
+  expect,
+  it,
+  beforeAll,
+} from '@jest/globals';
 import useXhr from '@/useXhr';
 import type { Func } from '@/index';
 import mockXhr from './mockXhr';

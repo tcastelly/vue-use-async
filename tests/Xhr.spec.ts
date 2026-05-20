@@ -3,6 +3,13 @@
  */
 import Xhr from '@/Xhr';
 import type { Obj, XhrGet } from '@/index';
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+  afterAll,
+} from '@jest/globals';
 import mockXhr from './mockXhr';
 
 describe('Given Xhr and MockXhr', () => {

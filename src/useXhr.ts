@@ -308,7 +308,7 @@ export default function<
     const updateArgs = computed(() => {
       const _postArgs: $UpdateConfigArgs<ZZ> = {};
 
-      const unwrapParametersObj = unref(xhrConfig || {} as XhrConfig);
+      const unwrapParametersObj = unref(xhrConfig || {});
 
       // use params from second args of post function
       if (!_params) {

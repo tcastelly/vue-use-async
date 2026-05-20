@@ -1,3 +1,9 @@
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+} from '@jest/globals';
 import Deferred from '@/Deferred';
 
 describe('Given Deferred', () => {

@@ -1,3 +1,9 @@
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+} from '@jest/globals';
 import useMutation, { useMutationWithError } from '@/useMutation';
 
 describe('GIVEN useMutation', () => {
