@@ -17,7 +17,6 @@ import type {
   Obj,
   RequiredParams,
   TypeAllowed,
-  XhrConfig,
   XhrGet,
 } from '.';
 import Xhr from './Xhr';
@@ -91,9 +90,9 @@ export default function<
     token: null,
   });
 
-  const xhrList = ref<Array<Xhr<any>>>([]);
+  const xhrList = ref<Xhr<any>[]>([]);
 
-  const unwatch: Array<() => void> = [];
+  const unwatch: (() => void)[] = [];
 
   /**
    * For GET it's possible to add cache
@@ -292,7 +291,7 @@ export default function<
       onEnd: (cb) => onEndList.push(cb),
       error,
       abort: () => xhrPromise.value?.abortXhr(),
-      promise: computed(() => xhrPromise.value || new Promise(() => {
+      promise: computed(async () => xhrPromise.value || new Promise(() => {
       })),
       reload,
       xhr,
@@ -348,7 +347,7 @@ export default function<
 
     return {
       ...useAsync(
-        () => xhrFunc({
+        async () => xhrFunc({
           ...updateArgs.value,
           params: p,
         }),

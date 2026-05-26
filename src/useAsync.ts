@@ -34,7 +34,7 @@ const useAsync = <T,
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
   promise: ComputedRef<null | Promise<T>>;
 } => {
-  type PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
+  type _PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
 
   const isPending = ref<undefined | boolean>();
 
@@ -42,11 +42,11 @@ const useAsync = <T,
 
   const error: Ref<null | Error> = ref(null);
 
-  const onErrorList: OnErrorCb<PP>[] = [];
+  const onErrorList: OnErrorCb<_PP>[] = [];
 
-  const onStartList: OnStartCb<PP>[] = [];
+  const onStartList: OnStartCb<_PP>[] = [];
 
-  const onEndList: OnEndCb<UnwrappedPromiseType<F>, PP>[] = [];
+  const onEndList: OnEndCb<UnwrappedPromiseType<F>, _PP>[] = [];
 
   // for legacy use case
   const d = ref<null | Promise<T>>(null);
@@ -114,15 +114,15 @@ const useAsync = <T,
 
   const reload = () => _reload(wrapParams.value);
 
-  const onError = (cb: OnErrorCb<PP>) => {
+  const onError = (cb: OnErrorCb<_PP>) => {
     onErrorList.push(cb);
   };
 
-  const onStart = (cb: OnStartCb<PP>) => {
+  const onStart = (cb: OnStartCb<_PP>) => {
     onStartList.push(cb);
   };
 
-  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<F>, PP>) => {
+  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<F>, _PP>) => {
     onEndList.push(cb);
   };
 

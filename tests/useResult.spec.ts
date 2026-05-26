@@ -33,11 +33,6 @@ describe('GIVEN useResult', () => {
         label: `${v.label} bar`,
       }));
 
-      const resC = useResult(resA, { id: 43, label: 'bar' }, (v) => ({
-        ...v,
-        label: `${v.label} bar`,
-      }));
-
       watch(
         () => resA.value,
         (v) => console.log(v),

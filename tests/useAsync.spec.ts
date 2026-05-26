@@ -10,7 +10,7 @@ import useAsync from '@/useAsync';
 
 describe('GIVEN, `useAsync', () => {
   describe('WHEN resolve `useAsync`', () => {
-    const func = () => new Promise<string>((resolve) => {
+    const func = async () => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve('ok');
       });
@@ -32,7 +32,7 @@ describe('GIVEN, `useAsync', () => {
     let err: Error;
 
     beforeAll(async () => new Promise((resolve) => {
-      const rejectFunc = () => Promise.reject(Error('ko')).catch((e) => {
+      const rejectFunc = async () => Promise.reject(Error('ko')).catch((e) => {
         err = e;
         resolve(e);
       });
@@ -47,7 +47,7 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect params', () => {
-    const func = (arg: string) => new Promise<string>((resolve) => {
+    const func = async (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 200);
@@ -66,7 +66,7 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN change params', () => {
-    const func = (arg: string) => new Promise<string>((resolve) => {
+    const func = async (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 5);
@@ -105,7 +105,7 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN wait enabled', () => {
-    const func = (arg: string) => new Promise<string>((resolve) => {
+    const func = async (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 5);
@@ -152,7 +152,7 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect params and `condition` as callback', () => {
-    const func = (arg: string) => new Promise<string>((resolve) => {
+    const func = async (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 200);
@@ -175,7 +175,7 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect params and `condition` as Ref', () => {
-    const func = (arg: string) => new Promise<string>((resolve) => {
+    const func = async (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
       }, 200);
@@ -198,7 +198,7 @@ describe('GIVEN, `useAsync', () => {
   });
 
   describe('WHEN `func` expect multiple params', () => {
-    const func = (arg1: string, arg2: number, arg3: boolean) => new Promise<string>((resolve) => {
+    const func = async (arg1: string, arg2: number, arg3: boolean) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg1} ${arg2} ${arg3}`);
       }, 200);

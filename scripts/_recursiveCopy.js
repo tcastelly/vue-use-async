@@ -1,11 +1,7 @@
-const { promisify } = require('node:util');
-const {
-  readdir,
-  stat,
-  copyFile,
-} = require('node:fs');
-const { join } = require('node:path');
-const mkdirIfNotExist = require('./_mkdirIfNotExist.cjs');
+import { promisify } from 'node:util';
+import { copyFile, readdir, stat } from 'node:fs';
+import { join } from 'node:path';
+import mkdirIfNotExist from './_mkdirIfNotExist.js';
 
 const copyFileAsync = promisify(copyFile);
 
@@ -13,7 +9,7 @@ const readdirAsync = promisify(readdir);
 
 const statAsync = promisify(stat);
 
-module.exports = async function recursiveCopy(src, dest) {
+export default async function recursiveCopy(src, dest) {
   const isDirectory = (await statAsync(src)).isDirectory();
   if (isDirectory) {
     await mkdirIfNotExist(dest);
@@ -31,4 +27,4 @@ module.exports = async function recursiveCopy(src, dest) {
     return copyFileAsync(src, dest);
   }
   return null;
-};
+}

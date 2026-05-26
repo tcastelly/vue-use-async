@@ -7,10 +7,10 @@ import type Xhr from '@/Xhr';
 import { cacheIds, clearCache } from '@/cache';
 import {
   afterAll,
+  beforeAll,
   describe,
   expect,
   it,
-  beforeAll,
 } from '@jest/globals';
 import useXhr from '@/useXhr';
 import type { Func } from '@/index';
@@ -21,8 +21,12 @@ describe('GIVEN `useXhr`', () => {
 
   describe('WHEN run the function to resolve get', () => {
     it('THEN `get` should be a function', () => {
-      const { get } = useXhr({ legacy: true, token });
-      expect(typeof get).toBe('function');
+      const { get } = useXhr({
+        legacy: true,
+        token,
+      });
+      expect(typeof get)
+        .toBe('function');
     });
 
     describe('WHEN execute `get` Xhr', () => {
@@ -31,7 +35,11 @@ describe('GIVEN `useXhr`', () => {
       let reload: Func;
       let isPending: ComputedRef<undefined | null | boolean>;
       let xhr: Xhr<any>;
-      const params = ref({ ok: 1, undefinedParam: undefined, otherParam: true });
+      const params = ref({
+        ok: 1,
+        undefinedParam: undefined,
+        otherParam: true,
+      });
 
       afterAll(() => {
         // maybe already restored
@@ -39,11 +47,15 @@ describe('GIVEN `useXhr`', () => {
       });
 
       beforeAll((done) => {
-        const { get } = useXhr({ legacy: true, token });
-
-        mocked = mockXhr().get({
-          url: '/fake/get/1?otherParam=true',
+        const { get } = useXhr({
+          legacy: true,
+          token,
         });
+
+        mocked = mockXhr()
+          .get({
+            url: '/fake/get/1?otherParam=true',
+          });
         mocked.resolve('get-ok');
 
         const {
@@ -72,25 +84,33 @@ describe('GIVEN `useXhr`', () => {
         );
       });
       it('THEN query should be retrieved with good value', () => {
-        expect(data.value).toBe('get-ok');
+        expect(data.value)
+          .toBe('get-ok');
       });
 
       it('AND url should have params', () => {
-        expect(xhr.url).toBe('/fake/get/1');
+        expect(xhr.url)
+          .toBe('/fake/get/1');
       });
 
       it('AND token should be in the `xhr` instance', () => {
-        expect(xhr.token).toBe('FAKE_TOKEN');
-        expect(mocked.context.header[1][0]).toBe('Authorization');
-        expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
+        expect(xhr.token)
+          .toBe('FAKE_TOKEN');
+        expect(mocked.context.header[1][0])
+          .toBe('Authorization');
+        expect(mocked.context.header[1][1])
+          .toBe(`Bearer ${String(token.value)}`);
       });
 
       it('AND cache should be set', () => {
-        expect(cacheIds().includes('/fake/get/1?otherParam=true')).toBe(true);
+        expect(cacheIds()
+          .includes('/fake/get/1?otherParam=true'))
+          .toBe(true);
       });
 
       it('AND params should be split in and params', () => {
-        expect(JSON.stringify(xhr.params)).toContain(JSON.stringify({ otherParam: true }));
+        expect(JSON.stringify(xhr.params))
+          .toContain(JSON.stringify({ otherParam: true }));
       });
 
       describe('WHEN execute `reload`', () => {
@@ -114,7 +134,8 @@ describe('GIVEN `useXhr`', () => {
         });
 
         it('THEN `isPending` should be toggle to true', () => {
-          expect(_isPending).toBe(true);
+          expect(_isPending)
+            .toBe(true);
         });
       });
     });
@@ -122,26 +143,37 @@ describe('GIVEN `useXhr`', () => {
 
   describe('WHEN run the function to resolve a post', () => {
     it('THEN `post` should be a function', () => {
-      const { post } = useXhr({ legacy: true, token });
-      expect(typeof post).toBe('function');
+      const { post } = useXhr({
+        legacy: true,
+        token,
+      });
+      expect(typeof post)
+        .toBe('function');
     });
 
     describe('WHEN execute `post`', () => {
       let mocked: any;
       let data: Ref<undefined | null | string>;
       let xhr: Xhr<any>;
-      const params = ref({ ok: 1, undefinedParam: undefined });
+      const params = ref({
+        ok: 1,
+        undefinedParam: undefined,
+      });
 
       afterAll(() => {
         // maybe already restored
         mocked.restore?.();
       });
       beforeAll((done) => {
-        const { post } = useXhr({ legacy: true, token });
-
-        mocked = mockXhr().post({
-          url: '/fake/post/1',
+        const { post } = useXhr({
+          legacy: true,
+          token,
         });
+
+        mocked = mockXhr()
+          .post({
+            url: '/fake/post/1',
+          });
         mocked.resolve('post-ok');
 
         const {
@@ -165,25 +197,34 @@ describe('GIVEN `useXhr`', () => {
       });
 
       it('THEN query should be retrieved with good value', () => {
-        expect(data.value).toBe('post-ok');
+        expect(data.value)
+          .toBe('post-ok');
       });
 
       it('AND token should be in the `xhr` instance', () => {
-        expect(xhr.token).toBe('FAKE_TOKEN');
-        expect(mocked.context.header[1][0]).toBe('Authorization');
-        expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
+        expect(xhr.token)
+          .toBe('FAKE_TOKEN');
+        expect(mocked.context.header[1][0])
+          .toBe('Authorization');
+        expect(mocked.context.header[1][1])
+          .toBe(`Bearer ${String(token.value)}`);
       });
 
       it('AND params should be extracted', () => {
-        expect(JSON.stringify(xhr.params)).toContain(JSON.stringify(params.value));
+        expect(JSON.stringify(xhr.params))
+          .toContain(JSON.stringify(params.value));
       });
     });
   });
 
   describe('WHEN run the function to resolve a delete', () => {
     it('THEN `post` should be a function', () => {
-      const { post } = useXhr({ legacy: true, token });
-      expect(typeof post).toBe('function');
+      const { post } = useXhr({
+        legacy: true,
+        token,
+      });
+      expect(typeof post)
+        .toBe('function');
     });
 
     describe('WHEN execute `post`', () => {
@@ -197,11 +238,15 @@ describe('GIVEN `useXhr`', () => {
         mocked.restore?.();
       });
       beforeAll((done) => {
-        const { delete: _delete } = useXhr({ legacy: true, token });
-
-        mocked = mockXhr().delete({
-          url: '/fake/delete/1?%5B1%2C2%2C3%5D',
+        const { delete: _delete } = useXhr({
+          legacy: true,
+          token,
         });
+
+        mocked = mockXhr()
+          .delete({
+            url: '/fake/delete/1?%5B1%2C2%2C3%5D',
+          });
         mocked.resolve('delete-ok');
 
         const {
@@ -225,29 +270,41 @@ describe('GIVEN `useXhr`', () => {
       });
 
       it('THEN query should be retrieved with good value', () => {
-        expect(data.value).toBe('delete-ok');
+        expect(data.value)
+          .toBe('delete-ok');
       });
 
       it('AND token should be in the `xhr` instance', () => {
-        expect(xhr.token).toBe('FAKE_TOKEN');
-        expect(mocked.context.header[1][0]).toBe('Authorization');
-        expect(mocked.context.header[1][1]).toBe(`Bearer ${String(token.value)}`);
+        expect(xhr.token)
+          .toBe('FAKE_TOKEN');
+        expect(mocked.context.header[1][0])
+          .toBe('Authorization');
+        expect(mocked.context.header[1][1])
+          .toBe(`Bearer ${String(token.value)}`);
       });
 
       it('AND params should be extracted', () => {
-        expect(JSON.stringify(xhr.params)).toContain(JSON.stringify(params));
+        expect(JSON.stringify(xhr.params))
+          .toContain(JSON.stringify(params));
       });
     });
   });
 
   describe('WHEN run the function to reject the query', () => {
     it('THEN `get` should be a function', () => {
-      const { get } = useXhr({ legacy: true, token });
-      expect(typeof get).toBe('function');
+      const { get } = useXhr({
+        legacy: true,
+        token,
+      });
+      expect(typeof get)
+        .toBe('function');
     });
 
     describe('WHEN execute `get` Xhr', () => {
-      const { get } = useXhr({ legacy: true, token });
+      const { get } = useXhr({
+        legacy: true,
+        token,
+      });
 
       let mocked: any;
 
@@ -257,23 +314,25 @@ describe('GIVEN `useXhr`', () => {
       });
 
       beforeAll(() => {
-        mocked = mockXhr().get({ url: '/fake/fail/get/1' });
+        mocked = mockXhr()
+          .get({ url: '/fake/fail/get/1' });
         mocked.reject('ko');
       });
 
-      it('THEN error should be retrieved with good value', () => {
-        const fetch = async (): Promise<unknown> => new Promise((resolve, reject) => {
-          const { promise } = get(
-            '/fake/fail/get/:id',
-            () => ({
-              id: 1,
-            }),
-          );
-          promise.value.catch((e) => {
-            reject(Error(e));
-          });
-        });
-        return expect(fetch).rejects.toThrow('ko');
+      it('THEN error should be retrieved with good value', async () => {
+        const { promise } = get(
+          '/fake/fail/get/:id',
+          () => ({
+            id: 1,
+          }),
+        );
+
+        try {
+          const r = await promise.value;
+          expect(r).toBeFalsy();
+        } catch (error: unknown) {
+          expect(error).toBe('ko');
+        }
       });
     });
   });

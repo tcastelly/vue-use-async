@@ -17,7 +17,7 @@ const {
 } = XMLHttpRequest.prototype;
 
 class MockXhr {
-  header: Array<any>;
+  header: any[];
 
   xhr: null | XMLHttpRequest;
 

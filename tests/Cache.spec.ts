@@ -11,10 +11,10 @@ import {
 import type { XhrGet } from '@/index';
 
 describe('Given Cache', () => {
-  it('THEN no cache should be available', () => {
+  it('THEN no cache should be available', async () => {
     let res = null;
     try {
-      res = cache({ id: '/fake/' });
+      res = await cache({ id: '/fake/' });
     } catch (e) {
       expect(res).toBeNull();
     } finally {
@@ -38,12 +38,12 @@ describe('Given Cache', () => {
         xhr: () => p,
       });
     });
-    it('THEN cache should be inserted', () => expect(query).resolves.toEqual('ok'));
+    it('THEN cache should be inserted', async () => expect(query).resolves.toEqual('ok'));
     describe('WHEN destroy a specific cache', () => {
       let xhr: () => XhrGet<any>;
       beforeAll(() => {
         // @ts-ignore - fake xhr
-        xhr = () => new Promise((resolve) => {
+        xhr = async () => new Promise((resolve) => {
           resolve('ok');
         });
         cache({
@@ -57,10 +57,10 @@ describe('Given Cache', () => {
         });
         clearCache('/fake-canceled/');
       });
-      it('THEN cache should be empty', () => {
+      it('THEN cache should be empty', async () => {
         let res = null;
         try {
-          res = cache({ id: '/fake-canceled/' });
+          res = await cache({ id: '/fake-canceled/' });
         } catch (e) {
           expect(res).toBeNull();
         } finally {

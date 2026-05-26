@@ -55,27 +55,22 @@ export default class Xhr<T> {
     return queryParams;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   onError: (e: ProgressEvent) => void = () => {
   };
 
-  // eslint-disable-next-line class-methods-use-this
   onStart: (e: ProgressEvent) => void = () => {
   };
 
-  // eslint-disable-next-line class-methods-use-this
   onAbort: (e: ProgressEvent) => void = () => {
   };
 
-  // eslint-disable-next-line class-methods-use-this
   onProgress: (e: ProgressEvent) => void = () => {
   };
 
-  // eslint-disable-next-line class-methods-use-this,
   onEnd: (result: T | null, e: ProgressEvent) => void = () => {
   };
 
-  static onBeforeSendList: Array<(params: Obj) => Obj> = [];
+  static onBeforeSendList: ((params: Obj) => Obj)[] = [];
 
   static onBeforeSend(cb: (params: Obj) => Obj) {
     Xhr.onBeforeSendList.push(cb);
@@ -103,11 +98,9 @@ export default class Xhr<T> {
   // @ts-ignore - declared in _constructor
   _oXHR: XMLHttpRequest;
 
-  // eslint-disable-next-line class-methods-use-this
   _onEnd: (e: ProgressEvent) => void = () => {
   };
 
-  // eslint-disable-next-line class-methods-use-this
   _onError: (e: ProgressEvent) => void = () => {
   };
 
@@ -156,7 +149,7 @@ export default class Xhr<T> {
     this._deferred.promise.then(removeEvents, removeEvents);
   }
 
-  post(paramsObj: XhrConfig): Promise<T> {
+  async post(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
 
     const {
@@ -173,7 +166,7 @@ export default class Xhr<T> {
     return this._deferred.promise;
   }
 
-  put(paramsObj: XhrConfig): Promise<T> {
+  async put(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
 
     const {
@@ -196,7 +189,8 @@ export default class Xhr<T> {
    *
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
-  get(paramsObj?: XhrConfig): XhrGet<T> {
+  // @ts-ignore - XhrGet inherit from Promise
+  async get(paramsObj?: XhrConfig): XhrGet<T> {
     this._constructor(paramsObj || {});
 
     const {
@@ -221,7 +215,7 @@ export default class Xhr<T> {
     return _d as XhrGet<T>;
   }
 
-  delete(paramsObj: XhrConfig): Promise<T> {
+  async delete(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
 
     const {
@@ -241,7 +235,7 @@ export default class Xhr<T> {
   /**
    * Abort xhr query and reject promise
    */
-  abort(): Promise<T> {
+  async abort(): Promise<T> {
     // don t abort twice
     if (!this._isXhrResolved || this._isXhrRejected) {
       // @ts-ignore
@@ -318,7 +312,7 @@ export default class Xhr<T> {
    * Force to resolve deferred
    * @param res
    */
-  resolve(res: T): Promise<T> {
+  async resolve(res: T): Promise<T> {
     this._deferred.resolve(res);
 
     return this._deferred.promise;
@@ -328,7 +322,7 @@ export default class Xhr<T> {
    * Force to reject deferred
    * @param res
    */
-  reject(res: Error): Promise<any> {
+  async reject(res: Error): Promise<any> {
     this._deferred.reject(res);
 
     return this._deferred.promise;
@@ -362,8 +356,8 @@ export default class Xhr<T> {
   /**
    * url with path params will be replaced by params values
    */
-  static injectParamsInUrl(url: string, params: Obj | Array<unknown>, method?: Method): { url: string; params: Obj };
-  static injectParamsInUrl(url: string, params: Obj | Array<unknown> = {}, method: Method = 'GET') {
+  static injectParamsInUrl(url: string, params: Obj | unknown[], method?: Method): { url: string; params: Obj };
+  static injectParamsInUrl(url: string, params: Obj | unknown[] = {}, method: Method = 'GET') {
     // don't try to inject params if there is nothing to inject
     if (Array.isArray(params) || Object.keys(params).length === 0) {
       return {

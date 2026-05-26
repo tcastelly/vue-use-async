@@ -15,7 +15,7 @@ describe('Given Deferred', () => {
         _d.resolve('ok');
       }, 0);
     });
-    it('THEN the promise should be resolved', () => expect(_d.promise).resolves.toEqual('ok'));
+    it('THEN the promise should be resolved', async () => expect(_d.promise).resolves.toEqual('ok'));
   });
   describe('WHEN instance a Deferred and reject it', () => {
     let _d: Deferred<string>;
@@ -25,6 +25,6 @@ describe('Given Deferred', () => {
         _d.reject('ko');
       }, 0);
     });
-    it('THEN the promise should be rejected', () => expect(_d.promise).rejects.toMatch('ko'));
+    it('THEN the promise should be rejected', async () => expect(_d.promise).rejects.toMatch('ko'));
   });
 });

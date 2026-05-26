@@ -1,9 +1,13 @@
-const { join } = require('node:path');
-const { copyFile } = require('node:fs/promises');
-const recursiveCopy = require('./_recursiveCopy.cjs');
+import path, { join } from 'node:path';
+import { copyFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import recursiveCopy from './_recursiveCopy.js';
 
 //
 // script launched after build only
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const main = async () => {
   await recursiveCopy('src', 'dist');

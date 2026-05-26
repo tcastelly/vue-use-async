@@ -69,7 +69,7 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-ok'));
+    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('post-ok'));
   });
 
   describe('WHEN send POST query with array as parameter', () => {
@@ -85,7 +85,7 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('post-users-ok'));
+    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('post-users-ok'));
   });
 
   describe('WHEN send put query', () => {
@@ -98,7 +98,7 @@ describe('Given Xhr and MockXhr', () => {
       query = new Xhr().put({ url: '/fake/put' });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('put-ok'));
+    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('put-ok'));
   });
 
   describe('WHEN send DELETE query', () => {
@@ -114,7 +114,7 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('delete-ok'));
+    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('delete-ok'));
   });
 
   describe('WHEN send DELETE query with query params', () => {
@@ -130,7 +130,7 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('delete-ok'));
+    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('delete-ok'));
   });
 
   describe('WHEN send DELETE query with query params injected as path params', () => {
@@ -150,7 +150,7 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', () => expect(query).resolves.toEqual('delete-ok'));
+    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('delete-ok'));
   });
 
   describe('WHEN send ABORT query', () => {
@@ -167,7 +167,7 @@ describe('Given Xhr and MockXhr', () => {
     });
 
     it('THEN fake should be catch', () => {
-      const fetch = () => {
+      const fetch = async () => {
         query = new Xhr().get({
           url: '/fake/abort',
           params: { user: 'Thomas' },

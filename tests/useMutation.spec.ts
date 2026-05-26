@@ -8,7 +8,7 @@ import useMutation, { useMutationWithError } from '@/useMutation';
 
 describe('GIVEN useMutation', () => {
   describe('WITH single param', () => {
-    const func = (a: string) => new Promise<string>((resolve) => {
+    const func = async (a: string) => new Promise<string>((resolve) => {
       resolve(a);
     });
 
@@ -42,7 +42,7 @@ describe('GIVEN useMutation', () => {
   });
 
   describe('WITH multiple params', () => {
-    const func = (a: string, b: string) => new Promise<string>((resolve) => {
+    const func = async (a: string, b: string) => new Promise<string>((resolve) => {
       resolve(a + b);
     });
     const {
@@ -77,17 +77,16 @@ describe('GIVEN useMutation', () => {
   });
 
   describe('WITH error type', () => {
-    const func = (a: string) => new Promise<string>((resolve, reject) => {
-      // eslint-disable-next-line prefer-promise-reject-errors
+    const func = async (_: string) => new Promise<string>((resolve, reject) => {
       reject({ message2: 'fakeError' });
     });
 
-    const useMutation = useMutationWithError<{ message2: string }>();
+    const _useMutation = useMutationWithError<{ message2: string }>();
 
     const {
       mutate,
       error,
-    } = useMutation(func);
+    } = _useMutation(func);
 
     describe('WHEN mutate', () => {
       beforeAll(async () => {

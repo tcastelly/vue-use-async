@@ -26,27 +26,23 @@ jobs:
         uses: actions/setup-node@v4
         if: steps.version-updated.outputs.has-updated
         with:
-          node-version: '20.x'
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies and build 🔧
-        if: steps.version-updated.outputs.has-updated
-        run: npm ci && npm run build
-
-
-      - name: Publish package on NPM 📦
+      - name: Install dependencies build and publish 🔧📦
         if: steps.version-updated.outputs.has-updated
         run: |
-          npm install -g npm@latest
-          # Get version from package.json
-          VERSION=$(node -p "require('./package.json').version")
-          echo "Package version: $VERSION"
+          npm ci
           
-          # Check if version contains a prerelease identifier
-          if [[ "$VERSION" == *"-"* ]]; then
-            echo "Prerelease detected, publishing with tag 'beta'"
+          # Extract version from package.json
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Detected version: $VERSION"
+
+          # Check if version contains 'beta'
+          if [[ $VERSION == *"beta"* ]]; then
+            echo "Publishing with --tag beta"
             npm publish --tag beta
           else
-            echo "Stable release, publishing with default tag 'latest'"
+            echo "Publishing as latest"
             npm publish
           fi

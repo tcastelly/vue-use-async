@@ -2,12 +2,15 @@ import Logger from './_base/Logger';
 import type { XhrGet } from '.';
 
 const _cache = new Map<string, XhrGet<any>>();
-/**
- * @params {String} params.id
- * @params {Promise} params.xhr
- * @params {Number} params.duration, in ms
- */
-export default function<T> (params: { id: string; xhr?: () => XhrGet<T>; duration?: number | 'max' | null }): XhrGet<T> {
+
+interface Params<T> {
+  id: string;
+  xhr?: () => XhrGet<T>;
+  duration?: number | 'max' | null;
+}
+
+// @ts-ignore - XhrGet inherit from Promise
+export default async function<T>(params: Params<T>): XhrGet<T> {
   const { id, xhr } = params || {};
   let duration: number = typeof params.duration !== 'string' ? (params.duration || 200) : 200;
   let _d;

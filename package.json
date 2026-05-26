@@ -1,6 +1,6 @@
 {
   "name": "vue-use-async",
-  "version": "1.13.0",
+  "version": "1.13.2",
   "description": "Xhr and async helpers",
   "repository": {
     "type": "git",
@@ -12,8 +12,8 @@
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "afterbuild": "node ./scripts/afterbuild.cjs",
-    "beforebuild": "node ./scripts/beforeBuild.cjs && npm run tsgo:export-types",
+    "afterbuild": "node scripts/afterbuild.js",
+    "beforebuild": "node scripts/beforeBuild.js && npm run tsgo:export-types",
     "build": "npm run beforebuild && npm run build:webpack && npm run afterbuild",
     "build:webpack": "webpack --mode=production",
     "lint": "npm run tsgo:check-types && eslint scripts src tests",
@@ -26,20 +26,25 @@
     "tsgo:check-types": "tsgo --noemit",
     "tsgo:export-types": "tsgo --outDir types"
   },
+  "dependencies": {
+    "@eslint/config-helpers": "^0.6.0",
+    "@jest/globals": "^30.4.1"
+  },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/plugin-proposal-decorators": "^7.29.0",
-    "@babel/preset-env": "^7.29.5",
-    "@babel/preset-typescript": "^7.28.5",
+    "@babel/plugin-proposal-decorators": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.39.2",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@tcy/eslint-rules": "^1.6.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.9.1",
-    "@typescript-eslint/eslint-plugin": "^8.59.4",
-    "@typescript-eslint/parser": "^8.59.4",
-    "@typescript/native-preview": "^7.0.0-dev.20260519.1",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260526.1",
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
     "eslint": "^9.39.2",
@@ -55,8 +60,8 @@
     "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.4",
-    "webpack": "^5.107.0",
+    "typescript-eslint": "^8.60.0",
+    "webpack": "^5.107.2",
     "webpack-cli": "^7.0.2"
   },
   "peerDependencies": {
@@ -66,8 +71,8 @@
     "darwin",
     "linux"
   ],
-  "dependencies": {
-    "@eslint/config-helpers": "^0.6.0",
-    "@jest/globals": "^30.4.1"
-  }
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
 }
