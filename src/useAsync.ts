@@ -22,8 +22,9 @@ const useAsync = <T,
   P extends RequiredParams<Parameters<F>[0], A>,
 >(
   func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-  params?: P,
-  enabled: Ref<boolean> | (() => boolean) = ref(true),
+  ...[params, enabledArg]: undefined extends P
+    ? [params?: P, enabled?: Ref<boolean> | (() => boolean)]
+    : [params: P, enabled?: Ref<boolean> | (() => boolean)]
 ): {
   isPending: Ref<undefined | boolean>;
   data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
@@ -35,6 +36,8 @@ const useAsync = <T,
   promise: ComputedRef<null | Promise<T>>;
 } => {
   type _PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
+
+  const enabled: Ref<boolean> | (() => boolean) = enabledArg ?? ref(true);
 
   const isPending = ref<undefined | boolean>();
 
@@ -91,7 +94,7 @@ const useAsync = <T,
 
     // it's possible to pass multiple args by using an array as params
     d.value = Array.isArray(_params)
-      ? funcRest(..._params)
+      ? funcRest(...(_params as unknown as A))
       : funcDefault(_params);
 
     d.value.catch((_error) => {

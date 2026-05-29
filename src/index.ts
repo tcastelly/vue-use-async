@@ -73,11 +73,9 @@ export type GetConfig<T> = $GetConfig<T> | Ref<$GetConfig<T>>;
 
 export type TypeAllowed = undefined | null | string | number | boolean | Obj;
 
-type Params<Z, A extends unknown[]> = (() => (Z | [...A]))
-  | ComputedRef<Z | [...A]>
-  | Ref<Z | [...A]>
-  | Z
-  | [...A];
+type Params<Z, A extends unknown[]> = A extends [unknown, unknown, ...unknown[]]
+  ? (() => [...A]) | ComputedRef<[...A]> | Ref<[...A]> | [...A]
+  : (() => (Z | [...A])) | ComputedRef<Z | [...A]> | Ref<Z | [...A]> | Z | [...A];
 
 export type RequiredParams<Z extends TypeAllowed, A extends TypeAllowed[]> = Params<Z, A>;
 
