@@ -1,21 +1,18 @@
 //
 // script launched before build only
 
-import { rm } from 'node:fs';
+import { promises } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 
-const del = (dir) => new Promise((resolve, reject) => {
-  rm(dir, {
+const { rm } = promises;
+
+const del = async (dir) => {
+  await rm(dir, {
     recursive: true,
     force: true,
-  }, (err) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(`${dir} has been deleted!`);
-    }
   });
-});
+  return `${dir} has been deleted!`;
+};
 
 const main = async () => {
   const [r, r1] = await Promise.all([
