@@ -187,10 +187,12 @@ export default class Xhr<T> {
    * Rewrite URL or send query parameters
    * Return a Promise with a function to abort the xhr
    *
+   * It's mandatory to don't have `async` in function signature, else the `abortXhr` is lost
+   *
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
-  // @ts-ignore - XhrGet inherit from Promise
-  async get(paramsObj?: XhrConfig): XhrGet<T> {
+  // eslint-disable-next-line @typescript-eslint/promise-function-async
+  get(paramsObj?: XhrConfig): XhrGet<T> {
     this._constructor(paramsObj || {});
 
     const {

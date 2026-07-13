@@ -4,11 +4,11 @@
 import Xhr from '@/Xhr';
 import type { Obj, XhrGet } from '@/index';
 import {
+  afterAll,
+  beforeAll,
   describe,
   expect,
   it,
-  beforeAll,
-  afterAll,
 } from '@jest/globals';
 import mockXhr from './mockXhr';
 
@@ -42,6 +42,11 @@ describe('Given Xhr and MockXhr', () => {
         url: '/fake/get',
         params: {},
       });
+    });
+
+    it('THEN abortXhr should exist', () => {
+      // @ts-expect-error
+      expect(query.abortXhr).toBeInstanceOf(Function);
     });
 
     it('THEN fake should be catch', () => {
@@ -130,7 +135,9 @@ describe('Given Xhr and MockXhr', () => {
       });
     });
 
-    it('THEN fake should be catch', async () => expect(query).resolves.toEqual('delete-ok'));
+    it('THEN fake should be catch', () => {
+      expect(query).resolves.toEqual('delete-ok');
+    });
   });
 
   describe('WHEN send DELETE query with query params injected as path params', () => {
@@ -163,7 +170,7 @@ describe('Given Xhr and MockXhr', () => {
             user: 'Thomas',
           },
         })
-        .abort();
+        .abortXhr();
     });
 
     it('THEN fake should be catch', () => {

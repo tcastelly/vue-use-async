@@ -122,7 +122,7 @@ class MockXhr {
 
     return {
       context: this,
-      abort: this.abort.bind(this, condition),
+      abortXhr: this.abort.bind(this, condition),
       resolve: this.resolve.bind(this),
       reject: this.reject.bind(this),
     };
