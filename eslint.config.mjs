@@ -79,6 +79,8 @@ const typescriptConfig = [
       'no-underscore-dangle': 'off',
       'class-methods-use-this': 'off',
 
+      '@typescript-eslint/promise-function-async': 'off',
+
       // managed with custom import-specifiers-per-line and /export-specifiers-per-line
       '@stylistic/object-curly-newline': 'off',
     },

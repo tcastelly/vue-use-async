@@ -149,7 +149,7 @@ export default class Xhr<T> {
     this._deferred.promise.then(removeEvents, removeEvents);
   }
 
-  async post(paramsObj: XhrConfig): Promise<T> {
+  post(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
 
     const {
@@ -166,7 +166,7 @@ export default class Xhr<T> {
     return this._deferred.promise;
   }
 
-  async put(paramsObj: XhrConfig): Promise<T> {
+  put(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
 
     const {
@@ -191,7 +191,6 @@ export default class Xhr<T> {
    *
    * @returns {Promise}, consolidate the promise with the `abortXhr` function
    */
-  // eslint-disable-next-line @typescript-eslint/promise-function-async
   get(paramsObj?: XhrConfig): XhrGet<T> {
     this._constructor(paramsObj || {});
 
@@ -217,7 +216,7 @@ export default class Xhr<T> {
     return _d as XhrGet<T>;
   }
 
-  async delete(paramsObj: XhrConfig): Promise<T> {
+  delete(paramsObj: XhrConfig): Promise<T> {
     this._constructor(paramsObj);
 
     const {
@@ -237,7 +236,7 @@ export default class Xhr<T> {
   /**
    * Abort xhr query and reject promise
    */
-  async abort(): Promise<T> {
+  abort(): Promise<T> {
     // don t abort twice
     if (!this._isXhrResolved || this._isXhrRejected) {
       // @ts-ignore
@@ -314,7 +313,7 @@ export default class Xhr<T> {
    * Force to resolve deferred
    * @param res
    */
-  async resolve(res: T): Promise<T> {
+  resolve(res: T): Promise<T> {
     this._deferred.resolve(res);
 
     return this._deferred.promise;
@@ -324,7 +323,7 @@ export default class Xhr<T> {
    * Force to reject deferred
    * @param res
    */
-  async reject(res: Error): Promise<any> {
+  reject(res: Error): Promise<any> {
     this._deferred.reject(res);
 
     return this._deferred.promise;
