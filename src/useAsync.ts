@@ -23,14 +23,23 @@ type AsyncParams<F extends AsyncFunc> = Parameters<F> extends TypeAllowed[]
   ? RequiredParams<Parameters<F>[0], Parameters<F>>
   : never;
 
-// - no parameter: `params` is forbidden (only `undefined` to be able to pass `enabled`)
+// - no parameter: `params` is forbidden, `enabled` can be passed directly or after `undefined`
 // - only optional parameters: `params` is optional
 // - otherwise `params` is required
 type AsyncArgs<F extends AsyncFunc, P> = Parameters<F> extends []
-  ? [params?: undefined, enabled?: Enabled]
+  ? [enabled?: Enabled] | [params: undefined, enabled?: Enabled]
   : [] extends Parameters<F>
     ? [params?: P, enabled?: Enabled]
     : [params: P, enabled?: Enabled];
+
+// `useAsync(func, enabled)`: without expected parameter, a single arg resolving to a boolean is `enabled`
+const isEnabledArg = (func: AsyncFunc, rest: unknown[]): rest is [Enabled] => {
+  if (rest.length !== 1 || func.length !== 0) {
+    return false;
+  }
+  const [arg] = rest;
+  return typeof (typeof arg === 'function' ? arg() : unref(arg)) === 'boolean';
+};
 
 type UnwrapParams<P> = P extends () => infer PP
   ? PP
@@ -41,7 +50,7 @@ const useAsync = <
   P extends AsyncParams<F> = AsyncParams<F>,
 >(
   func: F,
-  ...[params, enabledArg]: AsyncArgs<F, P>
+  ...rest: AsyncArgs<F, P>
 ): {
   isPending: Ref<undefined | boolean>;
   data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
@@ -52,11 +61,13 @@ const useAsync = <
   onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, UnwrapParams<P>>) => unknown;
   promise: ComputedRef<null | Promise<UnwrappedPromiseType<F>>>;
 } => {
+  const [params, enabled = () => true]: [unknown?, Enabled?] = isEnabledArg(func, rest)
+    ? [undefined, rest[0]]
+    : rest;
+
   type T = UnwrappedPromiseType<F>;
 
   type _PP = UnwrapParams<P>;
-
-  const enabled: Enabled = enabledArg ?? ref(true);
 
   const isPending = ref<undefined | boolean>();
 

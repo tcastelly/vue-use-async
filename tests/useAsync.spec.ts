@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { computed, ref } from 'vue';
 import {
   beforeAll,
@@ -104,7 +104,7 @@ describe('GIVEN, `useAsync', () => {
     });
   });
 
-  describe('WHEN wait enabled', () => {
+  describe('WHEN wait enabled with param', () => {
     const func = async (arg: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
         resolve(`ok ${arg}`);
@@ -148,6 +148,80 @@ describe('GIVEN, `useAsync', () => {
 
     it('THEN `data` should be resolved', () => {
       expect(data.value).toBe('ok msg');
+    });
+  });
+
+  describe('WHEN wait enabled without param', () => {
+    const func = async () => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve('ok');
+      }, 5);
+    });
+
+    const enabled = ref(true);
+
+    let data: Ref<undefined | null | string>;
+    beforeAll((done) => {
+      let onEnd;
+      ({ data, onEnd } = useAsync(
+        func,
+        enabled,
+      ));
+
+      setTimeout(() => {
+        enabled.value = false;
+
+        setTimeout(() => {
+          enabled.value = true;
+        }, 10);
+      }, 100);
+
+      // initial call + call when enabled again
+      let i = 0;
+      onEnd(() => {
+        if (i > 0) {
+          done();
+        }
+        i += 1;
+      });
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok');
+    });
+  });
+
+  describe('WHEN disabled without param', () => {
+    let calls = 0;
+    const func = async () => {
+      calls += 1;
+      return 'ok';
+    };
+
+    const enabled = ref(false);
+
+    let data: Ref<undefined | null | string>;
+    let promise: ComputedRef<null | Promise<string>>;
+    beforeAll(async () => {
+      ({ data, promise } = useAsync(func, () => enabled.value));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20);
+      });
+    });
+
+    it('THEN `func` should not be called', () => {
+      expect(calls).toBe(0);
+      expect(data.value).toBe(undefined);
+    });
+
+    it('THEN `func` should be called once enabled', async () => {
+      enabled.value = true;
+      await new Promise((resolve) => {
+        setTimeout(resolve);
+      });
+      await promise.value;
+      expect(calls).toBe(1);
+      expect(data.value).toBe('ok');
     });
   });
 
@@ -230,7 +304,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async () => {
       // @ts-expect-error - we're trying to call `func` without params
-      ({ data, promise } = useAsync(func, () => 'ok' as any));
+      ({ data, promise } = useAsync(func, () => 'ok'));
       await promise.value;
     });
 
@@ -250,7 +324,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async () => {
       // @ts-expect-error - we're trying to call `func` without params
-      ({ data, promise } = useAsync(func, () => ({}) as any));
+      ({ data, promise } = useAsync(func, () => ({})));
       await promise.value;
     });
 
@@ -272,7 +346,7 @@ describe('GIVEN, `useAsync', () => {
       // @ts-expect-error - we're trying to call `func` without params
       ({ data, promise } = useAsync(func, () => ({
         ok: true,
-      }) as any));
+      })));
       await promise.value;
     });
 
@@ -292,7 +366,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async () => {
       // @ts-expect-error - we're trying to call `func` without params
-      ({ data, promise } = useAsync(func, () => [] as any));
+      ({ data, promise } = useAsync(func, () => []));
       await promise.value;
     });
 
@@ -312,7 +386,7 @@ describe('GIVEN, `useAsync', () => {
     let promise;
     beforeAll(async () => {
       // @ts-expect-error - we're trying to call `func` without params
-      ({ data, promise } = useAsync(func, () => [true] as any));
+      ({ data, promise } = useAsync(func, () => [true]));
       await promise.value;
     });
 
