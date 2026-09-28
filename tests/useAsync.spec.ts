@@ -219,6 +219,108 @@ describe('GIVEN, `useAsync', () => {
     });
   });
 
+  describe('WHEN use `func` with unexpected (1) params', () => {
+    const func = async () => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve('ok');
+      }, 200);
+    });
+
+    let data: Ref<undefined | null | string>;
+    let promise;
+    beforeAll(async () => {
+      // @ts-expect-error - we're trying to call `func` without params
+      ({ data, promise } = useAsync(func, () => 'ok' as any));
+      await promise.value;
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok');
+    });
+  });
+
+  describe('WHEN use `func` with unexpected (2) params', () => {
+    const func = async () => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve('ok');
+      }, 200);
+    });
+
+    let data: Ref<undefined | null | string>;
+    let promise;
+    beforeAll(async () => {
+      // @ts-expect-error - we're trying to call `func` without params
+      ({ data, promise } = useAsync(func, () => ({}) as any));
+      await promise.value;
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok');
+    });
+  });
+
+  describe('WHEN use `func` with unexpected (3) params', () => {
+    const func = async () => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve('ok');
+      }, 200);
+    });
+
+    let data: Ref<undefined | null | string>;
+    let promise;
+    beforeAll(async () => {
+      // @ts-expect-error - we're trying to call `func` without params
+      ({ data, promise } = useAsync(func, () => ({
+        ok: true,
+      }) as any));
+      await promise.value;
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok');
+    });
+  });
+
+  describe('WHEN use `func` with unexpected (4) params', () => {
+    const func = async () => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve('ok');
+      }, 200);
+    });
+
+    let data: Ref<undefined | null | string>;
+    let promise;
+    beforeAll(async () => {
+      // @ts-expect-error - we're trying to call `func` without params
+      ({ data, promise } = useAsync(func, () => [] as any));
+      await promise.value;
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok');
+    });
+  });
+
+  describe('WHEN use `func` with unexpected (5) params', () => {
+    const func = async () => new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve('ok');
+      }, 200);
+    });
+
+    let data: Ref<undefined | null | string>;
+    let promise;
+    beforeAll(async () => {
+      // @ts-expect-error - we're trying to call `func` without params
+      ({ data, promise } = useAsync(func, () => [true] as any));
+      await promise.value;
+    });
+
+    it('THEN `data` should be resolved', () => {
+      expect(data.value).toBe('ok');
+    });
+  });
+
   describe('WHEN use `func` without params', () => {
     const func = async (arg1: string, arg2: number, arg3: boolean) => new Promise<string>((resolve) => {
       setTimeout(() => {
@@ -258,6 +360,7 @@ describe('GIVEN, `useAsync', () => {
       expect(data.value).toBe('ok toto undefined undefined');
     });
   });
+
   describe('WHEN use `func` without optional parameter', () => {
     const func = async (arg1?: string) => new Promise<string>((resolve) => {
       setTimeout(() => {
@@ -276,6 +379,7 @@ describe('GIVEN, `useAsync', () => {
       expect(data.value).toBe('ok undefined');
     });
   });
+
   describe('WHEN use `func` without initialized optional parameter', () => {
     const func = async (arg1 = 'ok') => new Promise<string>((resolve) => {
       setTimeout(() => {

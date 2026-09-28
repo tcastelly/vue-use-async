@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref, UnwrapRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import {
   computed,
   ref,
@@ -15,29 +15,48 @@ type OnStartCb<T> = (params: T) => unknown;
 
 type OnEndCb<T, Z> = (res: T, params: Z) => unknown;
 
-const useAsync = <T,
-  Z extends TypeAllowed,
-  A extends TypeAllowed[],
-  F extends ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-  P extends RequiredParams<Parameters<F>[0], A>,
+type AsyncFunc = (...args: any[]) => Promise<unknown>;
+
+type Enabled = Ref<boolean> | (() => boolean);
+
+type AsyncParams<F extends AsyncFunc> = Parameters<F> extends TypeAllowed[]
+  ? RequiredParams<Parameters<F>[0], Parameters<F>>
+  : never;
+
+// - no parameter: `params` is forbidden (only `undefined` to be able to pass `enabled`)
+// - only optional parameters: `params` is optional
+// - otherwise `params` is required
+type AsyncArgs<F extends AsyncFunc, P> = Parameters<F> extends []
+  ? [params?: undefined, enabled?: Enabled]
+  : [] extends Parameters<F>
+    ? [params?: P, enabled?: Enabled]
+    : [params: P, enabled?: Enabled];
+
+type UnwrapParams<P> = P extends () => infer PP
+  ? PP
+  : (P extends Ref<infer PP> ? PP : P);
+
+const useAsync = <
+  F extends AsyncFunc,
+  P extends AsyncParams<F> = AsyncParams<F>,
 >(
-  func: ((...args: A) => Promise<T>) | ((args: Z) => Promise<T>),
-  ...[params, enabledArg]: undefined extends P
-    ? [params?: P, enabled?: Ref<boolean> | (() => boolean)]
-    : [params: P, enabled?: Ref<boolean> | (() => boolean)]
+  func: F,
+  ...[params, enabledArg]: AsyncArgs<F, P>
 ): {
   isPending: Ref<undefined | boolean>;
   data: ComputedRef<undefined | null | UnwrappedPromiseType<F>>;
   error: Ref<null | Error>;
-  reload: () => null | Promise<T>;
-  onError: (cb: OnErrorCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
-  onStart: (cb: OnStartCb<P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => void;
-  onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, P extends () => infer PP ? PP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P)>) => unknown;
-  promise: ComputedRef<null | Promise<T>>;
+  reload: () => null | Promise<UnwrappedPromiseType<F>>;
+  onError: (cb: OnErrorCb<UnwrapParams<P>>) => void;
+  onStart: (cb: OnStartCb<UnwrapParams<P>>) => void;
+  onEnd: (cb: OnEndCb<UnwrappedPromiseType<F>, UnwrapParams<P>>) => unknown;
+  promise: ComputedRef<null | Promise<UnwrappedPromiseType<F>>>;
 } => {
-  type _PP = P extends () => infer PPP ? PPP : (P extends ComputedRef<unknown> ? UnwrapRef<P> : P);
+  type T = UnwrappedPromiseType<F>;
 
-  const enabled: Ref<boolean> | (() => boolean) = enabledArg ?? ref(true);
+  type _PP = UnwrapParams<P>;
+
+  const enabled: Enabled = enabledArg ?? ref(true);
 
   const isPending = ref<undefined | boolean>();
 
@@ -49,7 +68,7 @@ const useAsync = <T,
 
   const onStartList: OnStartCb<_PP>[] = [];
 
-  const onEndList: OnEndCb<UnwrappedPromiseType<F>, _PP>[] = [];
+  const onEndList: OnEndCb<T, _PP>[] = [];
 
   // for legacy use case
   const d = ref<null | Promise<T>>(null);
@@ -71,7 +90,7 @@ const useAsync = <T,
   });
 
   // generate new xhr/promise
-  const _reload = (_params: RequiredParams<Z, A>) => {
+  const _reload = (_params: unknown) => {
     if (!_enabled.value) {
       return null;
     }
@@ -86,16 +105,12 @@ const useAsync = <T,
     isPending.value = true;
     error.value = null;
 
-    // possible to call with rest params
-    const funcDefault = func as ((args: RequiredParams<Z, A>) => Promise<T>);
-
-    // call with only one param
-    const funcRest = func as ((...args: A) => Promise<T>);
+    const _func = func as (...args: unknown[]) => Promise<T>;
 
     // it's possible to pass multiple args by using an array as params
     d.value = Array.isArray(_params)
-      ? funcRest(...(_params as unknown as A))
-      : funcDefault(_params);
+      ? _func(..._params)
+      : _func(_params);
 
     d.value.catch((_error) => {
       error.value = _error || null;
@@ -105,7 +120,7 @@ const useAsync = <T,
     d.value.then((res) => {
       data.value = res;
 
-      onEndList.forEach((cb) => cb(res as UnwrappedPromiseType<F>, wrapParams.value));
+      onEndList.forEach((cb) => cb(res, wrapParams.value));
     });
 
     d.value.finally(() => {
@@ -125,7 +140,7 @@ const useAsync = <T,
     onStartList.push(cb);
   };
 
-  const onEnd = (cb: OnEndCb<UnwrappedPromiseType<F>, _PP>) => {
+  const onEnd = (cb: OnEndCb<T, _PP>) => {
     onEndList.push(cb);
   };
 

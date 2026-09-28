@@ -134,6 +134,7 @@ const typescriptConfig = [
             },
           },
         ],
+      'tcy/consistent-const-scoping': 'off',
     },
   },
   {
