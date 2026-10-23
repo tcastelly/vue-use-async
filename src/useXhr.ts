@@ -291,7 +291,10 @@ export default function<
       onStart: (cb) => onStartList.push(cb),
       onEnd: (cb) => onEndList.push(cb),
       error,
-      abort: () => xhrPromise.value?.abortXhr(),
+      abort: () => {
+        console.log('abort from external', xhr.url);
+        return xhrPromise.value?.abortXhr();
+      },
       promise: computed(async () => xhrPromise.value || new Promise(() => {
       })),
       reload,
