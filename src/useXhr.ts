@@ -203,6 +203,7 @@ export default function<
       }
 
       if (isPending.value) {
+        console.log(url, isPending.value);
         xhr.abort();
       }
 
