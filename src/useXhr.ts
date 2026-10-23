@@ -203,7 +203,7 @@ export default function<
       }
 
       if (isPending.value) {
-        console.log(url, isPending.value);
+        console.log('abort from GET func', url, isPending.value);
         xhr.abort();
       }
 
@@ -376,6 +376,7 @@ export default function<
     onBeforeUnmount(() => {
       xhrList.value.forEach((xhr) => {
         if (xhr.isPending) {
+          console.log('abort from umount', xhr.url);
           xhr.abort();
         }
       });
